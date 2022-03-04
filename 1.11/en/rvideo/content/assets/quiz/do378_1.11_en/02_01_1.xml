@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<quiz>
+	<quizHeading><![CDATA[Quiz: Describing Quarkus as a Microservice Runtime]]></quizHeading>
+	<question type="mmcq" time="">
+		<questionText><![CDATA[Which three of the following standards were the base of the MicroProfile 1.0 release? (Choose three.)]]></questionText>
+		<options>
+			<option data-correct="false"><![CDATA[JPA.]]></option>
+			<option data-correct="true"><![CDATA[CDI.]]></option>
+			<option data-correct="true"><![CDATA[JAX-RS.]]></option>
+			<option data-correct="true"><![CDATA[JSON-P.]]></option>
+		</options>
+	</question>
+	<question type="mmcq" time="">
+		<questionText><![CDATA[Which two of the following statements about the development process in Quarkus are true. (Chose two.)]]></questionText>
+		<options>
+			<option data-correct="false"><![CDATA[Each library is configured in its own configuration file.]]></option>
+			<option data-correct="true"><![CDATA[Provides live code changes in developer mode.]]></option>
+			<option data-correct="true"><![CDATA[Integrates native build for included libraries.]]></option>
+		</options>
+	</question>
+	<question type="mcq" time="">
+		<questionText><![CDATA[Why is memory usage so important in a cloud-native environment?]]></questionText>
+		<options>
+			<option data-correct="false"><![CDATA[As an application scales out, the number of developers grows.]]></option>
+			<option data-correct="true"><![CDATA[As an application scales out, the memory usage is multiplied.]]></option>
+			<option data-correct="false"><![CDATA[As an application scales out, the likelihood of a memory leak increases.]]></option>
+			<option data-correct="false"><![CDATA[Memory usage is not that important in a cloud-native environment.]]></option>
+		</options>
+	</question>
+	<question type="mmcq" time="">
+		<questionText><![CDATA[Which two of the following statements are benefits of a shorter startup time in a cloudnative environment? (Choose two.)]]></questionText>
+		<options>
+			<option data-correct="true"><![CDATA[A shorter startup time can decrease application down time.]]></option>
+			<option data-correct="false"><![CDATA[A shorter startup time can increase application down time.]]></option>
+			<option data-correct="true"><![CDATA[A shorter startup time reduces overall deployment time.]]></option>
+			<option data-correct="false"><![CDATA[A shorter startup time can increase developer productivity.]]></option>
+		</options>
+	</question>
+	<question type="mcq" time="">
+		<questionText><![CDATA[How does Ahead of Time compilation (AoT) reduce memory usage?]]></questionText>
+		<options>
+			<option data-correct="false"><![CDATA[AoT does not reduce memory usage.]]></option>
+			<option data-correct="false"><![CDATA[AoT removes classes until they are needed.]]></option>
+			<option data-correct="false"><![CDATA[AoT uses a special JVM.]]></option>
+			<option data-correct="true"><![CDATA[AoT removes unnecessary classes.]]></option>
+		</options>
+	</question>
+	<checkButtonText><![CDATA[Check]]></checkButtonText>
+	<resetButtonText><![CDATA[Reset]]></resetButtonText>
+	<showButtonText><![CDATA[Show Solution]]></showButtonText>
+	<resumeButtonText><![CDATA[Resume Video]]></resumeButtonText>
+	
+	<instructionData><![CDATA[Choose the correct answers to the following questions:]]></instructionData>
+</quiz>

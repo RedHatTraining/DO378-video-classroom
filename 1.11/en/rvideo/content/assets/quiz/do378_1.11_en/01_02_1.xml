@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<quiz>
+	<quizHeading><![CDATA[Quiz: Describing Microservice Architecture Patterns]]></quizHeading>
+	<question type="mmcq" time="">
+		<questionText><![CDATA[Which three of the following statements about an asynchronous message-based communication in microservices are true? (Choose three.)]]></questionText>
+		<options>
+			<option data-correct="true"><![CDATA[Microservices can use the AMQP or MQTT protocols for asynchronous message-based communication.]]></option>
+			<option data-correct="true"><![CDATA[An advantage of asynchronous communication is that messages can be buffered using message queues.]]></option>
+			<option data-correct="false"><![CDATA[In asynchronous communication, clients must be available to receive messages to avoid losing the messages.]]></option>
+			<option data-correct="true"><![CDATA[Using an asynchronous communication mechanism such as AMQP requires the use of a message broker or other similar middleware integration technology.]]></option>
+		</options>
+	</question>
+	<question type="mmcq" time="">
+		<questionText><![CDATA[Which three of the following are microservice architecture patterns? (Choose three.)]]></questionText>
+		<options>
+			<option data-correct="true"><![CDATA[Fault tolerance.]]></option>
+			<option data-correct="true"><![CDATA[Service security.]]></option>
+			<option data-correct="true"><![CDATA[Request tracing.]]></option>
+			<option data-correct="false"><![CDATA[Self-serving deployments.]]></option>
+		</options>
+	</question>
+	<question type="mmcq" time="">
+		<questionText><![CDATA[Which two of the following statements regarding the fault tolerance patterns are true? (Choose two.)]]></questionText>
+		<options>
+			<option data-correct="false"><![CDATA[The circuit breaker pattern has three distinct states: open, half-open, and broken.]]></option>
+			<option data-correct="true"><![CDATA[While in the half-open state, a circuit breaker periodically allows service calls to execute to check the health of the dependent service.]]></option>
+			<option data-correct="true"><![CDATA[The bulkhead pattern allows you to allocate a dedicated thread pool or a semaphore for each dependent service call, limiting the number of concurrent calls to the service.]]></option>
+			<option data-correct="false"><![CDATA[The bulkhead pattern is used as a layer of abstraction between a client and services.]]></option>
+		</options>
+	</question>
+	<question type="mmcq" time="">
+		<questionText><![CDATA[Which two of the following statements about distributed tracing and aggregated logging are correct? (Choose two.)]]></questionText>
+		<options>
+			<option data-correct="false"><![CDATA[OpenTracing API is a popular tracing implementation designed for monolithic applications.]]></option>
+			<option data-correct="true"><![CDATA[Distributed tracing tools collect the trace data for storage and visualization.]]></option>
+			<option data-correct="false"><![CDATA[Distributed tracing is only useful during development.]]></option>
+			<option data-correct="true"><![CDATA[OpenTracing API is an open standard for tracing with implementations in multiple languages.]]></option>
+		</options>
+	</question>
+	<checkButtonText><![CDATA[Check]]></checkButtonText>
+	<resetButtonText><![CDATA[Reset]]></resetButtonText>
+	<showButtonText><![CDATA[Show Solution]]></showButtonText>
+	<resumeButtonText><![CDATA[Resume Video]]></resumeButtonText>
+	
+	<instructionData><![CDATA[Choose the correct answers to the following questions.]]></instructionData>
+</quiz>

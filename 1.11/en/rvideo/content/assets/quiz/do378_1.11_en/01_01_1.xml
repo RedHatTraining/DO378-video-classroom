@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<quiz>
+	<quizHeading><![CDATA[Quiz: Describing Microservices]]></quizHeading>
+	<question type="mcq" time="">
+		<questionText><![CDATA[Which of the following statements about monolithic applications is true.]]></questionText>
+		<options>
+			<option data-correct="false"><![CDATA[A monolithic application is always packaged into a .tar.gz file.]]></option>
+			<option data-correct="false"><![CDATA[A monolithic application is a lightweight application, which is divided into a multiple services and a client tier.]]></option>
+			<option data-correct="true"><![CDATA[Monolithic applications are often complex to build and can be difficult to maintain.]]></option>
+			<option data-correct="false"><![CDATA[Individual pieces of a monolithic application are typically developed by individual small autonomous teams.]]></option>
+		</options>
+	</question>
+	<question type="mmcq" time="">
+		<questionText><![CDATA[Which two of the following statements about microservices are true? (Choose two).]]></questionText>
+		<options>
+			<option data-correct="false"><![CDATA[Microservices are managed centrally, and typically share one common database.]]></option>
+			<option data-correct="false"><![CDATA[Microservices are typically deployed on full-fledged application servers, which manage their lifecycle.]]></option>
+			<option data-correct="true"><![CDATA[Microservices are self-contained, independent services.]]></option>
+			<option data-correct="true"><![CDATA[Microservices within a single organization can be built using different programming languages.]]></option>
+		</options>
+	</question>
+	<question type="mmcq" time="">
+		<questionText><![CDATA[A company named "At Your Doorstep Inc." is considering using microservice architecture for their new grocery delivery application. They have two small teams to manage IT development and operations in seven different locations. Which two of the following statements support their decision in favor of microservices? (Choose two.)]]></questionText>
+		<options>
+			<option data-correct="false"><![CDATA[All order operations must be centralized in a single data center.]]></option>
+			<option data-correct="true"><![CDATA[Microservices can be built for each business operation.]]></option>
+			<option data-correct="false"><![CDATA[Microservices must be deployed manually to ensure there are no errors.]]></option>
+			<option data-correct="true"><![CDATA[Individual services in a microservice-based application can go live quickly by using continuous integration and delivery.]]></option>
+		</options>
+	</question>
+	<question type="mcq" time="">
+		<questionText><![CDATA[Which of the following statements regarding quicker development of microservices is true.]]></questionText>
+		<options>
+			<option data-correct="false"><![CDATA[Microservices are developed and managed by large teams to support quicker development.]]></option>
+			<option data-correct="false"><![CDATA[A separate development and operations team is key to quicker development.]]></option>
+			<option data-correct="true"><![CDATA[Individual microservices are often developed, maintained, and operated by small teams.]]></option>
+			<option data-correct="false"><![CDATA[All microservices in an application are tested collectively, which reduces the testing time.]]></option>
+		</options>
+	</question>
+	<question type="mmcq" time="">
+		<questionText><![CDATA[Which of the two following statements about microservices architecture are correct? (Choose two.)]]></questionText>
+		<options>
+			<option data-correct="false"><![CDATA[Microservice applications are required to be deployed on the same physical host.]]></option>
+			<option data-correct="true"><![CDATA[Microservices architecture supports high availability of individual microservices.]]></option>
+			<option data-correct="false"><![CDATA[Microservices can not be used if a company is embracing DevOps.]]></option>
+			<option data-correct="true"><![CDATA[Microservices are designed using a bounded context, which can communicate with other bounded contexts.]]></option>
+		</options>
+	</question>
+	<checkButtonText><![CDATA[Check]]></checkButtonText>
+	<resetButtonText><![CDATA[Reset]]></resetButtonText>
+	<showButtonText><![CDATA[Show Solution]]></showButtonText>
+	<resumeButtonText><![CDATA[Resume Video]]></resumeButtonText>
+	
+	<instructionData><![CDATA[Choose the correct answers to the following questions.]]></instructionData>
+</quiz>

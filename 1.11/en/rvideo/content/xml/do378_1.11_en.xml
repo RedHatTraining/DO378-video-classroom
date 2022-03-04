@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Days>
+    <Day id="2" name="Day 1">
+		<Chapter name="Introduction">
+			<video name="Course Introduction" uuid="ec805628-c73f-4f6b-8515-e3a64476ac59" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_00_01_Course_Introduction"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_00_01_Course_Introduction"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Orientation to the Classroom Environment" uuid="57372987-1b25-48b9-a8d2-ba9301fcd37f" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_00_02_Orientation_to_the_Classroom_Environment"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_00_02_Orientation_to_the_Classroom_Environment"><![CDATA[]]></videothumb>
+			</video>
+		</Chapter>
+		<Chapter name="Describing a Microservice Architecture">
+			<video name="Describing Microservices" uuid="9896f986-d4d7-4193-ad2e-4c23a0ab9697" data-duration="60" has-quiz="true" quiz-time="1022" quiz-name="01_01">
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_01_01_Describing_Microservices"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_01_01_Describing_Microservices"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Describing Microservice Architecture Patterns" uuid="2fbf32cb-a65f-4f1c-89ce-ce6eab41151a" data-duration="60" has-quiz="true" quiz-time="1022" quiz-name="01_02">
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_01_02_Describing_Microservice_Architecture_Patterns"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_01_02_Describing_Microservice_Architecture_Patterns"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Guided Exercise - Verifying OpenShift Credentials" uuid="8d07ce5d-8133-432e-adf5-777caa80a76f" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_01_03_Guided_Exercise_Verifying_OpenShift_Credentials"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_01_03_Guided_Exercise_Verifying_OpenShift_Credentials"><![CDATA[]]></videothumb>
+			</video>
+			<quizzes>
+				<quiz data-id="01_01_1"><![CDATA[Describing Microservices]]></quiz>
+				<quiz data-id="01_02_1"><![CDATA[Describing Microservice Architecture Patterns]]></quiz>
+			</quizzes>
+			<references> 
+				<reference><![CDATA[<pre><strong>What are Microservices?</strong><br><a href="http://microservices.io/">http://microservices.io/</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Microservices patterns by Chris Richardson Manning Publications</strong><br><a href="https://www.manning.com/books/microservices-patterns">https://www.manning.com/books/microservices-patterns</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Eclipse Microprofile Fault Tolerance Specifications</strong><br><a href="https://download.eclipse.org/microprofile/microprofile-fault-tolerance-2.1.1/microprofile-fault-tolerance-spec.html">https://download.eclipse.org/microprofile/microprofile-fault-tolerance-2.1.1/microprofile-fault-tolerance-spec.html</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>SmallRye Fault Tolerance</strong><br><a href="https://github.com/smallrye/smallrye-fault-tolerance">https://github.com/smallrye/smallrye-fault-tolerance</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Jaeger site</strong><br><a href="https://www.jaegertracing.io/">https://www.jaegertracing.io/</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Prometheus documentation</strong><br><a href="https://prometheus.io/docs/">https://prometheus.io/docs/</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Grafana</strong><br><a href="https://grafana.com/">https://grafana.com/</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>OpenTracing project</strong><br><a href="">https://opentracing.io/</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>OpenTelemetry project.</strong><br><a href="https://opentelemetry.io/">https://opentelemetry.io/</a></pre>]]></reference>
+			</references>
+		</Chapter>
+		<Chapter name="Implementing a Microservice with Quarkus">
+			<video name="Describing Quarkus as a Microservice Runtime" uuid="e8d8a25b-6682-49d7-8750-5ce75c6bafa3" data-duration="60" has-quiz="true" quiz-time="1022" quiz-name="02_01">
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_02_01_Describing_Quarkus_as_a_Microservice_Runtime"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_02_01_Describing_Quarkus_as_a_Microservice_Runtime"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Implementing a JSON Microservice with CDI and JAX-RS" uuid="1c89611b-1879-480b-8dfa-55699a390253" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_02_02_Implementing_a_JSON_Microservice_with_CDI_and_JAX-RS"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_02_02_Implementing_a_JSON_Microservice_with_CDI_and_JAX-RS"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Guided Exercise - Implementing a RESTful Microservice" uuid="643124a0-ede4-4bdc-8513-c0f5f9f0c3b4" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_02_03_Guided_Exercise_Implementing_a_RESTful_Microservice"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_02_03_Guided_Exercise_Implementing_a_RESTful_Microservice"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Persisting Data with Panache" uuid="e57aefad-05b2-4c90-8d75-6edc8b92279a" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_02_04_Persisting_Data_with_Panache"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_02_04_Persisting_Data_with_Panache"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Guided Exercise - Persisting Data with Panache" uuid="9abf29b4-e55e-45d8-b0a9-3ba2cf7abeb4" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_02_05_Guided_Exercise_Persisting_Data_with_Panache"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_02_05_Guided_Exercise_Persisting_Data_with_Panache"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Lab - Implementing a Microservice with Quarkus" uuid="1a533689-f3fc-4310-b9a0-6bdcfd282864" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_02_06_Lab_Implementing_a_Microservice_with_Quarkus"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_02_06_Lab_Implementing_a_Microservice_with_Quarkus"><![CDATA[]]></videothumb>
+			</video>
+			<quizzes>
+				<quiz data-id="02_01_1"><![CDATA[Describing Quarkus as a Microservice Runtime]]></quiz>
+			</quizzes>
+			<references> 
+				<reference><![CDATA[<pre><strong>Product Documentation for Red Hat build of Quarkus</strong><br><a href="https://access.redhat.com/documentation/en-us/red_hat_build_of_quarkus/1.11">https://access.redhat.com/documentation/en-us/red_hat_build_of_quarkus/1.11</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Microprofile</strong><br><a href="https://microprofile.io/">https://microprofile.io/</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Quarkus (Upstream open source project)</strong><br><a href="https://quarkus.io/">https://quarkus.io/</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>CDI 2.0 specification</strong><br><a href="https://docs.jboss.org/cdi/spec/2.0/cdi-spec.html">https://docs.jboss.org/cdi/spec/2.0/cdi-spec.html</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>JAX-RS 2.1 specification</strong><br><a href="https://jcp.org/en/jsr/detail?id=370">https://jcp.org/en/jsr/detail?id=370</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>JSON Binding 1.0 Users Guide</strong><br><a href="https://javaee.github.io/jsonb-spec/users-guide.html">https://javaee.github.io/jsonb-spec/users-guide.html</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>VSCodium</strong><br><a href="https://vscodium.com/">https://vscodium.com/</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Jakarta Persistance</strong><br><a href="https://en.wikipedia.org/wiki/Jakarta_Persistence">https://en.wikipedia.org/wiki/Jakarta_Persistence</a></pre>]]></reference>
+			</references>
+		</Chapter>
+	</Day>
+	<Day id="3" name="Day 2">
+		<Chapter name="Deploying Microservice-based Applications">
+			<video name="Describing a Microservice Application" uuid="787d7e49-2fe7-4182-8e3c-5be1d0be1434" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_03_01_Describing_a_Microservice_Application"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_03_01_Describing_a_Microservice_Application"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Guided Exercise - Describing a Microservice Application" uuid="413636b8-abb7-4cd1-81aa-bc404275fcc8" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_03_02_Guided_Exercise_Describing_a_Microservice_Application"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_03_02_Guided_Exercise_Describing_a_Microservice_Application"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Deploying Microservices in Red Hat OpenShift Container Platform" uuid="34a217c7-e936-4fca-85fc-1ba820fbdde5" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_03_03_Deploying_Microservices_in_Red_Hat_OpenShift_Container_Platform"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_03_03_Deploying_Microservices_in_Red_Hat_OpenShift_Container_Platform"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Guided Exercise - Deploying Microservices in Red Hat OpenShift Container Platform" uuid="16251902-5853-4279-86bc-1964582aee0e" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_03_04_Guided_Exercise_Deploying_Microservices_in_Red_Hat_OpenShift_Container_Platform"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_03_04_Guided_Exercise_Deploying_Microservices_in_Red_Hat_OpenShift_Container_Platform"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Deploying Quarkus Applications in Red Hat OpenShift Container Platform" uuid="1f19614e-aa42-4f0f-a1dc-83b035c8fdd2" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_03_05_Deploying_Quarkus_Applications_in_Red_Hat_OpenShift_Container_Platform"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_03_05_Deploying_Quarkus_Applications_in_Red_Hat_OpenShift_Container_Platform"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Guided Exercise - Deploying Quarkus Applications in Red Hat OpenShift Container Platform" uuid="7aaffe66-2c70-47ac-864a-161a88b76abf" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_03_06_Guided_Exercise_Deploying_Quarkus_Applications_in_Red_Hat_OpenShift_Container_Platform"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_03_06_Guided_Exercise_Deploying_Quarkus_Applications_in_Red_Hat_OpenShift_Container_Platform"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Lab - Deploying Microservice-based Applications" uuid="28c46860-745b-4e4c-90a3-fffdc2203fab" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_03_07_Lab_Deploying_Microservice-based_Applications"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_03_07_Lab_Deploying_Microservice-based_Applications"><![CDATA[]]></videothumb>
+			</video>
+			<references> 
+				<reference><![CDATA[<pre><strong>The Quarkus Conference application is based on the MicroProfile Conference application</strong><br><a href="https://github.com/eclipse/microprofile-conference/">https://github.com/eclipse/microprofile-conference/</a></pre>]]></reference>
+				<reference><![CDATA[<pre>For more information, refer to the Product Documentation for Red Hat OpenShift Container Platform at<br><a href="https://access.redhat.com/documentation/en-us/openshift_container_platform/4.6">https://access.redhat.com/documentation/en-us/openshift_container_platform/4.6</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Deploying your Quarkus applications to OpenShift</strong><br><a href="https://access.redhat.com/documentation/en-us/red_hat_build_of_quarkus/1.11/html-single/deploying_your_quarkus_applications_to_openshift/index">https://access.redhat.com/documentation/en-us/red_hat_build_of_quarkus/1.11/html-single/deploying_your_quarkus_applications_to_openshift/index</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Eclipse JKube</strong><br><a href="https://www.eclipse.org/jkube/">https://www.eclipse.org/jkube/</a></pre>]]></reference>
+			</references>
+		</Chapter>
+		<Chapter name="Building Microservice Applications with Quarkus">
+			<video name="Injecting Configuration Data" uuid="3f7a1082-d08d-4c1c-bba2-f81b2a0e535b" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_04_01_Injecting_Configuration_Data"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_04_01_Injecting_Configuration_Data"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Guided Exercise - Injecting Configuration Data" uuid="06a108fd-4b08-455d-a846-dbc02b9b2971" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_04_02_Guided_Exercise_Injecting_Configuration_Data"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_04_02_Guided_Exercise_Injecting_Configuration_Data"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Implementing Feature Toggles" uuid="633cbf1e-03cd-4299-9502-c10b52c9ad44" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_04_03_Implementing_Feature_Toggles"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_04_03_Implementing_Feature_Toggles"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Guided Exercise - Implementing Feature Toggles" uuid="c7437052-fbc1-496d-9a7c-03f769d79dce" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_04_04_Guided_Exercise_Implementing_Feature_Toggles"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_04_04_Guided_Exercise_Implementing_Feature_Toggles"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Connecting Multiple Services" uuid="23b7ecb0-c41f-4141-9bc1-db0bd351ccad" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_04_05_Connecting_Multiple_Services"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_04_05_Connecting_Multiple_Services"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Guided Exercise - Connecting Multiple Services" uuid="b5799c48-2226-4b7f-a282-0ad1bd70fbcf" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_04_06_Guided_Exercise_Connecting_Multiple_Services"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_04_06_Guided_Exercise_Connecting_Multiple_Services"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Lab - Building Microservice Applications with Quarkus" uuid="3861cd04-b582-4803-9e3c-b44a856693fa" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_04_07_Lab_Building_Microservice_Applications_with_Quarkus"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_04_07_Lab_Building_Microservice_Applications_with_Quarkus"><![CDATA[]]></videothumb>
+			</video>
+			<references> 
+				<reference><![CDATA[<pre><strong>Configuring your Quarkus applications</strong><br><a href="https://access.redhat.com/documentation/en-us/red_hat_build_of_quarkus/1.11/html-single/configuring_your_quarkus_applications/index">https://access.redhat.com/documentation/en-us/red_hat_build_of_quarkus/1.11/html-single/configuring_your_quarkus_applications/index</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Configuration For MicroProfile</strong><br><a href="https://microprofile.io/project/eclipse/microprofile-config">https://microprofile.io/project/eclipse/microprofile-config</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Feature Toggle</strong><br><a href="https://en.wikipedia.org/wiki/Feature_toggle">https://en.wikipedia.org/wiki/Feature_toggle</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Feature Toggles, by Martin Fowler</strong><br><a href="https://martinfowler.com/articles/feature-toggles.html">https://martinfowler.com/articles/feature-toggles.html</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Canary Release</strong><br><a href="https://martinfowler.com/bliki/CanaryRelease.html">https://martinfowler.com/bliki/CanaryRelease.html</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>RESTEasy</strong><br><a href="https://resteasy.github.io/">https://resteasy.github.io/</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Eclipse MicroProfileRest Client</strong><br><a href="https://github.com/eclipse/microprofile-rest-client">https://github.com/eclipse/microprofile-rest-client</a></pre>]]></reference>
+			</references>
+		</Chapter>
+		<Chapter name="Implementing Fault Tolerance">
+			<video name="Applying Fault Tolerance Policies to a Microservice" uuid="81b05612-32e8-4c1f-96fa-607d1820b1a1" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_05_01_Applying_Fault_Tolerance_Policies_to_a_Microservice"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_05_01_Applying_Fault_Tolerance_Policies_to_a_Microservice"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Guided Exercise - Applying Fault Tolerance Policies" uuid="12c11e70-9fd6-44af-8981-7b3bb458fa55" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_05_02_Guided_Exercise_Applying_Fault_Tolerance_Policies"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_05_02_Guided_Exercise_Applying_Fault_Tolerance_Policies"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Implementing a Health Check Monitored by OpenShift" uuid="ff66a48e-b07a-4235-baf5-2a6108d64f72" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_05_03_Implementing_a_Health_Check_Monitored_by_OpenShift"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_05_03_Implementing_a_Health_Check_Monitored_by_OpenShift"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Guided Exercise - Implementing a Health Check" uuid="bfec4686-8006-4bd8-8057-16617483f4fe" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_05_04_Guided_Exercise_Implementing_a_Health_Check"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_05_04_Guided_Exercise_Implementing_a_Health_Check"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Lab - Implementing Fault Tolerance" uuid="eaba13ba-b17d-4052-b5e6-38b61c014f23" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_05_05_Lab_Implementing_Fault_Tolerance"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_05_05_Lab_Implementing_Fault_Tolerance"><![CDATA[]]></videothumb>
+			</video>
+			<references> 
+				<reference><![CDATA[<pre><strong>MicroProfile Fault Tolerance Specifications</strong><br><a href="https://download.eclipse.org/microprofile/microprofile-fault-tolerance-2.1.1/microprofile-fault-tolerance-spec.html">https://download.eclipse.org/microprofile/microprofile-fault-tolerance-2.1.1/microprofile-fault-tolerance-spec.html</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>SmallRye Fault Tolerance repository</strong><br><a href="https://github.com/smallrye/smallrye-fault-tolerance">https://github.com/smallrye/smallrye-fault-tolerance</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Red Hat OpenShift Service Mesh product page</strong><br><a href="https://www.openshift.com/learn/topics/service-mesh">https://www.openshift.com/learn/topics/service-mesh</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>MicroProfile Health</strong><br><a href="https://download.eclipse.org/microprofile/microprofile-health-2.2/microprofile-health-spec.html">https://download.eclipse.org/microprofile/microprofile-health-2.2/microprofile-health-spec.html</a></pre>]]></reference>
+			</references>
+		</Chapter>
+		
+	</Day>
+	
+	<Day id="4" name="Day 3">
+		<Chapter name="Building and Deploying Native Quarkus Applications">
+			<video name="Building Native Applications with Quarkus" uuid="a6fce051-4d5f-41f1-87f4-514564121a90" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_06_01_Building_Native_Applications_with_Quarkus"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_06_01_Building_Native_Applications_with_Quarkus"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Guided Exercise - Building Native Applications with Quarkus" uuid="1dee9407-7a12-458e-848d-f719bdf2ee23" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_06_02_Guided_Exercise_Building_Native_Applications_with_Quarkus"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_06_02_Guided_Exercise_Building_Native_Applications_with_Quarkus"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Containerizing Quarkus Native Applications" uuid="5487ce70-5300-48dc-8cf0-a60f4485e906" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_06_03_Containerizing_Quarkus_Native_Applications"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_06_03_Containerizing_Quarkus_Native_Applications"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Guided Exercise - Containerizing Quarkus Native Applications" uuid="aee64672-866f-4370-9561-15b379a9da9b" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_06_04_Guided_Exercise_Containerizing_Quarkus_Native_Applications"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_06_04_Guided_Exercise_Containerizing_Quarkus_Native_Applications"><![CDATA[]]></videothumb>
+			</video>
+			<references> 
+				<reference><![CDATA[<pre>For more information on native executables, refer to the Product Documentation for Red Hat Build of Quarkus at<br><a href="https://access.redhat.com/documentation/en-us/red_hat_build_of_quarkus/1.7/html-single/compiling_your_quarkus_applications_to_native_executables/index">https://access.redhat.com/documentation/en-us/red_hat_build_of_quarkus/1.7/html-single/compiling_your_quarkus_applications_to_native_executables/index</a></pre>]]></reference>
+				<reference><![CDATA[<pre>For more information on deploying native executables to OpenShift, refer to the Product Documentation for Red Hat Build of Quarkus at<br><a href="https://access.redhat.com/documentation/en-us/red_hat_build_of_quarkus/1.11/html-single/compiling_your_quarkus_applications_to_native_executables/index#proc-creating-container-openshift-build_quarkus-building-native-executable">https://access.redhat.com/documentation/en-us/red_hat_build_of_quarkus/1.11/html-single/compiling_your_quarkus_applications_to_native_executables/index#proc-creating-container-openshift-build_quarkus-building-native-executable</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Source2Image</strong><br><a href="https://github.com/openshift/source-to-image">https://github.com/openshift/source-to-image</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Jib</strong><br><a href="https://github.com/GoogleContainerTools/jib">https://github.com/GoogleContainerTools/jib</a></pre>]]></reference>
+			</references>
+		</Chapter>
+		<Chapter name="Testing Microservices">
+			<video name="Testing Quarkus Microservices" uuid="d2137c24-cf06-48e9-9a1a-4b2654da6175" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_07_01_Testing_Quarkus_Microservices"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_07_01_Testing_Quarkus_Microservices"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Guided Exercise - Testing Quarkus Microservices" uuid="b6c861e9-f261-4afb-9cc7-6bc7cf2345c4" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_07_02_Guided_Exercise_Testing_Quarkus_Microservices"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_07_02_Guided_Exercise_Testing_Quarkus_Microservices"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Testing Microservices with Mock Frameworks" uuid="2f4db836-9626-43bb-ab34-276ec8482322" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_07_03_Testing_Microservices_with_Mock_Frameworks"><![CDATA[]]></subtitle>
+				<videothumb name=""><![CDATA[]]></videothumb>
+			</video>
+			<video name="Guided Exercise - Testing Microservices with Mock Frameworks" uuid="923e4331-3574-46cc-9ff7-27c6bae6296b" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_07_04_Guided_Exercise_Testing_Microservices_with_Mock_Frameworks"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_07_04_Guided_Exercise_Testing_Microservices_with_Mock_Frameworks"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Lab - Testing Microservices" uuid="2fb2bbe4-eb5e-4c5c-9d5c-f7363082c23b" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_07_05_Lab_Testing_Microservices"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_07_05_Lab_Testing_Microservices"><![CDATA[]]></videothumb>
+			</video>
+			<references> 
+				<reference><![CDATA[<pre>For more information on testing with Quarkus, refer to the Product Documentation for Red Hat Build of Quarkus at<br><a href="https://access.redhat.com/documentation/en-us/red_hat_build_of_quarkus/1.11/html-single/testing_your_quarkus_applications/index">https://access.redhat.com/documentation/en-us/red_hat_build_of_quarkus/1.11/html-single/testing_your_quarkus_applications/index</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>JUnit 5 official page</strong><br><a href="https://junit.org/junit5/">https://junit.org/junit5/</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>REST-assured site</strong><br><a href="https://github.com/rest-assured/rest-assured">https://github.com/rest-assured/rest-assured</a></pre>]]></reference>
+				<reference><![CDATA[<pre>For more information on Quarkus test mocks, refer to the Product Documentation for Red Hat Build of Quarkus at<br><a href="https://access.redhat.com/documentation/en-us/red_hat_build_of_quarkus/1.11/html-single/testing_your_quarkus_applications/index#proc-test-mocking-objects">https://access.redhat.com/documentation/en-us/red_hat_build_of_quarkus/1.11/html-single/testing_your_quarkus_applications/index#proc-test-mocking-objects</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Mockito Home Page</strong><br><a href="https://site.mockito.org/">https://site.mockito.org/</a></pre>]]></reference>
+			</references>
+		</Chapter>
+		<Chapter name="Securing Microservices Communication">
+			<video name="Implementing Communication Security in Quarkus Microservices" uuid="59a3ff35-1b32-4487-aa83-dac7aba8cbed" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_08_01_Implementing_Communication_Security_in_Quarkus_Microservices"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_08_01_Implementing_Communication_Security_in_Quarkus_Microservices"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Guided Exercise - Implementing Communication Security in Quarkus Microservices" uuid="0556f302-0eab-4e03-a7dc-cf320e985b63" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_08_02_Guided_Exercise_Implementing_Communication_Security_in_Quarkus_Microservices"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_08_02_Guided_Exercise_Implementing_Communication_Security_in_Quarkus_Microservices"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Authenticating and Authorizing Requests" uuid="872c97b8-39c7-4d69-ae81-14366319375a" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_08_03_Authenticating_and_Authorizing_Requests"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_08_03_Authenticating_and_Authorizing_Requests"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Guided Exercise - Authenticating and Authorizing Requests" uuid="a60aa8f2-d1fd-4832-b302-aa4916bfb303" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_08_04_Guided_Exercise_Authenticating_and_Authorizing_Requests"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_08_04_Guided_Exercise_Authenticating_and_Authorizing_Requests"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Lab - Securing Microservices" uuid="41fd4a86-af15-435d-b713-6c3ad6cc2b7f" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_08_05_Lab_Securing_Microservices"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_08_05_Lab_Securing_Microservices"><![CDATA[]]></videothumb>
+			</video>
+			<references> 
+				<reference><![CDATA[<pre><strong>Cross-Origin Resource Sharing (CORS)</strong><br><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>CORS filter in Quarkus</strong><br><a href="https://quarkus.io/version/1.11/guides/http-reference#cors-filter">https://quarkus.io/version/1.11/guides/http-reference#cors-filter</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Using TLS with Quarkus native executables</strong><br><a href="https://quarkus.io/version/1.11/guides/native-and-ssl">https://quarkus.io/version/1.11/guides/native-and-ssl</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Learn how to do Mutual TLS in Quarkus apps</strong><br><a href="https://quarkus.io/blog/quarkus-mutual-tls/">https://quarkus.io/blog/quarkus-mutual-tls/</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Quarkus mTLS example</strong><br><a href="https://github.com/openlab-red/quarkus-mtls-quickstart">https://github.com/openlab-red/quarkus-mtls-quickstart</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Difference Between a Java Keystore and a Truststore</strong><br><a href="https://www.baeldung.com/java-keystore-truststore-difference">https://www.baeldung.com/java-keystore-truststore-difference</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Difference between openssl and keytool</strong><br><a href="https://security.stackexchange.com/questions/98282/difference-between-openssl-and-keytool">https://security.stackexchange.com/questions/98282/difference-between-openssl-and-keytool</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Red Hat OpenShift Service Mesh product page</strong><br><a href="https://access.redhat.com/documentation/en-us/openshift_container_platform/4.6/html-single/service_mesh/index">https://access.redhat.com/documentation/en-us/openshift_container_platform/4.6/html-single/service_mesh/index</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Istio documentation</strong><br><a href="https://istio.io/latest/docs/">https://istio.io/latest/docs/</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Quarkus - Security Architecture and Guides</strong><br><a href="https://quarkus.io/version/1.11/guides/security">https://quarkus.io/version/1.11/guides/security</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Web authentication with HttpAuthenticationMechanism</strong><br><a href="https://developer.ibm.com/languages/java/tutorials/j-javaee8-security-api-2/">https://developer.ibm.com/languages/java/tutorials/j-javaee8-security-api-2/</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>javax.annotation.security (Java™ EE 8 Specification APIs)</strong><br><a href="https://javaee.github.io/javaee-spec/javadocs/javax/annotation/security/package-summary.html">https://javaee.github.io/javaee-spec/javadocs/javax/annotation/security/package-summary.html</a></pre>]]></reference>
+			</references>
+		</Chapter>
+	</Day>
+	<Day id="6" name="Day 4">
+		<Chapter name="Monitoring Quarkus Microservices">
+			<video name="Adding Metrics to a Microservice" uuid="8fbfbd9f-46e0-4ff6-ac88-03691c86b01a" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_09_01_Adding_Metrics_to_a_Microservice"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_09_01_Adding_Metrics_to_a_Microservice"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Guided Exercise - Adding Metrics to a Microservice" uuid="2b149a7c-7e05-4eaa-998e-ccaac15f171f" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_09_02_Guided_Exercise_Adding_Metrics_to_a_Microservice"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_09_02_Guided_Exercise_Adding_Metrics_to_a_Microservice"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Tracing Requests Across Microservices" uuid="cb735fe5-2cf4-441c-9486-94c14db55f6b" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_09_03_Tracing_Requests_Across_Microservices"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_09_03_Tracing_Requests_Across_Microservices"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Guided Exercise - Tracing Requests Across Microservices" uuid="4b5beb3f-41d3-47ff-9e60-8afae92fba9f" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_09_04_Guided_Exercise_Tracing_Requests_Across_Microservices"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_09_04_Guided_Exercise_Tracing_Requests_Across_Microservices"><![CDATA[]]></videothumb>
+			</video>
+			<video name="Lab - Monitoring Microservices" uuid="21a7c1e0-ff2a-4e34-ac2f-6df6dc379be3" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_09_05_Lab_Monitoring_Microservices"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_09_05_Lab_Monitoring_Microservices"><![CDATA[]]></videothumb>
+			</video>
+			<references> 
+				<reference><![CDATA[<pre><strong>Collecting Metrics in Quarkus Applications</strong><br><a href="https://access.redhat.com/documentation/en-us/red_hat_build_of_quarkus/1.11/html-single/collecting_metrics_in_your_quarkus_applications/index">https://access.redhat.com/documentation/en-us/red_hat_build_of_quarkus/1.11/html-single/collecting_metrics_in_your_quarkus_applications/index</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Types of Metrics in Prometheus</strong><br><a href="https://prometheus.io/docs/concepts/metric_types/">https://prometheus.io/docs/concepts/metric_types/</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Grafana</strong><br><a href="https://grafana.com/">https://grafana.com/</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>Quarkus - Micrometer Metrics</strong><br><a href="https://quarkus.io/version/1.11/guides/micrometer">https://quarkus.io/version/1.11/guides/micrometer</a></pre>]]></reference>
+				<reference><![CDATA[<pre>For more information, refer to the Jaeger documentation at<br><a href="https://www.jaegertracing.io/">https://www.jaegertracing.io/</a></pre>]]></reference>
+				<reference><![CDATA[<pre><strong>OpenTracing API</strong><br><a href="https://opentracing.io/">https://opentracing.io/</a></pre>]]></reference>
+			</references>
+		</Chapter>
+		<Chapter name="Comprehensive Review of Red Hat Cloud-native Microservices Development with Quarkus">
+			<video name="Lab - Develop and Deploy Microservices on OpenShift" uuid="6bcd4ed9-4ac3-4694-9667-9f51032dd7f0" data-duration="60" >
+				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_10_01_Lab_Develop_and_Deploy_Microservices_on_OpenShift"><![CDATA[]]></subtitle>
+				<videothumb name="DO378_1-11_VC_10_01_Lab_Develop_and_Deploy_Microservices_on_OpenShift"><![CDATA[]]></videothumb>
+			</video>
+		</Chapter>
+ 	</Day>
+	<outro showtime="633"  hidetime="641" width="370" height="100" top="235" left="220">
+		<![CDATA[<a href="http://redhat.com/training" target="_blank">redhat.com/training</a>]]>
+	</outro>
+</Days>
