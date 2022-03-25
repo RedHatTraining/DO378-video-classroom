@@ -1,5 +1,1185 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:01.860
+Welcome back! In this
+chapter we are going to
 
+00:00:01.860 --> 00:00:04.185
+discuss fault tolerance and health.
+
+00:00:04.185 --> 00:00:06.855
+First, we are going to
+have a look at
+
+00:00:06.855 --> 00:00:10.800
+how to apply all the different
+fault tolerance policies that
+
+00:00:10.800 --> 00:00:14.490
+we discussed in an earlier chapter
+to your Quarkus applications
+
+00:00:14.490 --> 00:00:16.665
+and of course, try that out and practice.
+
+00:00:16.665 --> 00:00:20.850
+Then we are going to have a look at how
+to implement a health check that is
+
+00:00:20.850 --> 00:00:25.125
+monitored by OpenShift and have a
+guided exercise about that as well.
+
+00:00:25.125 --> 00:00:26.055
+As usual,
+
+00:00:26.055 --> 00:00:27.570
+at the end of the chapter,
+
+00:00:27.570 --> 00:00:30.015
+we have a challenge review lab.
+
+00:00:30.015 --> 00:00:35.760
+So we now know how to invoke
+downstream web services from
+
+00:00:35.760 --> 00:00:38.790
+our application code as a
+REST client. Now it becomes
+
+00:00:38.790 --> 00:00:42.970
+very important to be able
+to handle failures as well.
+
+00:00:43.420 --> 00:00:48.770
+Fault tolerance policy implementation
+in Quarkus use SmallRye
+
+00:00:48.770 --> 00:00:50.795
+Fault Tolerance
+
+00:00:50.795 --> 00:00:53.210
+and it is an implementation
+
+00:00:53.210 --> 00:00:56.000
+of the MicroProfile Fault
+Tolerance specification,
+
+00:00:56.000 --> 00:00:59.120
+which means that we have
+got multiple strategies
+
+00:00:59.120 --> 00:01:05.030
+available to implement
+or to handle failures.
+
+00:01:05.030 --> 00:01:07.505
+The ones that we have discussed,
+
+00:01:07.505 --> 00:01:10.400
+Circuit breaker, Bulkhead, Fallback,
+
+00:01:10.400 --> 00:01:13.880
+Retry policies and Timeouts.
+
+00:01:13.880 --> 00:01:17.300
+All have their own specific annotations as
+
+00:01:17.300 --> 00:01:21.815
+prescribed by the MicroProfile
+Fault Tolerance specification.
+
+00:01:21.815 --> 00:01:27.200
+However, the Asynchronous
+policy defined by
+
+00:01:27.200 --> 00:01:32.675
+the Fault Tolerance specification
+as well has been left behind.
+
+00:01:32.675 --> 00:01:35.300
+So it's not included for 2 reasons.
+
+00:01:35.300 --> 00:01:40.115
+First, it's not a fault tolerance
+policy and in and of itself,
+
+00:01:40.115 --> 00:01:44.540
+but it's rather a technique of
+decoupling requests from the response.
+
+00:01:44.540 --> 00:01:48.230
+And second, Quarkus already does integrate
+
+00:01:48.230 --> 00:01:52.385
+Asynchronous and reactive
+programming technique in the core,
+
+00:01:52.385 --> 00:01:56.285
+which makes Asynchronous
+an obsolete annotation.
+
+00:01:56.285 --> 00:01:58.310
+Let's take a look at all
+of these annotations
+
+00:01:58.310 --> 00:02:00.860
+one by one, starting with timeout.
+
+00:02:00.860 --> 00:02:04.575
+So timeout is meant to prevent
+
+00:02:04.575 --> 00:02:07.540
+the client code from waiting for too
+
+00:02:07.540 --> 00:02:11.215
+long to get a response from a
+web service it has invoked.
+
+00:02:11.215 --> 00:02:13.540
+It is a very simple annotation.
+
+00:02:13.540 --> 00:02:18.340
+It simply has a value which is long type,
+
+00:02:18.340 --> 00:02:22.120
+and it is the maximum amount
+of time that the request that
+
+00:02:22.120 --> 00:02:26.365
+is happening in a method may take
+before the method is interrupted.
+
+00:02:26.365 --> 00:02:31.119
+Actually, it is the maximum amount of
+time the method can take to complete
+
+00:02:31.119 --> 00:02:35.020
+because timeout is a
+method level annotation.
+
+00:02:35.020 --> 00:02:40.960
+And of course, because the value
+means nothing without a unit,
+
+00:02:40.960 --> 00:02:43.180
+we do have the ability to specify
+
+00:02:43.180 --> 00:02:46.695
+the unit as a field of
+the ChronoUnit class.
+
+00:02:46.695 --> 00:02:55.410
+By default, the timeout is
+specified in milliseconds.
+
+00:02:55.450 --> 00:02:59.195
+If the timeout is exceeded,
+
+00:02:59.195 --> 00:03:02.210
+then a TimeoutException is raised,
+
+00:03:02.210 --> 00:03:04.415
+which you can then handle with
+
+00:03:04.415 --> 00:03:08.280
+other fault tolerance annotations
+as we are about to see.
+
+00:03:08.890 --> 00:03:11.330
+If a request fails,
+
+00:03:11.330 --> 00:03:17.585
+it might be because the downstream web
+service you are invoking is flapping.
+
+00:03:17.585 --> 00:03:19.025
+It might be available,
+
+00:03:19.025 --> 00:03:21.275
+but then it might
+intermittently be unavailable and
+
+00:03:21.275 --> 00:03:23.000
+then quickly become available again.
+
+00:03:23.000 --> 00:03:25.295
+And in that case, it might help,
+
+00:03:25.295 --> 00:03:28.835
+if you try again 2 or 3 times.
+
+00:03:28.835 --> 00:03:32.495
+The Retry policy, using the Retry annotation
+
+00:03:32.495 --> 00:03:37.370
+is capable of doing that for you again,
+
+00:03:37.370 --> 00:03:46.595
+you can annotate the method that
+you want to keep retrying like this.
+
+00:03:46.595 --> 00:03:49.745
+So the getProduct method, it
+supposedly invokes
+
+00:03:49.745 --> 00:03:54.320
+downstream web service somewhere, can be
+annotated with the Retry annotation,
+
+00:03:54.320 --> 00:03:57.920
+which has a number of
+additional parameters such as
+
+00:03:57.920 --> 00:04:02.480
+maximum number of retry attempts, a delay.
+
+00:04:02.480 --> 00:04:05.870
+So the amount of time
+between the subsequent
+
+00:04:05.870 --> 00:04:10.040
+retry attempts
+that the code will wait.
+
+00:04:10.040 --> 00:04:14.105
+Of course, delayUnit that
+is paired with a delay and
+
+00:04:14.105 --> 00:04:19.820
+a maximum duration that it
+may take for the retries
+
+00:04:19.820 --> 00:04:23.030
+to attempt to get a response.
+
+00:04:23.030 --> 00:04:29.240
+This may be very useful with the
+combination with jitter.
+
+00:04:29.240 --> 00:04:34.130
+Because jitter can actually
+add a random amount of
+
+00:04:34.130 --> 00:04:41.990
+time or subtract random amount of time
+from each wait between retries.
+
+00:04:41.990 --> 00:04:45.035
+So you do not exactly know,
+
+00:04:45.035 --> 00:04:47.315
+especially with large jitter values,
+
+00:04:47.315 --> 00:04:50.255
+how long 3 attempts may take.
+
+00:04:50.255 --> 00:04:53.825
+You may have said that maximum
+number of retries is 3
+
+00:04:53.825 --> 00:04:56.240
+but if your delay is,
+
+00:04:56.240 --> 00:05:00.590
+let's say 1 second and
+your jitter is half a second,
+
+00:05:00.590 --> 00:05:06.320
+then 3 attempts may take as
+little as 1 second or as long as 4.5,
+
+00:05:06.320 --> 00:05:10.865
+so you may want to specify
+a maximum duration as well.
+
+00:05:10.865 --> 00:05:17.284
+Both maxDuration and jitter also have
+their own respective unit parameters.
+
+00:05:17.284 --> 00:05:21.230
+Now the interesting thing about
+retries as they can be selective.
+
+00:05:21.230 --> 00:05:23.990
+Well timeouts cannot be selective when
+
+00:05:23.990 --> 00:05:27.560
+a method is taking more than
+x amount of time to complete,
+
+00:05:27.560 --> 00:05:30.530
+we will simply raise an
+exception. With retries
+
+00:05:30.530 --> 00:05:34.565
+we can be selective about when we
+perform retries. What is a failure?
+
+00:05:34.565 --> 00:05:39.455
+What kind of an exception do
+we consider worthy of retrying?
+
+00:05:39.455 --> 00:05:42.560
+And in which cases we
+will simply not retry
+
+00:05:42.560 --> 00:05:49.475
+and these 2 conditions can be specified
+with the retryOn and abortOn,
+
+00:05:49.475 --> 00:05:53.030
+which are both arrays of classes.
+
+00:05:53.030 --> 00:05:56.870
+That is, arrays of exception types that we
+
+00:05:56.870 --> 00:06:01.620
+want to either retry upon or give up upon.
+
+00:06:02.080 --> 00:06:05.780
+When timing out, retrying,
+
+00:06:05.780 --> 00:06:07.610
+services can still fail.
+
+00:06:07.610 --> 00:06:08.720
+If we can timeout,
+
+00:06:08.720 --> 00:06:13.490
+we can retry up to a specific amount
+of times and still not get a response,
+
+00:06:13.490 --> 00:06:16.805
+so it's very useful to be able to return
+
+00:06:16.805 --> 00:06:21.650
+some sort of a meaningful response rather
+than a stack trace of an exception.
+
+00:06:21.650 --> 00:06:27.155
+The @FallBack annotation allows
+us to specify a fallbackMethod.
+
+00:06:27.155 --> 00:06:31.399
+So for example, and say the product,
+
+00:06:31.399 --> 00:06:36.200
+the getProduct method contains
+REST client or database code.
+
+00:06:36.200 --> 00:06:39.200
+It's not just limited to REST, right?
+
+00:06:39.200 --> 00:06:43.805
+That may fail. If it fails,
+
+00:06:43.805 --> 00:06:49.070
+assuming all other policies we may have
+configured on this method also fail,
+
+00:06:49.070 --> 00:06:54.980
+we can have a @FallBack annotation
+pointing to a fallbackMethod.
+
+00:06:54.980 --> 00:06:58.775
+But there is a big condition here.
+
+00:06:58.775 --> 00:07:01.865
+Note that the fallbackMethod is a string.
+
+00:07:01.865 --> 00:07:07.640
+However, whatever method we
+mentioned in that string must
+
+00:07:07.640 --> 00:07:13.685
+have the same signature as the original
+method. So the same parameters,
+
+00:07:13.685 --> 00:07:15.335
+the same return type.
+
+00:07:15.335 --> 00:07:18.635
+Otherwise, we will get
+a compile-time error.
+
+00:07:18.635 --> 00:07:22.850
+Another option is for
+FallBack method to define an
+
+00:07:22.850 --> 00:07:28.370
+entire class that contains
+methods that are able
+
+00:07:28.370 --> 00:07:32.120
+to handle FallBack
+responses. In that class
+
+00:07:32.120 --> 00:07:37.085
+then we just need to have a
+handle method which accepts
+
+00:07:37.085 --> 00:07:43.410
+an ExecutionContext as a parameter
+and returns some sort of a string.
+
+00:07:44.170 --> 00:07:47.885
+Of course it must be
+accessible, that is visible
+
+00:07:47.885 --> 00:07:52.190
+from the original class where
+we have annotated the original.
+
+00:07:52.190 --> 00:07:54.540
+Tricky method.
+
+00:07:55.060 --> 00:07:58.700
+So the only 2 parameters we can use with
+
+00:07:58.700 --> 00:08:02.510
+the FallBack annotation
+are either the method,
+
+00:08:02.510 --> 00:08:05.355
+which is the method we should call or
+
+00:08:05.355 --> 00:08:08.110
+without any parameters, we can simply
+
+00:08:08.110 --> 00:08:13.070
+specify the class name of the
+class that we want to invoke.
+
+00:08:13.350 --> 00:08:20.155
+Circuit Breaker is a very
+powerful method of failing fast,
+
+00:08:20.155 --> 00:08:24.655
+not causing any worse
+damage than it already is.
+
+00:08:24.655 --> 00:08:29.830
+Whereby we can simply tell
+the circuit breaker that it
+
+00:08:29.830 --> 00:08:35.095
+should stop invoking whatever
+the method is doing.
+
+00:08:35.095 --> 00:08:41.110
+If it receives a failure
+under certain conditions
+
+00:08:41.110 --> 00:08:45.175
+and then not even retry for
+a specified amount of time,
+
+00:08:45.175 --> 00:08:47.535
+just open the circuit,
+
+00:08:47.535 --> 00:08:51.290
+fail every time we invoke the
+method, fail immediately.
+
+00:08:51.290 --> 00:08:54.680
+And then after a specified
+amount of time, try
+
+00:08:54.680 --> 00:08:58.010
+tip toe around that method and
+
+00:08:58.010 --> 00:09:01.100
+see if it succeeds and if
+it still doesn't succeed,
+
+00:09:01.100 --> 00:09:02.480
+keep the circuit open.
+
+00:09:02.480 --> 00:09:04.220
+But if it does succeed,
+
+00:09:04.220 --> 00:09:07.685
+then put the circuit
+into half closed mode.
+
+00:09:07.685 --> 00:09:10.550
+And if it keeps returning success,
+
+00:09:10.550 --> 00:09:14.210
+eventually close the circuit and
+start using the method again.
+
+00:09:14.210 --> 00:09:17.900
+This is particularly
+useful for methods that
+
+00:09:17.900 --> 00:09:22.895
+either take a long amount
+of time before they fail,
+
+00:09:22.895 --> 00:09:24.950
+which is something that we cannot afford,
+
+00:09:24.950 --> 00:09:27.860
+for example. We could
+mitigate this with timeouts,
+
+00:09:27.860 --> 00:09:32.900
+but still, what if you have a method
+that even in the case it's successful,
+
+00:09:32.900 --> 00:09:34.850
+takes a long time to complete,
+
+00:09:34.850 --> 00:09:37.535
+but then it takes even longer,
+
+00:09:37.535 --> 00:09:40.325
+when it returns an error.
+
+00:09:40.325 --> 00:09:44.135
+You cannot easily handle
+this with a timeout.
+
+00:09:44.135 --> 00:09:47.615
+A circuit breaker is
+perfect for that though.
+
+00:09:47.615 --> 00:09:52.160
+On the other hand, we have good
+use case in circuit breakers
+
+00:09:52.160 --> 00:09:58.820
+for downstream services
+that may be stressed,
+
+00:09:58.820 --> 00:10:05.345
+may eventually periodically enter
+non-responsive state because of overload
+
+00:10:05.345 --> 00:10:08.000
+and we just simply do not want to add to
+
+00:10:08.000 --> 00:10:10.640
+that overload by sending in more requests,
+
+00:10:10.640 --> 00:10:12.710
+which I'm going to be
+served anyway because
+
+00:10:12.710 --> 00:10:15.095
+we are going to timeout before they do.
+
+00:10:15.095 --> 00:10:18.590
+So, circuit breaker is very
+useful for those situations.
+
+00:10:18.590 --> 00:10:24.000
+It is again as usual, a method annotation
+
+00:10:24.700 --> 00:10:28.400
+and it has a couple of
+very important parameter.
+
+00:10:28.400 --> 00:10:31.010
+So it is an annotation and why
+
+00:10:31.010 --> 00:10:34.460
+it's fully qualified
+here, it doesn't need to be.
+
+00:10:34.460 --> 00:10:38.610
+Let's look at the
+parameters. Of first of all,
+
+00:10:38.980 --> 00:10:42.470
+the requestsVolumeThreshold
+
+00:10:42.470 --> 00:10:47.090
+is the number of consecutive
+requests we monitor.
+
+00:10:47.090 --> 00:10:52.010
+The failureRatio is the share
+of those requests that we
+
+00:10:52.010 --> 00:10:57.845
+monitor that are allowed to fail
+before we trip the circuit open.
+
+00:10:57.845 --> 00:11:01.040
+So with the requestVolumeThreshold of
+
+00:11:01.040 --> 00:11:07.380
+2 and a failure ratio
+of 0.5, that's 50%
+
+00:11:07.870 --> 00:11:12.980
+even a single request that
+fails will trip the circuit
+
+00:11:12.980 --> 00:11:18.695
+open. With the requestVolumeThreshold
+of, let's say 4
+
+00:11:18.695 --> 00:11:22.055
+and the failure ratio of
+
+00:11:22.055 --> 00:11:28.550
+0.75, 3 out of 4 consecutive
+request must have failed.
+
+00:11:28.550 --> 00:11:32.480
+So as for the circuit to open and not even
+
+00:11:32.480 --> 00:11:37.745
+attempt to use the downstream
+or to use the method anymore.
+
+00:11:37.745 --> 00:11:39.560
+The delay,
+
+00:11:39.560 --> 00:11:42.380
+and of course, the accompanying delayUnit
+
+00:11:42.380 --> 00:11:44.840
+is the amount of time that circuit stays
+
+00:11:44.840 --> 00:11:51.740
+open after it's been tripped by
+failure ratio having been reached.
+
+00:11:51.740 --> 00:11:56.300
+And then the successThreshold
+is the number of
+
+00:11:56.300 --> 00:12:00.620
+consecutive success
+invocations in the half
+
+00:12:00.620 --> 00:12:06.590
+close state before we close it again
+and stop worrying about the results.
+
+00:12:06.590 --> 00:12:08.060
+Then there's also, of course,
+
+00:12:08.060 --> 00:12:11.390
+the failOn and skipOn
+methods that allow us
+
+00:12:11.390 --> 00:12:14.870
+to be selective about when
+to use the circuit breakers.
+
+00:12:14.870 --> 00:12:20.554
+So we can skip the circuit breaker
+on specific types of exceptions
+
+00:12:20.554 --> 00:12:27.575
+whereas we can include specific recognized
+types of exceptions in the failOn,
+
+00:12:27.575 --> 00:12:30.305
+which are again both as with retry,
+
+00:12:30.305 --> 00:12:36.990
+there are arrays of exception types
+that we want to consider.
+
+00:12:37.800 --> 00:12:45.400
+Lastly, the Bulkhead pattern
+allows us to limit the amount
+
+00:12:45.400 --> 00:12:47.410
+of stress that we send towards
+
+00:12:47.410 --> 00:12:53.090
+the whatever downstream service
+we are using from our method.
+
+00:12:53.160 --> 00:12:57.490
+It is simply a thread
+pool for client threads
+
+00:12:57.490 --> 00:13:05.230
+that our method invokes
+or our method triggers.
+
+00:13:05.230 --> 00:13:09.310
+For example, with our getProducts method,
+
+00:13:09.310 --> 00:13:10.690
+if we annotate it with
+
+00:13:10.690 --> 00:13:15.550
+the @Bulkhead annotation and
+specify that the value is 5, 5
+
+00:13:15.550 --> 00:13:20.665
+concurrent threads will be allowed
+to enter the getProducts method.
+
+00:13:20.665 --> 00:13:25.735
+Once 5 threads are waiting for
+the getProducts method to complete,
+
+00:13:25.735 --> 00:13:30.040
+any subsequent invocation will
+either fail immediately or will
+
+00:13:30.040 --> 00:13:34.990
+be placed into the waitingTaskQueue
+if we've configured that one.
+
+00:13:34.990 --> 00:13:40.240
+So these are actually the only 2
+options for the Bulkhead annotation.
+
+00:13:40.240 --> 00:13:44.020
+The value itself is the number of
+concurrent requests that is allowed.
+
+00:13:44.020 --> 00:13:46.180
+The waitingTaskQueue is
+
+00:13:46.180 --> 00:13:49.990
+the number of waiting threads
+that can be placed
+
+00:13:49.990 --> 00:13:51.535
+into a waiting state
+
+00:13:51.535 --> 00:13:55.660
+and of course, as current
+pending request complete,
+
+00:13:55.660 --> 00:14:01.790
+waiting threads from the queue are
+allowed to invoke the method as well.
+
+00:14:02.770 --> 00:14:07.580
+It's important to know
+that of course,
+
+00:14:07.580 --> 00:14:10.085
+if we are running our
+application in a container,
+
+00:14:10.085 --> 00:14:13.730
+in a pod and we create
+multiple instances of that pod,
+
+00:14:13.730 --> 00:14:16.790
+this is local to just a
+single instance, right?
+
+00:14:16.790 --> 00:14:20.195
+So if we set the bulkhead
+on a method to 5,
+
+00:14:20.195 --> 00:14:23.659
+and it's invoking a downstream database,
+
+00:14:23.659 --> 00:14:27.290
+for example, which can handle
+5 concurrent connections.
+
+00:14:27.290 --> 00:14:31.280
+If we create 2 additional
+instances of our pod in OpenShift
+
+00:14:31.280 --> 00:14:36.080
+for example, that means a maximum
+of 15 concurrent connections.
+
+00:14:36.080 --> 00:14:39.500
+You should bear that in mind
+when configuring bulkheads.
+
+00:14:39.500 --> 00:14:41.180
+Of course, you can provide
+
+00:14:41.180 --> 00:14:45.845
+multiple fault tolerance policies
+to a method at the same time.
+
+00:14:45.845 --> 00:14:50.540
+And if you do, they are processed
+in a very specific order.
+
+00:14:50.540 --> 00:14:52.490
+So the first one,
+
+00:14:52.490 --> 00:14:55.235
+if the circuit is currently open,
+
+00:14:55.235 --> 00:14:57.410
+the Circuit Breaker policy will throw
+
+00:14:57.410 --> 00:15:00.800
+an exception, if you have
+configured one on the method.
+
+00:15:00.800 --> 00:15:09.365
+If not, if you have the Bulkhead methods
+configured and its queue is full,
+
+00:15:09.365 --> 00:15:13.130
+as well as the waiting or
+the pending client list,
+
+00:15:13.130 --> 00:15:16.280
+then it's the Bulkhead that
+will throw an exception.
+
+00:15:16.280 --> 00:15:20.750
+If none of the previous ones throw
+an exception or if they do not exist,
+
+00:15:20.750 --> 00:15:23.780
+then we invoke the original method.
+
+00:15:23.780 --> 00:15:25.895
+Then if it takes too long,
+
+00:15:25.895 --> 00:15:29.090
+the Timeout policy will interrupt us.
+
+00:15:29.090 --> 00:15:31.805
+Otherwise, if there is no Timeout,
+
+00:15:31.805 --> 00:15:34.520
+the Retry policy may retry the request,
+
+00:15:34.520 --> 00:15:37.385
+adding to the total time, of course,
+
+00:15:37.385 --> 00:15:43.295
+which means that Retry and Timeout can
+also be combined with great effect.
+
+00:15:43.295 --> 00:15:46.790
+And then of course, if the Retry or
+
+00:15:46.790 --> 00:15:50.405
+the Timeout have failed or any
+of the other ones have failed,
+
+00:15:50.405 --> 00:15:53.105
+then the Fallback method will return
+
+00:15:53.105 --> 00:15:55.850
+the shortcut response. When you are
+
+00:15:55.850 --> 00:15:58.595
+mixing the Retry and
+Circuit Breaker policies,
+
+00:15:58.595 --> 00:16:00.080
+it's also important to know that
+
+00:16:00.080 --> 00:16:04.655
+the Circuit Breaker records
+each Retry as a failure.
+
+00:16:04.655 --> 00:16:06.020
+So it tries to
+
+00:16:06.020 --> 00:16:11.270
+use Retries to compute the circuit
+status using the threshold window,
+
+00:16:11.270 --> 00:16:15.050
+the failure threshold
+over a window of attempts.
+
+00:16:15.050 --> 00:16:21.065
+The same rule also applies when using
+Circuit Breaker and the Bulkhead policy.
+
+00:16:21.065 --> 00:16:23.270
+So Bulkhead attempts and
+
+00:16:23.270 --> 00:16:28.170
+failures, count as failed
+invocations to the circuit breaker.
+
+00:16:28.990 --> 00:16:32.090
+It's very nice to know also that
+
+00:16:32.090 --> 00:16:35.900
+the Fault Tolerance specification
+seamlessly integrates
+
+00:16:35.900 --> 00:16:39.755
+with the MicroProfile
+config specification
+
+00:16:39.755 --> 00:16:41.900
+and of course also the
+Metrics specification
+
+00:16:41.900 --> 00:16:45.035
+but we are going to talk about
+Metrics later in the course.
+
+00:16:45.035 --> 00:16:46.820
+What does that mean?
+
+00:16:46.820 --> 00:16:51.274
+It means that you can actually
+annotate your methods
+
+00:16:51.274 --> 00:16:56.315
+simply by adding specific properties
+to your application.properties file.
+
+00:16:56.315 --> 00:17:00.455
+So what you do is you would use
+the fully qualified class name
+
+00:17:00.455 --> 00:17:04.880
+followed by a slash and the name of the
+method that you're trying to annotate,
+
+00:17:04.880 --> 00:17:07.640
+followed by another slash
+and the policy that
+
+00:17:07.640 --> 00:17:10.580
+you want to configure
+followed by another slash,
+
+00:17:10.580 --> 00:17:14.780
+and the list of properties for
+that particular policy,
+
+00:17:14.780 --> 00:17:17.810
+so one property at a time.
+
+00:17:17.810 --> 00:17:22.400
+If you want to provide an annotation
+instruction for the entire class,
+
+00:17:22.400 --> 00:17:25.565
+for the annotations that support
+class level annotations,
+
+00:17:25.565 --> 00:17:28.100
+simply leave out the method.
+
+00:17:28.100 --> 00:17:30.170
+Like in this following example,
+
+00:17:30.170 --> 00:17:34.790
+it would be the fully qualified class
+name followed by the policy name,
+
+00:17:34.790 --> 00:17:38.090
+followed by the attributes
+that you want to configure.
+
+00:17:38.090 --> 00:17:39.860
+We are going to review metrics,
+
+00:17:39.860 --> 00:17:43.100
+as already mentioned in a
+subsequent chapter in this course.
+
+00:17:43.100 --> 00:17:47.660
+But since we've mentioned fault
+tolerance and metrics in,
+
+00:17:47.660 --> 00:17:54.455
+in conclusion, Fallback
+annotations as well as others.
+
+00:17:54.455 --> 00:17:59.435
+generate a specific metric,
+
+00:17:59.435 --> 00:18:04.025
+such as ft. name.fallback.calls.
+
+00:18:04.025 --> 00:18:06.260
+total, where the name is
+
+00:18:06.260 --> 00:18:08.510
+actually the fully qualified
+name of the class
+
+00:18:08.510 --> 00:18:11.660
+plus the method and this metric counts
+
+00:18:11.660 --> 00:18:16.040
+the number of times that the
+fallback method has been invoked.
+
+00:18:16.040 --> 00:18:18.950
+But there are also similar
+metrics automatically
+
+00:18:18.950 --> 00:18:22.175
+generated for other policies as well.
+
+00:18:22.175 --> 00:18:26.930
+Although Quarkus does rely on
+the SmallRye implementation,
+
+00:18:26.930 --> 00:18:29.675
+fault tolerance, there are
+
+00:18:29.675 --> 00:18:33.560
+other alternatives that you might want
+to consider for one or another reason.
+
+00:18:33.560 --> 00:18:36.770
+Hystrix, for example is
+a third party library
+
+00:18:36.770 --> 00:18:39.050
+and it is an implementation
+of fault tolerance
+
+00:18:39.050 --> 00:18:43.655
+that also supports MicroProfile
+requirements.
+
+00:18:43.655 --> 00:18:47.645
+Hystrix does have also
+other features such as
+
+00:18:47.645 --> 00:18:51.815
+latency, monitoring,
+concurrency capabilities,
+
+00:18:51.815 --> 00:18:56.690
+and the web user interface turbine
+that you can use for monitoring
+
+00:18:56.690 --> 00:19:02.930
+metrics and identifying
+problems. Of course,
+
+00:19:02.930 --> 00:19:09.260
+the one perhaps downside to Hystrix
+is that it does require in some cases,
+
+00:19:09.260 --> 00:19:11.570
+quite a bit of coding to
+integrate with their code.
+
+00:19:11.570 --> 00:19:15.905
+So it's not as easily
+annotation driven as SmallRye is.
+
+00:19:15.905 --> 00:19:20.600
+Now if modifying your code
+or application properties,
+
+00:19:20.600 --> 00:19:24.710
+as we have seen, it's also possible to
+do it as a matter of configuration.
+
+00:19:24.710 --> 00:19:26.555
+If neither of the 2 is possible,
+
+00:19:26.555 --> 00:19:28.850
+you might want to consider using
+
+00:19:28.850 --> 00:19:34.175
+Red Hat OpenShift Service Mesh
+or its upstream project, Istio.
+
+00:19:34.175 --> 00:19:37.190
+Because this is a different way,
+
+00:19:37.190 --> 00:19:41.630
+a non-invasive way from the
+perspective of your application of
+
+00:19:41.630 --> 00:19:46.190
+configuring fault tolerance as a
+matter of platform functionality.
+
+00:19:46.190 --> 00:19:52.250
+So the sidecar pattern
+is used by Istio and
+
+00:19:52.250 --> 00:19:54.740
+Service Mesh to takeover
+
+00:19:54.740 --> 00:19:59.120
+the communication from your application
+and act as a proxy to your app,
+
+00:19:59.120 --> 00:20:02.360
+whereby the proxy can then
+implement various policies
+
+00:20:02.360 --> 00:20:05.960
+without your application even
+knowing anything about it.
+
+00:20:05.960 --> 00:20:09.410
+There are 2 main benefits
+to this approach, which are,
+
+00:20:09.410 --> 00:20:13.580
+the first is that the entire configuration
+is outside of the application,
+
+00:20:13.580 --> 00:20:17.120
+so you do not need to recompile, rebuild,
+
+00:20:17.120 --> 00:20:20.375
+restart the application if
+you are changing the policies and
+
+00:20:20.375 --> 00:20:26.525
+the implementation also resides
+outside of the application itself,
+
+00:20:26.525 --> 00:20:29.720
+which means that it is a
+language agnostic application.
+
+00:20:29.720 --> 00:20:31.400
+So you do not really need to use
+
+00:20:31.400 --> 00:20:35.420
+a specific language or execution
+environment to use it.
+
+00:20:35.420 --> 00:20:39.589
+Also, it's got a centralized
+configuration stores,
+
+00:20:39.589 --> 00:20:45.020
+so you can actually use
+policy collection that you
+
+00:20:45.020 --> 00:20:47.270
+then selectively apply to
+
+00:20:47.270 --> 00:20:51.200
+all your applications from a
+single point of configuration.
+
+00:20:51.200 --> 00:20:53.120
+Let's stick with SmallRye
+
+00:20:53.120 --> 00:20:54.830
+and in the next video,
+
+00:20:54.830 --> 00:20:56.300
+let's have a look at how to apply
+
+00:20:56.300 --> 00:20:59.225
+fault tolerance policies
+to the Quarkus application.
+
+00:20:59.225 --> 00:21:00.840
+See you there.
 

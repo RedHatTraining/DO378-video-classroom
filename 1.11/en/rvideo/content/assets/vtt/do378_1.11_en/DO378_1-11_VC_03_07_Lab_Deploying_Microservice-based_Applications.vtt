@@ -1,5 +1,332 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:02.010
+In this end of chapter review lab,
 
+00:00:02.010 --> 00:00:05.610
+we are going to use both methods
+that we discussed in this chapter.
+
+00:00:05.610 --> 00:00:08.310
+So first we are going to use
+the OpenShift extension to
+
+00:00:08.310 --> 00:00:12.000
+Quarkus and deploy an application
+using a Source-to-Image build
+
+00:00:12.000 --> 00:00:15.120
+and then we're going to login to
+the OpenShift web console and
+
+00:00:15.120 --> 00:00:18.810
+deploy a pre-fabricated
+image. Running the lab
+
+00:00:18.810 --> 00:00:20.760
+deploy-review start script,
+
+00:00:20.760 --> 00:00:24.780
+which makes sure that the deploy-review
+project is created.
+
+00:00:24.780 --> 00:00:26.775
+We can then source
+
+00:00:26.775 --> 00:00:30.930
+the OpenShift configuration if you
+haven't yet in the current terminal,
+
+00:00:30.930 --> 00:00:32.970
+and login to OpenShift again,
+
+00:00:32.970 --> 00:00:34.695
+if you haven't yet.
+
+00:00:34.695 --> 00:00:38.640
+Now, the project, the only
+project that should exist
+
+00:00:38.640 --> 00:00:42.295
+in your user account should
+be selected automatically.
+
+00:00:42.295 --> 00:00:47.000
+If it is not, then simply
+issue oc project command,
+
+00:00:47.000 --> 00:00:51.334
+switching to deploy-review
+suffix by your username.
+
+00:00:51.334 --> 00:00:54.485
+Go into the source code directory.
+
+00:00:54.485 --> 00:00:58.910
+In the /labs/deploy-revie/microservice-speaker location
+
+00:00:58.910 --> 00:01:04.100
+we have the microservice
+
+00:01:04.100 --> 00:01:07.535
+that we've already reviewed
+in previous exercises.
+
+00:01:07.535 --> 00:01:12.545
+We have a look at the source code and
+the resources associated with it.
+
+00:01:12.545 --> 00:01:16.760
+We can see that this is
+the familiar DAO service,
+
+00:01:16.760 --> 00:01:18.440
+the speaker model object,
+
+00:01:18.440 --> 00:01:21.545
+and the resource, which
+is the web service,
+
+00:01:21.545 --> 00:01:26.405
+as I have an application properties
+and an import.sql file.
+
+00:01:26.405 --> 00:01:31.625
+Now we are going to add the quarkus
+openshift extension to this project.
+
+00:01:31.625 --> 00:01:34.550
+Alternatively, instead of
+using quarku:add-extension,
+
+00:01:34.550 --> 00:01:41.120
+of course you can add this
+dependency manually to pom xml.
+
+00:01:41.120 --> 00:01:44.914
+Then we are going to do a package,
+
+00:01:44.914 --> 00:01:49.790
+but with the options of quarkus.
+kubernetes.deploy equals true.
+
+00:01:49.790 --> 00:01:52.430
+quarkus.kubernetes.expose equals true
+
+00:01:52.430 --> 00:01:54.260
+and we are going to also ask for
+
+00:01:54.260 --> 00:01:58.370
+the swagger-ui to be included
+in the resulting application.
+
+00:01:58.370 --> 00:02:00.425
+We could just as well put
+
+00:02:00.425 --> 00:02:04.220
+these 3 properties into the
+application properties file
+
+00:02:04.220 --> 00:02:06.095
+but just for clarity,
+
+00:02:06.095 --> 00:02:08.135
+here they are on the command line.
+
+00:02:08.135 --> 00:02:13.070
+Now as the build proceeds and the
+tests are successfully executed,
+
+00:02:13.070 --> 00:02:19.594
+we can see that eventually the OpenShift
+source-to-image build is started.
+
+00:02:19.594 --> 00:02:23.960
+The image streams for the base and
+application image are created,
+
+00:02:23.960 --> 00:02:28.130
+the build configuration is
+created and then a build starts.
+
+00:02:28.130 --> 00:02:30.839
+Once that build completes,
+
+00:02:33.960 --> 00:02:38.275
+we can also see that the
+applications in deployed,
+
+00:02:38.275 --> 00:02:42.625
+creating a service DeploymentConfig
+and a Route.
+
+00:02:42.625 --> 00:02:46.900
+So it becomes accessible at
+this particular host name.
+
+00:02:46.900 --> 00:02:50.935
+Now let's switch to the Red Hat
+Online Learning Environment,
+
+00:02:50.935 --> 00:02:56.170
+lab environment tab, where you have
+the OpenShift Details section.
+
+00:02:56.170 --> 00:03:00.865
+We are going to use the link from this
+section to open the web console.
+
+00:03:00.865 --> 00:03:05.350
+So simply clicking on the
+link we will open in a new tab.
+
+00:03:05.350 --> 00:03:07.060
+Once the login screen loads,
+
+00:03:07.060 --> 00:03:10.075
+we can simply login using
+
+00:03:10.075 --> 00:03:15.200
+our username and the password from
+the OpenShift Details section.
+
+00:03:16.600 --> 00:03:25.475
+And we will be, should be placed into
+the Developer perspective by default.
+
+00:03:25.475 --> 00:03:28.580
+Looking at the Topology,
+
+00:03:28.580 --> 00:03:32.150
+now of course, we have to
+select a project before we
+
+00:03:32.150 --> 00:03:35.060
+can see the application
+topology in, here we go.
+
+00:03:35.060 --> 00:03:37.460
+There's the microservice
+speaker application
+
+00:03:37.460 --> 00:03:40.505
+we have just deployed using Quarkus.
+
+00:03:40.505 --> 00:03:43.400
+Now let's also deploy a new application,
+
+00:03:43.400 --> 00:03:47.720
+the microservice for the
+schedule application.
+
+00:03:47.720 --> 00:03:52.190
+Let's click Add here and scroll
+a little bit further down,
+
+00:03:52.190 --> 00:04:00.290
+we see the container image
+section. We'll enter quay.io/
+
+00:04:00.290 --> 00:04:02.580
+redhattraining/
+
+00:04:05.290 --> 00:04:13.140
+quarkus-conference-schedule image.
+
+00:04:15.190 --> 00:04:19.625
+We can just leave all the
+others settings as default,
+
+00:04:19.625 --> 00:04:22.340
+simply scroll down and make sure
+
+00:04:22.340 --> 00:04:26.045
+that Create a route to the
+application is checked.
+
+00:04:26.045 --> 00:04:28.830
+Then click Create.
+
+00:04:31.030 --> 00:04:33.200
+Now we will be able to see
+
+00:04:33.200 --> 00:04:38.255
+the quarkus schedule application appear
+next to the microservice speaker 1.
+
+00:04:38.255 --> 00:04:42.380
+Note that while the microservice
+speaker has a build associated
+
+00:04:42.380 --> 00:04:46.535
+with it, that's a little green circle in
+the bottom left corner next to it.
+
+00:04:46.535 --> 00:04:48.140
+There is no such thing,
+
+00:04:48.140 --> 00:04:51.125
+with the quarkus schedule application.
+
+00:04:51.125 --> 00:04:56.750
+Now if we click on the link in
+the top right corner of the schedule
+
+00:04:56.750 --> 00:04:58.955
+application open URL,
+
+00:04:58.955 --> 00:05:02.180
+it should open in a new tab.
+
+00:05:02.180 --> 00:05:08.075
+If we just add /swagger-ui to it,
+
+00:05:08.075 --> 00:05:12.065
+we are going to be able to see all the
+endpoints published by this application and
+
+00:05:12.065 --> 00:05:16.835
+let's just try out the /schedule/all 
+endpoint with the GET method,
+
+00:05:16.835 --> 00:05:20.465
+which will show us hopefully
+all the existing schedules.
+
+00:05:20.465 --> 00:05:24.545
+When we click Execute, here they are.
+
+00:05:24.545 --> 00:05:26.165
+Right!
+
+00:05:26.165 --> 00:05:30.110
+Let's run the grading scripts
+to see that we've done, we've
+
+00:05:30.110 --> 00:05:33.980
+performed all the exercise steps
+correctly. So lab deploy-
+
+00:05:33.980 --> 00:05:36.780
+review grade.
+
+00:05:44.680 --> 00:05:48.140
+Once you get all the passing scores,
+
+00:05:48.140 --> 00:05:51.230
+simply clean up after the
+exercise running lab deploy-
+
+00:05:51.230 --> 00:05:54.150
+review finish.
+
+00:05:58.690 --> 00:06:01.430
+And then join us in the next chapter,
+
+00:06:01.430 --> 00:06:04.805
+where we are going to have a look at how
+to build microservice applications
+
+00:06:04.805 --> 00:06:07.290
+with Quarkus. See you there.
 

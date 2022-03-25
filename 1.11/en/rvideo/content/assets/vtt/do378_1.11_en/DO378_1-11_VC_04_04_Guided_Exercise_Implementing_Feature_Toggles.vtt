@@ -1,5 +1,229 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:03.540
+In this exercise, we're going to
+implement a simple Feature Toggle for
 
+00:00:03.540 --> 00:00:07.635
+an operation in a trivial
+calculator application.
+
+00:00:07.635 --> 00:00:10.320
+Starting with lab apps-
+features start script
+
+00:00:10.320 --> 00:00:13.665
+to fetch the source
+code to our calculator.
+
+00:00:13.665 --> 00:00:16.530
+Let's move over to the
+calculator working directory,
+
+00:00:16.530 --> 00:00:17.730
+that's the DO378/
+
+00:00:17.730 --> 00:00:21.975
+labs/apps-feature/quarkus-calculator-monoliths/
+
+00:00:21.975 --> 00:00:23.985
+Looking at the source code,
+
+00:00:23.985 --> 00:00:28.050
+it is a simple SolverService and
+
+00:00:28.050 --> 00:00:32.685
+the SolverResource.java application
+base two classes based application,
+
+00:00:32.685 --> 00:00:35.730
+which is an empty application
+properties at the moment.
+
+00:00:35.730 --> 00:00:39.345
+So if we start the
+application in dev mode,
+
+00:00:39.345 --> 00:00:44.335
+as it starts, here we go.
+
+00:00:44.335 --> 00:00:45.955
+If we send it,
+
+00:00:45.955 --> 00:00:48.370
+it's listening on port 8080,
+
+00:00:48.370 --> 00:00:50.845
+if we send it a request to solve,
+
+00:00:50.845 --> 00:00:54.835
+it is listening on the solver
+endpoint to solve 3 plus 5,
+
+00:00:54.835 --> 00:00:58.150
+it correctly returns 8.0.
+
+00:00:58.150 --> 00:01:01.150
+If we send in a 3-5, however,
+
+00:01:01.150 --> 00:01:03.775
+it says it can't parse the expression.
+
+00:01:03.775 --> 00:01:08.185
+That's because the subtraction
+feature has not yet been implemented.
+
+00:01:08.185 --> 00:01:12.985
+So if we have a look and
+edit the SolverResource,
+
+00:01:12.985 --> 00:01:16.450
+the Java file, what we will be doing
+
+00:01:16.450 --> 00:01:20.065
+is we will be adding the
+ConfigProperty annotation,
+
+00:01:20.065 --> 00:01:22.670
+we will be adding a subtractPattern to
+
+00:01:22.670 --> 00:01:26.300
+the two existing patterns
+for multiplication and addition.
+
+00:01:26.300 --> 00:01:30.170
+So the subtraction pattern is basically
+a regular expression as well,
+
+00:01:30.170 --> 00:01:35.570
+so that the two operands are
+separated by a minus character.
+
+00:01:35.570 --> 00:01:40.985
+And we are also going to inject 
+a @ConfigProperty called
+
+00:01:40.985 --> 00:01:43.205
+features.subtract-enabled.
+
+00:01:43.205 --> 00:01:46.265
+The field is simply
+called subtractEnabled.
+
+00:01:46.265 --> 00:01:50.780
+Now, in the calculation decision group,
+
+00:01:50.780 --> 00:01:54.680
+we check that the property is enabled
+
+00:01:54.680 --> 00:01:57.620
+and if it is, we create a new Matcher,
+
+00:01:57.620 --> 00:02:01.880
+subtractMatcher, which
+matches the equation,
+
+00:02:01.880 --> 00:02:04.265
+looking for the subtractPattern
+
+00:02:04.265 --> 00:02:08.180
+and if the subtractPattern is found,
+
+00:02:08.180 --> 00:02:11.345
+we return the subtract method's result,
+
+00:02:11.345 --> 00:02:14.510
+which means we need to
+implement that method as well
+
+00:02:14.510 --> 00:02:16.115
+and it's simple enough.
+
+00:02:16.115 --> 00:02:20.555
+So it's just literally two strings,
+
+00:02:20.555 --> 00:02:25.220
+a log notifying that we are
+doing the subtraction and
+
+00:02:25.220 --> 00:02:28.220
+the solve invocation of
+
+00:02:28.220 --> 00:02:31.280
+the left-hand side and the
+right-hand side of the equation.
+
+00:02:31.280 --> 00:02:33.950
+This is in recursive calculator,
+
+00:02:33.950 --> 00:02:40.190
+so it progresses from outermost
+expression to the innermost one.
+
+00:02:40.190 --> 00:02:47.615
+So that's why we basically recursively
+invoke the solve method as well.
+
+00:02:47.615 --> 00:02:52.880
+And if that method does not find
+any nested calculation expression,
+
+00:02:52.880 --> 00:02:54.560
+it simply returns the same result,
+
+00:02:54.560 --> 00:02:58.535
+so for simple calculations like 3-5,
+
+00:02:58.535 --> 00:03:04.355
+this would just simply eventually
+resolve to 3 on the left-hand side,
+
+00:03:04.355 --> 00:03:05.840
+5 on the right-hand side,
+
+00:03:05.840 --> 00:03:09.200
+and then ultimately return the result.
+
+00:03:09.200 --> 00:03:12.080
+We still need to implement the toggle,
+
+00:03:12.080 --> 00:03:14.630
+so in the application.properties,
+
+00:03:14.630 --> 00:03:16.970
+we are going to add features.subtract-
+
+00:03:16.970 --> 00:03:19.940
+enabled initially
+set to false, right?
+
+00:03:19.940 --> 00:03:26.585
+So just checking that the application
+still gives us unable to parse result.
+
+00:03:26.585 --> 00:03:29.960
+We see that it is still
+unable to parse it.
+
+00:03:29.960 --> 00:03:34.010
+Now, changing that toggle to true and
+
+00:03:34.010 --> 00:03:39.170
+invoking the application again gives
+us the correct result of -2.
+
+00:03:39.170 --> 00:03:42.995
+That means we can stop the application,
+
+00:03:42.995 --> 00:03:45.950
+run the lab apps-feature
+finish script which cleans
+
+00:03:45.950 --> 00:03:49.565
+everything up and proceed
+to the next video,
+
+00:03:49.565 --> 00:03:55.230
+which is about connecting multiple
+services to each other. See you there.
 

@@ -1,5 +1,2434 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:01.080
+Welcome back!
 
+00:00:01.080 --> 00:00:03.195
+Let's have a look at how to implement
+
+00:00:03.195 --> 00:00:07.935
+JSON based microservices
+with CDI in JAX-RS
+
+00:00:07.935 --> 00:00:13.545
+But first, let's have a look at the
+components that play a part in this.
+
+00:00:13.545 --> 00:00:17.819
+Quarkus does take advantage of
+the MicroProfile specification
+
+00:00:17.819 --> 00:00:21.615
+and developers can build web services,
+
+00:00:21.615 --> 00:00:26.835
+which obviously are the foundation
+of microservice based architectures.
+
+00:00:26.835 --> 00:00:32.009
+And the components that we need
+to actually implement,
+
+00:00:32.009 --> 00:00:35.820
+to start implementing
+microservices with Quarkus
+
+00:00:35.820 --> 00:00:38.730
+or Quarkus Dependency Injection,
+
+00:00:38.730 --> 00:00:46.654
+which is comparable to CDI, Contexts and
+Dependency Injection specification,
+
+00:00:46.654 --> 00:00:53.510
+we will see in what ways it differs
+and how it's functionally slightly
+
+00:00:53.510 --> 00:00:56.630
+inferior to the fully blown
+CDI specification with
+
+00:00:56.630 --> 00:01:00.335
+the good reason to. JAX-RS
+
+00:01:00.335 --> 00:01:04.549
+which is Jakarta RESTful web services,
+
+00:01:04.549 --> 00:01:09.545
+and the JSON processing
+library, the JSON-P library.
+
+00:01:09.545 --> 00:01:11.630
+Using all these 3 components,
+
+00:01:11.630 --> 00:01:13.490
+you can build RESTful web services in
+
+00:01:13.490 --> 00:01:16.159
+a straightforward and
+very declarative manner.
+
+00:01:16.159 --> 00:01:18.094
+But before we go on,
+
+00:01:18.094 --> 00:01:22.579
+let's review the Dependency
+Injection specifications.
+
+00:01:22.579 --> 00:01:26.165
+A small revolution happened
+when Enterprise Java 6
+
+00:01:26.165 --> 00:01:30.860
+introduced the CDI
+specification in 2009.
+
+00:01:30.860 --> 00:01:35.660
+The Dependency Injection
+design pattern
+
+00:01:35.660 --> 00:01:40.220
+to create loosely based application
+components existed before,
+
+00:01:40.220 --> 00:01:44.839
+but it was not standardized
+and Enterprise Java did not
+
+00:01:44.839 --> 00:01:50.149
+really have a good way of implementing it.
+
+00:01:50.149 --> 00:01:56.299
+So what happened with CDI is that it
+
+00:01:56.299 --> 00:02:03.680
+immediately simplified code down
+to ridiculous level of simplicity.
+
+00:02:03.680 --> 00:02:06.680
+It produce the boilerplate 
+code by orders of
+
+00:02:06.680 --> 00:02:09.770
+magnitude because it is an inversion of
+
+00:02:09.770 --> 00:02:13.459
+control system where the
+developer is no longer
+
+00:02:13.459 --> 00:02:18.619
+responsible to create an instance
+of a class that they want to use.
+
+00:02:18.619 --> 00:02:22.969
+It becomes the container
+that becomes responsible.
+
+00:02:22.969 --> 00:02:26.014
+It is now the container that
+becomes responsible for that.
+
+00:02:26.014 --> 00:02:31.835
+And all we need to do it is give it some
+guidelines on what exactly we need.
+
+00:02:31.835 --> 00:02:38.299
+So bye-bye all the long checks and
+boilerplate code hidden somewhere,
+
+00:02:38.299 --> 00:02:43.159
+which is simply there only to create
+an instance of an object we needed.
+
+00:02:43.159 --> 00:02:46.144
+All of that is taken care
+of by the container.
+
+00:02:46.144 --> 00:02:49.309
+However, there are a couple
+of very important concepts
+
+00:02:49.309 --> 00:02:52.220
+in CDI that allow the container to,
+
+00:02:52.220 --> 00:02:53.779
+that is the runtime,
+
+00:02:53.779 --> 00:02:58.804
+the execution container, plain speak for
+that would be the application server.
+
+00:02:58.804 --> 00:03:01.100
+Although technically there is
+
+00:03:01.100 --> 00:03:04.549
+a subunit of the application
+server called the CDI container,
+
+00:03:04.549 --> 00:03:05.750
+which takes care of that.
+
+00:03:05.750 --> 00:03:09.679
+Now this container must be
+able to create classes,
+
+00:03:09.679 --> 00:03:17.284
+to create instances of classes or
+objects that suit your current needs.
+
+00:03:17.284 --> 00:03:22.490
+And it needs some pretty simple
+instructions on how to do this.
+
+00:03:22.490 --> 00:03:25.850
+Namely, it needs to know what
+
+00:03:25.850 --> 00:03:30.560
+the lifecycle context of the object
+that is about to create has to be.
+
+00:03:30.560 --> 00:03:32.870
+Is it a request scoped
+object that they
+
+00:03:32.870 --> 00:03:35.149
+can throw away immediately afterwards?
+
+00:03:35.149 --> 00:03:39.860
+Is it an object that has to be around
+for the duration of the application?
+
+00:03:39.860 --> 00:03:41.509
+Perhaps because it contains
+
+00:03:41.509 --> 00:03:46.055
+some important global state that
+the application needs to refer to,
+
+00:03:46.055 --> 00:03:50.074
+or is it just something that the
+user is going to use for awhile?
+
+00:03:50.074 --> 00:03:54.020
+And then we can remove it because
+let's say the session has ended
+
+00:03:54.020 --> 00:03:58.325
+or even a smaller unit which CDI
+introduced called the conversation,
+
+00:03:58.325 --> 00:04:02.149
+which is something between
+a request in the session,
+
+00:04:02.149 --> 00:04:04.370
+maybe it's even that scope.
+
+00:04:04.370 --> 00:04:09.900
+So for that purpose, CDI provide
+some lifecycle annotations,
+
+00:04:09.940 --> 00:04:15.994
+but also implements event-driven
+notification model.
+
+00:04:15.994 --> 00:04:20.840
+So it has support for events and
+interceptors of those events.
+
+00:04:20.840 --> 00:04:24.830
+It also enables us to develop
+
+00:04:24.830 --> 00:04:28.639
+decorators for components that
+are injected into our classes.
+
+00:04:28.639 --> 00:04:31.384
+So if an existing implementation
+
+00:04:31.384 --> 00:04:34.910
+only does about 80 percent
+of what we needed to do,
+
+00:04:34.910 --> 00:04:37.519
+but we needed to do something
+in addition to that,
+
+00:04:37.519 --> 00:04:39.110
+just a little bit more before,
+
+00:04:39.110 --> 00:04:42.199
+after its work has started or completed,
+
+00:04:42.199 --> 00:04:47.840
+we can create a decorator for a specific
+CDI component and declare it as such,
+
+00:04:47.840 --> 00:04:49.864
+just simply using an annotation,
+
+00:04:49.864 --> 00:04:51.649
+and the CDI system
+
+00:04:51.649 --> 00:04:54.740
+will use that instead of the original one
+
+00:04:54.740 --> 00:04:59.360
+because it's then up to us
+to actually invoke the code.
+
+00:04:59.360 --> 00:05:02.780
+So it's decorators and
+interceptors, are both
+
+00:05:02.780 --> 00:05:07.205
+basically solutions to a similar problem.
+
+00:05:07.205 --> 00:05:12.499
+And most importantly, all of
+this is done at runtime. So,
+
+00:05:12.499 --> 00:05:17.030
+at compilation time, you can easily
+have stub implementations or
+
+00:05:17.030 --> 00:05:20.029
+even just interfaces without
+
+00:05:20.029 --> 00:05:23.900
+actual functionality that you're going
+to use later in your application,
+
+00:05:23.900 --> 00:05:25.669
+which again as you can,
+
+00:05:25.669 --> 00:05:29.945
+you can probably imagine immensely
+simplifies the development.
+
+00:05:29.945 --> 00:05:31.550
+Now,
+
+00:05:31.550 --> 00:05:36.889
+CDI is all around managed beans, right?
+
+00:05:36.889 --> 00:05:40.400
+If the CDI container is
+going to create an object,
+
+00:05:40.400 --> 00:05:42.814
+it needs to manage its life cycle as well.
+
+00:05:42.814 --> 00:05:44.419
+So it needs to create it,
+
+00:05:44.419 --> 00:05:47.779
+but also it needs to mark it
+for garbage collection.
+
+00:05:47.779 --> 00:05:50.579
+Bean specifics,
+
+00:05:51.700 --> 00:06:00.719
+it's essentially almost any kind of
+Java bean that can be managed by CDI.
+
+00:06:01.420 --> 00:06:06.619
+There is no need for the bean itself
+to be aware of the lifecycle.
+
+00:06:06.619 --> 00:06:09.980
+There's no need 
+for it to worry about,
+
+00:06:09.980 --> 00:06:12.349
+you know, when it's going to be created,
+
+00:06:12.349 --> 00:06:14.870
+what's going to happen 
+when it's destroyed?
+
+00:06:14.870 --> 00:06:18.680
+How it connects to other
+objects and so on.
+
+00:06:18.680 --> 00:06:20.989
+A bean that is managed by
+
+00:06:20.989 --> 00:06:25.879
+CDI is created whenever a piece
+of code needs it somewhere.
+
+00:06:25.879 --> 00:06:28.249
+And it's created in
+accordance with the scope
+
+00:06:28.249 --> 00:06:31.235
+annotation either on that managed bean
+
+00:06:31.235 --> 00:06:37.910
+or which is another important concept,
+a scope annotation on the injection point.
+
+00:06:37.910 --> 00:06:45.335
+Now, the independence of managing
+the lifecycle of beans either,
+
+00:06:45.335 --> 00:06:47.239
+for example, being happy with
+
+00:06:47.239 --> 00:06:52.175
+the default lifecycle if we don't
+care or being able to fine tune it,
+
+00:06:52.175 --> 00:06:54.394
+control it at the injection point,
+
+00:06:54.394 --> 00:06:58.294
+actually makes code
+maintenance a lot easier.
+
+00:06:58.294 --> 00:07:00.634
+Now, the CDI framework,
+
+00:07:00.634 --> 00:07:04.804
+just as many modern frameworks,
+is annotation driven.
+
+00:07:04.804 --> 00:07:08.044
+And one of the most
+important annotations in
+
+00:07:08.044 --> 00:07:10.880
+any CDI application,
+are scope annotations.
+
+00:07:10.880 --> 00:07:13.954
+So we have @ApplicationScoped beans,
+
+00:07:13.954 --> 00:07:16.249
+@SessionScoped, @ConversationScoped,
+
+00:07:16.249 --> 00:07:18.394
+and @RequestScoped beans.
+
+00:07:18.394 --> 00:07:22.100
+Annotating a class with one
+of these scope annotations
+
+00:07:22.100 --> 00:07:26.270
+immediately tells to
+the CDI container what,
+
+00:07:26.270 --> 00:07:29.075
+how long this bean is going to be around?
+
+00:07:29.075 --> 00:07:31.384
+If it's @ApplicationScoped,
+
+00:07:31.384 --> 00:07:35.074
+it's just going to remain around
+until the application shuts down.
+
+00:07:35.074 --> 00:07:36.470
+If it's @SessionScoped,
+
+00:07:36.470 --> 00:07:38.899
+then it's going to remain
+until the session ends.
+
+00:07:38.899 --> 00:07:40.879
+The current contexts session,
+
+00:07:40.879 --> 00:07:44.254
+of course, the session
+in which it was created.
+
+00:07:44.254 --> 00:07:49.070
+If a scope annotation is
+not provided by CDI bean,
+
+00:07:49.070 --> 00:07:51.919
+then it is assumed to be a @Dependent bean,
+
+00:07:51.919 --> 00:07:58.579
+which basically means that its scope
+depends on the scope of the client.
+
+00:07:58.579 --> 00:08:03.304
+So on the scope of the application
+class where that bean is injected.
+
+00:08:03.304 --> 00:08:06.890
+If we inject a @Dependent bean
+into an Application Scoped class,
+
+00:08:06.890 --> 00:08:07.910
+it becomes an @ApplicationScoped Bean.
+
+00:08:08.930 --> 00:08:12.379
+If we inject a @Dependent bean
+into a request scope class,
+
+00:08:12.379 --> 00:08:14.750
+then it's a @RequestScoped bean and it will be
+
+00:08:14.750 --> 00:08:18.360
+terminated after the request completes.
+
+00:08:18.550 --> 00:08:23.554
+We have other annotations
+such as interceptor,
+
+00:08:23.554 --> 00:08:27.019
+decorator, producers, and so on.
+
+00:08:27.019 --> 00:08:32.900
+These are all advanced CDI concepts
+that you could probably do
+
+00:08:32.900 --> 00:08:39.139
+well if you need a refreshment
+by taking a look at the AD183
+
+00:08:39.139 --> 00:08:41.689
+class, the training course,
+
+00:08:41.689 --> 00:08:44.360
+which is also available
+from your learning subscription,
+
+00:08:44.360 --> 00:08:48.289
+which is an introductory course
+into Enterprise Java development.
+
+00:08:48.289 --> 00:08:51.450
+It has a really nice section on CDI.
+
+00:08:51.670 --> 00:08:55.265
+Now, looking at the 3 scopes,
+
+00:08:55.265 --> 00:08:57.319
+the 3 most important scopes,
+
+00:08:57.319 --> 00:08:59.540
+as I've already mentioned,
+
+00:08:59.540 --> 00:09:03.319
+the application scope means
+that the object that is
+
+00:09:03.319 --> 00:09:07.639
+created by the CDI container will live
+throughout the life of the application.
+
+00:09:07.639 --> 00:09:12.875
+It will be shared to all the method calls
+
+00:09:12.875 --> 00:09:14.645
+that mentioned that bean.
+
+00:09:14.645 --> 00:09:18.979
+So unless of course,
+
+00:09:18.979 --> 00:09:21.514
+the scope controls of
+
+00:09:21.514 --> 00:09:25.474
+the injection point are completely
+different and more specific,
+
+00:09:25.474 --> 00:09:29.465
+an @ApplicationScoped bean, once
+an instance of it is created,
+
+00:09:29.465 --> 00:09:32.179
+can be accessed from anywhere
+in the application by
+
+00:09:32.179 --> 00:09:36.499
+simply defining injection
+points and referring to it.
+
+00:09:36.499 --> 00:09:45.110
+@SessionScoped bean is created when it's
+first used in the session contexts.
+
+00:09:45.110 --> 00:09:48.739
+So if you're working with, let's say,
+
+00:09:48.739 --> 00:09:55.115
+some sort of a session related
+web application component,
+
+00:09:55.115 --> 00:10:03.589
+then any injection point that
+refers to this instance of
+
+00:10:03.589 --> 00:10:07.009
+a class that we're about to create will
+
+00:10:07.009 --> 00:10:13.009
+have been accessing the same
+instance of the CDI bean,
+
+00:10:13.009 --> 00:10:17.135
+as long as it's in the
+same session context.
+
+00:10:17.135 --> 00:10:24.305
+So you probably know that in a session
+there are multiple concurrent contexts,
+
+00:10:24.305 --> 00:10:26.749
+each depending to one user.
+
+00:10:26.749 --> 00:10:28.789
+So it's assumed.
+
+00:10:28.789 --> 00:10:33.425
+And in each of those contexts the
+state is generally different.
+
+00:10:33.425 --> 00:10:38.000
+Which means that if we have, for example,
+
+00:10:38.000 --> 00:10:42.739
+login bean that stores
+the users preferences,
+
+00:10:42.739 --> 00:10:44.269
+for example, it needs to be
+
+00:10:44.269 --> 00:10:47.255
+a different instance of a
+login been in 1 session,
+
+00:10:47.255 --> 00:10:48.529
+then in another session,
+
+00:10:48.529 --> 00:10:51.200
+because those are not
+2 of the same users,
+
+00:10:51.200 --> 00:10:55.700
+they are different users and they
+obviously have different preferences.
+
+00:10:55.700 --> 00:10:59.180
+If the session is destroyed
+or it times out,
+
+00:10:59.180 --> 00:11:04.219
+any such @SessionScoped bean that is
+associated with it is also destroyed,
+
+00:11:04.219 --> 00:11:08.135
+marked for garbage collection
+and essentially lost.
+
+00:11:08.135 --> 00:11:14.119
+And @RequestScoped beans are tied
+to each individual request and
+
+00:11:14.119 --> 00:11:19.740
+they're created by the CDI container
+when the service invocation starts,
+
+00:11:19.740 --> 00:11:21.714
+when the request is fulfilled,
+
+00:11:21.714 --> 00:11:24.805
+and those @RequestScoped 
+beans are destroyed.
+
+00:11:24.805 --> 00:11:29.214
+You may have noticed that we haven't
+mentioned @ConversationScoped at all here.
+
+00:11:29.214 --> 00:11:33.204
+This is because in Quarkus
+DI @ConversationScoped,
+
+00:11:33.204 --> 00:11:38.964
+decorators, extensions, specialization,
+pasteurization and so on,
+
+00:11:38.964 --> 00:11:42.129
+they are not supported.
+
+00:11:42.129 --> 00:11:46.705
+Additionally, bean manager, if you use it,
+
+00:11:46.705 --> 00:11:53.140
+only has a subset of the
+methods such as getBeans,
+
+00:11:53.140 --> 00:11:57.054
+createCreationalContext, getReference,
+getInjectableReference,
+
+00:11:57.054 --> 00:12:02.925
+resolve, getfireEvent, getEvent and so on.
+
+00:12:02.925 --> 00:12:08.254
+So it's not a fully blown
+implementation of the interface.
+
+00:12:08.254 --> 00:12:11.435
+And what's more important,
+
+00:12:11.435 --> 00:12:14.329
+the dependency injection in Quarkus
+
+00:12:14.329 --> 00:12:20.284
+ignores the content of the
+descriptor called the beans.xml.
+
+00:12:20.284 --> 00:12:23.539
+You may remember that
+beans.xml had to be
+
+00:12:23.539 --> 00:12:26.149
+present even if it was
+just an empty file to
+
+00:12:26.149 --> 00:12:31.370
+turn on CDI in Java EE
+application in Quarkus DI.
+
+00:12:31.370 --> 00:12:33.305
+This is not necessary.
+
+00:12:33.305 --> 00:12:34.549
+Actually if the file is there,
+
+00:12:34.549 --> 00:12:38.000
+it's completely ignored because we do
+
+00:12:38.000 --> 00:12:41.749
+not do injection calculations at runtime.
+
+00:12:41.749 --> 00:12:45.905
+Remember, Quarkus is all about
+predicting what's going to happen.
+
+00:12:45.905 --> 00:12:48.529
+So it needs to have everything related to
+
+00:12:48.529 --> 00:12:51.589
+injection available at compilation time.
+
+00:12:51.589 --> 00:12:55.160
+So one of the consequences
+of ignoring beans.
+
+00:12:55.160 --> 00:12:59.419
+xml file is that we cannot
+configure interceptors,
+
+00:12:59.419 --> 00:13:01.609
+decorators, alternatives, and so on,
+
+00:13:01.609 --> 00:13:03.560
+by using the beans.xml file.
+
+00:13:03.560 --> 00:13:05.495
+We would have to use,
+
+00:13:05.495 --> 00:13:08.735
+for example, qualifier annotations.
+
+00:13:08.735 --> 00:13:13.609
+If we have multiple available
+implementations of the same interface,
+
+00:13:13.609 --> 00:13:19.145
+then qualifiers are what you'd
+have to use in Quarkus DI.
+
+00:13:19.145 --> 00:13:22.190
+You'll find quite a number of differences
+
+00:13:22.190 --> 00:13:26.689
+actually between Quarkus in Enterprise
+Java throughout this course,
+
+00:13:26.689 --> 00:13:29.375
+including the coding style,
+
+00:13:29.375 --> 00:13:32.675
+some implementations
+of the specifications.
+
+00:13:32.675 --> 00:13:36.169
+The reasons are all because
+of a different approach
+
+00:13:36.169 --> 00:13:40.445
+that Quarkus takes at compilation.
+
+00:13:40.445 --> 00:13:43.445
+It needs to be able to
+build the minimal binary
+
+00:13:43.445 --> 00:13:46.399
+and that's why it cannot allow
+
+00:13:46.399 --> 00:13:51.395
+for things like dynamic
+loading, reflection at runtime,
+
+00:13:51.395 --> 00:13:58.160
+and all sorts of other magic that
+was possible if you relied on
+
+00:13:58.160 --> 00:14:04.969
+the fact that your application is
+living in a giant application server,
+
+00:14:04.969 --> 00:14:08.119
+which can actually dynamically
+load libraries
+
+00:14:08.119 --> 00:14:11.749
+which you can deploy and undeploy
+things to and from and so on,
+
+00:14:11.749 --> 00:14:14.150
+with Quarkus, that no longer happens.
+
+00:14:14.150 --> 00:14:15.259
+We are cloud native.
+
+00:14:15.259 --> 00:14:17.269
+We build container images that have
+
+00:14:17.269 --> 00:14:21.559
+all the dependencies bundled
+in them at build time.
+
+00:14:21.559 --> 00:14:25.640
+So a lot of the additional
+functionality that
+
+00:14:25.640 --> 00:14:29.914
+Quarkus does not have is simply
+irrelevant in this context.
+
+00:14:29.914 --> 00:14:33.289
+Now, back to CDI or Quarkus DI
+
+00:14:33.289 --> 00:14:39.530
+I should say, Quarkus discovers beans
+using a simplified bean discovery.
+
+00:14:39.530 --> 00:14:46.985
+And that means that DI
+beans have to be annotated.
+
+00:14:46.985 --> 00:14:53.405
+It constructs the bean archive
+doing the following operations.
+
+00:14:53.405 --> 00:14:56.780
+First it looks at application classes.
+
+00:14:56.780 --> 00:15:00.049
+Then it looks at dependencies of
+
+00:15:00.049 --> 00:15:03.859
+your application that have
+beans.xml descriptor,
+
+00:15:03.859 --> 00:15:06.979
+whereas the contents are ignored.
+
+00:15:06.979 --> 00:15:15.184
+Then it looks for any dependencies
+that have a Jandex index.
+
+00:15:15.184 --> 00:15:20.779
+And then it has a look at any additional
+classes that are referenced by
+
+00:15:20.779 --> 00:15:27.650
+quarkus.index-dependency in the
+Quarkus's application.properties file.
+
+00:15:27.650 --> 00:15:35.569
+Finally, it looks for any classes
+included in Quarkus integration code.
+
+00:15:35.569 --> 00:15:41.914
+Now, this is done at
+compilation time, as mentioned.
+
+00:15:41.914 --> 00:15:44.435
+Because at compilation time,
+
+00:15:44.435 --> 00:15:47.419
+all of these classes
+have to be examined for
+
+00:15:47.419 --> 00:15:51.859
+their respective cascaded
+injection points and so on.
+
+00:15:51.859 --> 00:16:00.335
+Even though typically field membership
+in Java is recommended to be private.
+
+00:16:00.335 --> 00:16:04.159
+All right! So field visibility
+
+00:16:04.159 --> 00:16:08.509
+in members of a class is
+supposed to be private.
+
+00:16:08.509 --> 00:16:10.940
+However, with Quarkus DI, package-
+
+00:16:10.940 --> 00:16:13.579
+private modifiers are preferred
+
+00:16:13.579 --> 00:16:18.485
+because eventually we might want
+to switch to Quarkus Native.
+
+00:16:18.485 --> 00:16:21.560
+And that has even stricter requirements
+
+00:16:21.560 --> 00:16:25.069
+on being able to trace
+code execution paths
+
+00:16:25.069 --> 00:16:32.359
+and predict which accesses to class
+members are going to be made and so on.
+
+00:16:32.359 --> 00:16:35.539
+So Quarkus generally will not give you
+
+00:16:35.539 --> 00:16:40.279
+headaches if you declared
+private members in your classes,
+
+00:16:40.279 --> 00:16:44.195
+until you go from Java
+execution mode to native mode.
+
+00:16:44.195 --> 00:16:48.620
+In that case, you're going to need a little
+bit of refactoring to support that.
+
+00:16:48.620 --> 00:16:51.919
+We do have a chapter on native execution.
+
+00:16:51.919 --> 00:16:55.220
+Later on, we're going to see a
+couple of things that we need
+
+00:16:55.220 --> 00:16:59.404
+to do about our applications
+in that context.
+
+00:16:59.404 --> 00:17:05.135
+So to achieve compatibility
+with Quarkus Native,
+
+00:17:05.135 --> 00:17:06.950
+as I said, we're going to come back to
+
+00:17:06.950 --> 00:17:10.174
+a practical exercise and
+some examples of this.
+
+00:17:10.174 --> 00:17:15.380
+But generally, you should not
+include an explicit access modifier.
+
+00:17:15.380 --> 00:17:19.099
+In fields, constructors, initializers,
+
+00:17:19.099 --> 00:17:21.500
+observe and producer methods,
+
+00:17:21.500 --> 00:17:27.439
+injection fields, that's very
+important, disposers and interceptors.
+
+00:17:27.439 --> 00:17:30.949
+So many of those are CDI related concepts.
+
+00:17:30.949 --> 00:17:35.165
+So again, have a look at
+AD183 training course,
+
+00:17:35.165 --> 00:17:39.815
+if you're not quite sure what
+is the functionality of those.
+
+00:17:39.815 --> 00:17:44.750
+Another thing, bean classes that
+
+00:17:44.750 --> 00:17:49.789
+do not define their scope explicitly
+using annotations are ignored.
+
+00:17:49.789 --> 00:17:52.744
+Now you may remember that in CDI,
+
+00:17:52.744 --> 00:17:58.940
+unannotated classes implicitly
+get a @Dependent scope. In Quarkus
+
+00:17:58.940 --> 00:18:00.814
+DI they do not,
+
+00:18:00.814 --> 00:18:08.494
+so however, if a class
+has producer methods,
+
+00:18:08.494 --> 00:18:10.939
+if a class has producer fields,
+
+00:18:10.939 --> 00:18:13.039
+if it has observer methods,
+
+00:18:13.039 --> 00:18:18.844
+then regardless of the lack of
+annotations on the class itself,
+
+00:18:18.844 --> 00:18:22.549
+Quarkus DI does recognize
+it as a CDI bean because it
+
+00:18:22.549 --> 00:18:26.254
+obviously perform some
+CDI related functions.
+
+00:18:26.254 --> 00:18:28.610
+If it, if there's a
+producer method in a class,
+
+00:18:28.610 --> 00:18:32.719
+then that class does not really have
+to have a scope quantitation because
+
+00:18:32.719 --> 00:18:38.130
+we know immediately it's going to be
+used by some sort of an injection point.
+
+00:18:38.470 --> 00:18:41.824
+Another exception is when
+
+00:18:41.824 --> 00:18:45.574
+business method is annotated with
+the @Scheduled annotation.
+
+00:18:45.574 --> 00:18:48.739
+Again, the class is immediately
+recognized and added to the list
+
+00:18:48.739 --> 00:18:54.119
+of Dependency Injection managed beans.
+
+00:18:54.730 --> 00:18:59.419
+An example bean declaration of
+a class that will be managed by
+
+00:18:59.419 --> 00:19:04.130
+Quarkus DI is this
+example bean in our books,
+
+00:19:04.130 --> 00:19:07.610
+which has an ApplicationScoped
+class-level annotation.
+
+00:19:07.610 --> 00:19:10.190
+It just has 1 string and
+
+00:19:10.190 --> 00:19:14.959
+1 method that prints out high, that doesn't even use that string,
+
+00:19:14.959 --> 00:19:16.699
+nevermind the content of the class
+
+00:19:16.699 --> 00:19:17.359
+really.
+
+00:19:17.359 --> 00:19:20.749
+What's important is that
+the ExampleBean has
+
+00:19:20.749 --> 00:19:24.989
+an annotation which is ApplicationScoped.
+
+00:19:25.330 --> 00:19:31.130
+You can then use this bean in
+an injection point like this.
+
+00:19:31.130 --> 00:19:38.000
+So the injection point called
+someProperty in some resource class
+
+00:19:38.000 --> 00:19:46.370
+at runtime will have an instance of the
+example bean injected into the field,
+
+00:19:46.370 --> 00:19:49.130
+which means that you can use it in
+
+00:19:49.130 --> 00:19:52.309
+the useBean method without
+initializing it first,
+
+00:19:52.309 --> 00:19:57.080
+which would have been a compile-time
+error in non CDI applications,
+
+00:19:57.080 --> 00:20:00.169
+but with CDI, we know that there's always
+
+00:20:00.169 --> 00:20:04.910
+the Dependency Injection framework to
+assist us with creating instances.
+
+00:20:04.910 --> 00:20:10.340
+Quarkus Dependency Injection
+is implemented by Quarkus Arc.
+
+00:20:10.340 --> 00:20:14.510
+It's controlled by entries starting
+
+00:20:14.510 --> 00:20:18.395
+with quarkus.arc prefix
+in the application.properties
+
+00:20:18.395 --> 00:20:21.589
+but we'll get back to configuring
+our applications later.
+
+00:20:21.589 --> 00:20:23.825
+It's just that not for you to make,
+
+00:20:23.825 --> 00:20:29.864
+if you want to fine tune
+quarkus.arc related behavior.
+
+00:20:29.864 --> 00:20:36.115
+Moving from CDI to JAX-RS. JAX-RS
+
+00:20:36.115 --> 00:20:42.115
+used to be known as the Java
+API for RESTful Web Services,
+
+00:20:42.115 --> 00:20:47.124
+but is now known as Jakarta
+RESTful Web Services.
+
+00:20:47.124 --> 00:20:53.334
+It is a specification that provides
+support for creating web services that
+
+00:20:53.334 --> 00:20:55.390
+implement what is known as
+
+00:20:55.390 --> 00:21:00.640
+Representational State Transfer
+or REST architectural pattern.
+
+00:21:00.640 --> 00:21:05.200
+The JAX-RS API is
+primarily annotation driven,
+
+00:21:05.200 --> 00:21:10.029
+very easy to use and
+facilitates the development of
+
+00:21:10.029 --> 00:21:14.450
+web service endpoints and clients in Java by
+
+00:21:14.450 --> 00:21:20.599
+simplifying the development and reducing
+much of the boilerplate code that is,
+
+00:21:20.599 --> 00:21:23.719
+whatever the way it's been
+required to build a web service.
+
+00:21:23.719 --> 00:21:27.094
+Starting with version 1.1
+
+00:21:27.094 --> 00:21:29.840
+JAX-RS was actually included in
+
+00:21:29.840 --> 00:21:33.649
+the Enterprise Java
+specification version 6,
+
+00:21:33.649 --> 00:21:37.894
+making it the de facto
+and industry standard.
+
+00:21:37.894 --> 00:21:39.349
+So both de facto and
+
+00:21:39.349 --> 00:21:44.315
+unofficial industry-standard for
+building Java-based REST services.
+
+00:21:44.315 --> 00:21:47.914
+Couple of core annotations that
+
+00:21:47.914 --> 00:21:52.549
+JAX-RS specification defines for
+building REST service classes.
+
+00:21:52.549 --> 00:21:56.374
+All of them can be found in javax.ws.rs
+
+00:21:56.374 --> 00:22:01.279
+package to import into your classes
+
+00:22:01.279 --> 00:22:03.064
+and of course some subpackages.
+
+00:22:03.064 --> 00:22:06.889
+Probably most important one is the
+@Path annotation because it defines
+
+00:22:06.889 --> 00:22:12.364
+the relative end point at which the
+web service is going to be available.
+
+00:22:12.364 --> 00:22:19.070
+So this can be class-level annotation or
+it can be a method level annotation.
+
+00:22:19.070 --> 00:22:23.030
+But if you use both the class and
+the method level annotations,
+
+00:22:23.030 --> 00:22:27.394
+they are concatenated
+together so as to produce
+
+00:22:27.394 --> 00:22:31.369
+longer endpoints, so that you
+can easily differentiate
+
+00:22:31.369 --> 00:22:35.719
+by providing sub end points on your methods.
+
+00:22:35.719 --> 00:22:38.300
+Whereas the entire class
+can be placed into
+
+00:22:38.300 --> 00:22:44.000
+the endpoint hierarchy by annotating
+it with the path annotation as well.
+
+00:22:44.000 --> 00:22:47.359
+Each method that implements some
+REST functionality would then
+
+00:22:47.359 --> 00:22:52.264
+have one of the HTTP methods
+and method annotations.
+
+00:22:52.264 --> 00:22:54.170
+On top of it is what?
+
+00:22:54.170 --> 00:22:58.970
+It just defines what kind
+of an HTTP method which is
+
+00:22:58.970 --> 00:23:03.649
+passed in a request to the
+corresponding endpoint will trigger
+
+00:23:03.649 --> 00:23:06.050
+this piece of code. And then
+
+00:23:06.050 --> 00:23:08.990
+ultimately produces and
+consumes or 2 annotations
+
+00:23:08.990 --> 00:23:14.810
+that explain to the web container
+whatever is being used,
+
+00:23:14.810 --> 00:23:17.300
+which kind of content
+
+00:23:17.300 --> 00:23:21.815
+type the method will produce
+for the producer's annotation,
+
+00:23:21.815 --> 00:23:24.680
+or which kind of
+content type it expects to
+
+00:23:24.680 --> 00:23:29.224
+consume if it needs some
+sort of a request body,
+
+00:23:29.224 --> 00:23:33.600
+sent to the method in order to process it.
+
+00:23:33.790 --> 00:23:39.979
+Any valid parameter to the @Produces
+and @Consumes annotations is one of
+
+00:23:39.979 --> 00:23:45.665
+the fields in the javax.ws.rs.core.MediaType class.
+
+00:23:45.665 --> 00:23:48.979
+Rest methods of course,
+can take parameters,
+
+00:23:48.979 --> 00:23:53.165
+and the way parameters are passed into
+
+00:23:53.165 --> 00:23:58.099
+your methods is actually managed by
+the JAX-RS specification as well.
+
+00:23:58.099 --> 00:24:01.145
+If you have a parameter in your path,
+
+00:24:01.145 --> 00:24:05.134
+such as for example in this URL,
+
+00:24:05.134 --> 00:24:09.154
+www.example.com/currencies/USD.
+
+00:24:09.154 --> 00:24:11.194
+If the USD was the parameter,
+
+00:24:11.194 --> 00:24:16.160
+then path parameter can actually inject
+
+00:24:16.160 --> 00:24:18.290
+this parameter if we define
+
+00:24:18.290 --> 00:24:22.685
+the path with the specific
+place holder. For this example,
+
+00:24:22.685 --> 00:24:26.630
+the path value would be,
+
+00:24:26.630 --> 00:24:36.689
+let's say we have a class that is annotated
+with the path auth slash currencies
+
+00:24:38.290 --> 00:24:44.850
+and then we have a method that
+is annotated with a path,
+
+00:24:45.130 --> 00:24:47.570
+which is the parameter itself.
+
+00:24:47.570 --> 00:24:55.019
+Of course, we would say
+something like curr
+
+00:24:56.280 --> 00:24:59.290
+and then in the path parameter,
+
+00:24:59.290 --> 00:25:03.399
+we can specify that the curr
+
+00:25:03.399 --> 00:25:08.875
+value should be injected into
+the methods parameter field.
+
+00:25:08.875 --> 00:25:14.890
+So this is a methods parameter annotation
+that literally takes whatever is
+
+00:25:14.890 --> 00:25:20.829
+passed as part of the URL and inject
+it into the method parameter.
+
+00:25:20.829 --> 00:25:24.249
+Query parameters work
+similarly to path parameters,
+
+00:25:24.249 --> 00:25:29.964
+except that they referred to named
+parameters appended at the end of the URL.
+
+00:25:29.964 --> 00:25:33.234
+So with this example/rest
+
+00:25:33.234 --> 00:25:36.100
+question mark name equals
+Test query parameter,
+
+00:25:36.100 --> 00:25:40.370
+but simply state that
+name parameters should
+
+00:25:40.370 --> 00:25:44.690
+be injected into the method
+parameter as it was passed.
+
+00:25:44.690 --> 00:25:48.365
+And then the method parameter
+would contain the string test.
+
+00:25:48.365 --> 00:25:51.409
+Header parameters can extract values from
+
+00:25:51.409 --> 00:25:56.074
+HTTP request headers and inject
+them into method parameters.
+
+00:25:56.074 --> 00:26:01.145
+Form parameters can take
+values from form field,
+
+00:26:01.145 --> 00:26:04.819
+no matter where it is URL
+
+00:26:04.819 --> 00:26:09.634
+encoded or whatever type of validation
+you've been coding for a form that is,
+
+00:26:09.634 --> 00:26:12.170
+and the context is
+
+00:26:12.170 --> 00:26:17.899
+a special annotation that injects the
+entire context of the HttpServletRequest
+
+00:26:17.899 --> 00:26:23.180
+that triggered
+this particular action
+
+00:26:23.180 --> 00:26:27.949
+of processing into a method
+parameter. Depending on its type,
+
+00:26:27.949 --> 00:26:30.394
+it can also be the security contexts,
+
+00:26:30.394 --> 00:26:32.420
+not just the HttpServletRequest.
+
+00:26:32.420 --> 00:26:36.110
+So it's function is actually
+
+00:26:36.110 --> 00:26:40.230
+dependent on the declared
+type of the method parameter.
+
+00:26:40.230 --> 00:26:42.859
+So if your method parameter is
+specifying that it's of
+
+00:26:42.859 --> 00:26:47.104
+type HttpServletRequest than
+that is what you're going to get.
+
+00:26:47.104 --> 00:26:50.644
+Otherwise, if it specifies that
+it is of type SecurityContext,
+
+00:26:50.644 --> 00:26:53.420
+if you annotated with an
+@Context annotation
+
+00:26:53.420 --> 00:26:58.159
+then the SecurityContexts will
+be injected into that parameter.
+
+00:26:58.159 --> 00:27:03.720
+You can also use that to
+
+00:27:03.970 --> 00:27:08.090
+inject class-level
+variables, not just methods.
+
+00:27:08.090 --> 00:27:12.919
+So in that sense, context is multifaceted
+
+00:27:12.919 --> 00:27:16.280
+annotation, is not just
+used in method parameters,
+
+00:27:16.280 --> 00:27:20.855
+it can also be used on fields
+of your class.
+
+00:27:20.855 --> 00:27:25.639
+You can also retrieve the URI info of
+
+00:27:25.639 --> 00:27:32.150
+incoming requests using the context
+annotation. Using JAX-RS in Quarkus,
+
+00:27:32.150 --> 00:27:34.715
+in practice looks like this.
+
+00:27:34.715 --> 00:27:40.159
+Our ExampleResource class is annotated
+with the path example annotation,
+
+00:27:40.159 --> 00:27:41.510
+which means that this is
+
+00:27:41.510 --> 00:27:46.024
+the base path that this REST web
+service will be listening on.
+
+00:27:46.024 --> 00:27:49.549
+All the methods unless
+otherwise specified,
+
+00:27:49.549 --> 00:27:54.110
+except and return JSON
+as the content type.
+
+00:27:54.110 --> 00:27:58.354
+And then we have simple greet method here,
+
+00:27:58.354 --> 00:28:02.419
+which is reacting to get requests to slash
+
+00:28:02.419 --> 00:28:06.380
+example endpoint and
+simply prints Hello friend.
+
+00:28:06.380 --> 00:28:09.785
+And we have another GET method,
+
+00:28:09.785 --> 00:28:12.454
+but this time with a path parameter.
+
+00:28:12.454 --> 00:28:17.990
+So anything sent to slash
+example slash something,
+
+00:28:17.990 --> 00:28:21.199
+something will be taken and injected into
+
+00:28:21.199 --> 00:28:24.500
+the name parameter of the method
+because it is annotated with
+
+00:28:24.500 --> 00:28:27.469
+the PathParam annotation
+specifying that is
+
+00:28:27.469 --> 00:28:31.145
+the name of the component
+of the URL that we want,
+
+00:28:31.145 --> 00:28:34.459
+that one too will react to get type request.
+
+00:28:34.459 --> 00:28:40.084
+JSON is a great way of
+representing structured data.
+
+00:28:40.084 --> 00:28:45.019
+But of course, it needs to be correctly
+
+00:28:45.019 --> 00:28:50.460
+transferred into Java objects if
+we want to use it in Java code.
+
+00:28:51.280 --> 00:28:56.900
+Traditional enterprise
+Java use JSON-P for many,
+
+00:28:56.900 --> 00:28:59.554
+many types of JSON manipulation.
+
+00:28:59.554 --> 00:29:03.589
+Quarkus though uses JSON-P.
+
+00:29:03.589 --> 00:29:09.710
+JSON-P specification defines an
+API for processing JSON streams,
+
+00:29:09.710 --> 00:29:13.684
+then transforming them into an object
+model and attaching events to it.
+
+00:29:13.684 --> 00:29:20.119
+Whereas JSON-B specification declares
+a binding layer from the JSON
+
+00:29:20.119 --> 00:29:24.485
+structure into your
+Java POJOs, mapping
+
+00:29:24.485 --> 00:29:28.370
+JSON values to Java object instances.
+
+00:29:28.370 --> 00:29:31.235
+Among other things, Quarkus
+also support
+
+00:29:31.235 --> 00:29:34.400
+Jackson for JSON serialization
+and deserialization.
+
+00:29:34.400 --> 00:29:35.869
+If you want to use Jackson,
+
+00:29:35.869 --> 00:29:42.079
+then in addition to adding
+JSON-B and dependencies,
+
+00:29:42.079 --> 00:29:48.034
+also add quarkus-resteasy-jackson or quarkus-jackson
+
+00:29:48.034 --> 00:29:51.704
+extensions for support for that.
+
+00:29:51.704 --> 00:29:57.370
+Now, binding a class for
+
+00:29:57.370 --> 00:30:00.294
+serialization and
+deserialization to and from
+
+00:30:00.294 --> 00:30:03.744
+JSON requires you to first of all,
+
+00:30:03.744 --> 00:30:06.580
+annotate your endpoint methods,
+
+00:30:06.580 --> 00:30:09.820
+of course, which you're going
+to use in the web service.
+
+00:30:09.820 --> 00:30:13.510
+And then annotate the
+service class or the method
+
+00:30:13.510 --> 00:30:17.334
+itself with consumes and
+produces annotations.
+
+00:30:17.334 --> 00:30:21.790
+This automatically triggers an
+attempt at serialization and
+
+00:30:21.790 --> 00:30:26.619
+deserialization based on the method
+parameters and return types.
+
+00:30:26.619 --> 00:30:30.399
+Of course, whatever the method
+parameter type and the return type are,
+
+00:30:30.399 --> 00:30:34.029
+those 2 classes need to be sort
+
+00:30:34.029 --> 00:30:39.140
+of the correct structure for
+the JSON we're receiving
+
+00:30:39.140 --> 00:30:42.800
+and of course, for returning,
+it is much easier.
+
+00:30:42.800 --> 00:30:47.134
+Serializing a Java object into JSON is
+a fairly straightforward operation.
+
+00:30:47.134 --> 00:30:49.730
+De-serializing it though
+is a bit trickier and
+
+00:30:49.730 --> 00:30:54.149
+that's something we're going
+to look into a bit later.
+
+00:30:55.510 --> 00:31:01.744
+If you want to return a Response
+object instead of a POJO,
+
+00:31:01.744 --> 00:31:04.489
+because you have to modify
+one thing or another
+
+00:31:04.489 --> 00:31:08.165
+about the HTTP server response,
+
+00:31:08.165 --> 00:31:11.734
+set some headers, I don't know, whatever.
+
+00:31:11.734 --> 00:31:13.880
+Then
+
+00:31:13.880 --> 00:31:17.600
+in Native all mode Quarkus
+will not be able to
+
+00:31:17.600 --> 00:31:21.845
+identify the type of object
+that needs to serialize.
+
+00:31:21.845 --> 00:31:25.340
+And in that case, you
+need to use register for
+
+00:31:25.340 --> 00:31:29.694
+reflection annotation to indicate to Graal
+
+00:31:29.694 --> 00:31:31.760
+VM that it needs to look into
+
+00:31:31.760 --> 00:31:37.714
+the POJO that you're using and
+enable serialization on it.
+
+00:31:37.714 --> 00:31:39.244
+But that's only relevant again,
+
+00:31:39.244 --> 00:31:40.939
+when you're using Quarkus Natives, so
+
+00:31:40.939 --> 00:31:42.559
+we going to get back to that?
+
+00:31:42.559 --> 00:31:46.400
+The JSON binding capabilities are
+actually based on code introspection.
+
+00:31:46.400 --> 00:31:51.890
+So for the most part you do not need
+to provide any additional annotations.
+
+00:31:51.890 --> 00:31:55.010
+But Quarkus does have to
+be able to instantiate
+
+00:31:55.010 --> 00:32:00.259
+the class and assign the
+values for its fields.
+
+00:32:00.259 --> 00:32:02.195
+And for that purpose,
+
+00:32:02.195 --> 00:32:08.420
+the POJO that is being
+manipulated by serialization and
+
+00:32:08.420 --> 00:32:17.720
+deserialization must have a class
+constructor that either has no-parameters,
+
+00:32:17.720 --> 00:32:21.019
+constructor, so default,
+constructor basically.
+
+00:32:21.019 --> 00:32:24.049
+Or you need to annotate
+
+00:32:24.049 --> 00:32:27.725
+the POJO constructor with
+the @JsonbCreator annotation.
+
+00:32:27.725 --> 00:32:32.224
+This is a special case when your
+class does not have default values.
+
+00:32:32.224 --> 00:32:35.630
+It need some sort of
+initialization parameter,
+
+00:32:35.630 --> 00:32:39.470
+even though JSON-B would if
+
+00:32:39.470 --> 00:32:44.104
+inject it the correct values from JSON
+into the class at a later point.
+
+00:32:44.104 --> 00:32:48.454
+So you have to annotate the
+constructor with @JsonbCreator.
+
+00:32:48.454 --> 00:32:54.979
+But then parameter names must match
+JSON property names or you must
+
+00:32:54.979 --> 00:32:57.964
+use @JsonProperty to indicate
+
+00:32:57.964 --> 00:33:03.540
+which JSON field should be used
+in the constructor's parameters.
+
+00:33:03.880 --> 00:33:07.220
+Also, attributes of the class
+
+00:33:07.220 --> 00:33:10.040
+must be publicly available
+for reading and writing
+
+00:33:10.040 --> 00:33:15.754
+by either having class attributes
+with publicaccess modifiers,
+
+00:33:15.754 --> 00:33:18.409
+or having appropriate getter and setter
+
+00:33:18.409 --> 00:33:21.934
+methods for each attribute used by JSON.
+
+00:33:21.934 --> 00:33:27.335
+Quarkus cannot break any rules and
+access restricted class members,
+
+00:33:27.335 --> 00:33:31.085
+so you have to have some
+way of setting the fields.
+
+00:33:31.085 --> 00:33:34.879
+There are situations where
+you do not want to serialize
+
+00:33:34.879 --> 00:33:38.105
+a property of an object even though
+it's there, such as for example,
+
+00:33:38.105 --> 00:33:40.684
+age. Age might be in a customer,
+
+00:33:40.684 --> 00:33:42.770
+might be a convenience property that you
+
+00:33:42.770 --> 00:33:45.770
+calculate from the birth
+date and current date.
+
+00:33:45.770 --> 00:33:51.305
+So you do not really have to
+store it and it does change,
+
+00:33:51.305 --> 00:33:53.540
+whereas birth dates do not change.
+
+00:33:53.540 --> 00:33:55.925
+So you can always recalculate
+the customer's age.
+
+00:33:55.925 --> 00:34:03.815
+So such views of objects can be annotated
+with @JsonbTransient annotation.
+
+00:34:03.815 --> 00:34:08.434
+And JSON-B will simply
+ignore them. If you want to
+
+00:34:08.434 --> 00:34:15.030
+ignore the annotation
+for serialization only
+
+00:34:16.030 --> 00:34:19.190
+but not deserialization,
+
+00:34:19.190 --> 00:34:21.500
+there might be cases like that,
+
+00:34:21.500 --> 00:34:24.664
+then just instead of annotating the field,
+
+00:34:24.664 --> 00:34:28.579
+simply use @JsonbTransient
+on the getter method.
+
+00:34:28.579 --> 00:34:32.299
+If you want to ignore the property for
+
+00:34:32.299 --> 00:34:36.139
+deserialization but include it
+in serialized classes,
+
+00:34:36.139 --> 00:34:37.309
+then just do the opposite.
+
+00:34:37.309 --> 00:34:39.304
+Do not annotate the getter class,
+
+00:34:39.304 --> 00:34:41.674
+but do annotate the setter one.
+
+00:34:41.674 --> 00:34:46.805
+You can achieve much more
+custom serialization properties
+
+00:34:46.805 --> 00:34:51.919
+by defining a CDI bean of type io.quarkus.
+
+00:34:51.919 --> 00:34:54.994
+jsonb.JsonConfigCustomizer,
+
+00:34:54.994 --> 00:35:00.485
+or a bean of type javax.json.bind.JsonbConfig.
+
+00:35:00.485 --> 00:35:02.540
+And then of course, CDI will automatically
+
+00:35:02.540 --> 00:35:07.024
+instantiate an instance of that
+class whenever it needs JSON-B
+
+00:35:07.024 --> 00:35:12.665
+in use the configuration in those
+classes for marshalling and unmarshalling.
+
+00:35:12.665 --> 00:35:15.424
+The annotations that we've
+been talking about just now,
+
+00:35:15.424 --> 00:35:19.280
+are JSON-B specific if
+you switch to Jackson as
+
+00:35:19.280 --> 00:35:23.150
+your underlying JSON serialization,
+deserialization, framework,
+
+00:35:23.150 --> 00:35:28.474
+then you use @JsonIgnore or @JsonIgnoreProperties, annotations,
+
+00:35:28.474 --> 00:35:32.839
+and fine-control serialization
+properties by defining
+
+00:35:32.839 --> 00:35:38.885
+a CDI bean of type io.quarkus.jackson.ObjectMapperCustomizer.
+
+00:35:38.885 --> 00:35:41.239
+Now, let's bring all these 3 together,
+
+00:35:41.239 --> 00:35:45.500
+CDI, JAX-RS and JSON-B.
+
+00:35:45.500 --> 00:35:51.964
+We will have an ExampleData class
+here that just has a name and an age.
+
+00:35:51.964 --> 00:35:55.864
+Then we will have an ExampleSrvice,
+
+00:35:55.864 --> 00:35:59.629
+which is an @ApplicationScoped
+CDI bean that we can
+
+00:35:59.629 --> 00:36:04.490
+inject into other classes
+and manage by Quarkus DI.
+
+00:36:04.490 --> 00:36:11.169
+It has simple create method that accepts
+
+00:36:11.169 --> 00:36:15.109
+some example data as a
+parameter and returns
+
+00:36:15.109 --> 00:36:20.120
+a list containing that ExampleData.
+
+00:36:20.120 --> 00:36:27.650
+So basically, it uses a field called
+list that is initially an ArrayList
+
+00:36:27.650 --> 00:36:32.059
+and every time we invoke
+the create method,
+
+00:36:32.059 --> 00:36:35.885
+whatever data we pass it
+is added to the list.
+
+00:36:35.885 --> 00:36:41.330
+So the final piece is the
+REST implementation itself.
+
+00:36:41.330 --> 00:36:48.184
+Naming convention essentially means
+that example is the base name,
+
+00:36:48.184 --> 00:36:54.245
+the service is the backend
+business logic method
+
+00:36:54.245 --> 00:36:56.509
+where work is being performed.
+
+00:36:56.509 --> 00:37:03.649
+And ExampleResource is usually used
+for RESTful web service classes,
+
+00:37:03.649 --> 00:37:06.964
+or whenever you're implementing
+the actual REST layer,
+
+00:37:06.964 --> 00:37:10.010
+you use the base name plus resource.
+
+00:37:10.010 --> 00:37:15.409
+Now, this ExampleResource web service is
+going to, it has an injection point
+
+00:37:15.409 --> 00:37:18.620
+defined where the ExampleService
+implementation
+
+00:37:18.620 --> 00:37:21.754
+of the application is called
+bean is going to be injected.
+
+00:37:21.754 --> 00:37:25.040
+The fact that the bean is
+ApplicationScoped means that
+
+00:37:25.040 --> 00:37:29.209
+no data ever added to the list is lost
+until the application is shut down
+
+00:37:29.209 --> 00:37:33.830
+obviously. It is registered
+
+00:37:33.830 --> 00:37:40.640
+@ /example path and both
+@consumes and @produces.
+
+00:37:40.640 --> 00:37:42.889
+JSON as content type.
+
+00:37:42.889 --> 00:37:46.370
+It has a single post
+method that does not have
+
+00:37:46.370 --> 00:37:49.700
+an additional endpoint subcontext,
+
+00:37:49.700 --> 00:37:53.359
+so anything sent with a
+post request to the
+
+00:37:53.359 --> 00:37:58.940
+/example will be handed
+over to the create method
+
+00:37:58.940 --> 00:38:03.140
+in the ExampleResource implementation.
+
+00:38:03.140 --> 00:38:07.429
+The ExampleData class is
+deserialized from JSON,
+
+00:38:07.429 --> 00:38:10.519
+so going back to the data structure,
+
+00:38:10.519 --> 00:38:15.620
+it needs to have a name and
+an age in the JSON body.
+
+00:38:15.620 --> 00:38:20.420
+And the service method create is invoked,
+
+00:38:20.420 --> 00:38:23.059
+returning the current contents
+
+00:38:23.059 --> 00:38:26.480
+of the list of data as
+they are at the moment.
+
+00:38:26.480 --> 00:38:28.789
+Of course, you can
+develop Quarkus code using
+
+00:38:28.789 --> 00:38:32.989
+whatever integrated development
+environment or editor you prefer to.
+
+00:38:32.989 --> 00:38:38.525
+Some environments like CodeReady Studio,
+
+00:38:38.525 --> 00:38:44.734
+which is essentially Eclipse with
+JBoss integration plug-ins,
+
+00:38:44.734 --> 00:38:49.924
+IntelliJ, Apache NetBeans,
+Visual Studio Code.
+
+00:38:49.924 --> 00:38:53.539
+Many of those will have plug-ins that
+will make your experience developing
+
+00:38:53.539 --> 00:38:57.929
+Quarkus applications more pleasurable.
+
+00:38:57.970 --> 00:39:01.880
+We will be using VSCodium in this course,
+
+00:39:01.880 --> 00:39:06.530
+which is a free and open source
+IDE based on Visual Studio Code.
+
+00:39:06.530 --> 00:39:09.424
+There is very little
+difference between the 2,
+
+00:39:09.424 --> 00:39:11.659
+except for the fact that VSCodium has
+
+00:39:11.659 --> 00:39:16.309
+an open source license and some
+code that disables telemetry,
+
+00:39:16.309 --> 00:39:17.885
+that is usage reporting
+
+00:39:17.885 --> 00:39:23.074
+and couple of other little
+details related to that.
+
+00:39:23.074 --> 00:39:25.999
+It's installed and configured
+to work with Quarkus on
+
+00:39:25.999 --> 00:39:30.395
+your workstation virtual machine
+in the lab environment already.
+
+00:39:30.395 --> 00:39:36.019
+VSCodium and Visual Studio Code
+have a lot of plugins that allow
+
+00:39:36.019 --> 00:39:42.755
+for Java application development and
+particularly Quarkus integration.
+
+00:39:42.755 --> 00:39:47.149
+Now the first start will ask
+you what theme you want to
+
+00:39:47.149 --> 00:39:50.239
+use and allow you
+
+00:39:50.239 --> 00:39:54.275
+to perform some additional
+configuration, initial configuration.
+
+00:39:54.275 --> 00:39:58.715
+And then once you started
+it for the first time,
+
+00:39:58.715 --> 00:40:02.360
+the extensions menu on the
+left-hand side will allow you
+
+00:40:02.360 --> 00:40:05.870
+to search for and install
+the extensions among
+
+00:40:05.870 --> 00:40:14.434
+which Quarkus has a number
+of additional supports
+
+00:40:14.434 --> 00:40:17.029
+extensions, such as, for example,
+
+00:40:17.029 --> 00:40:21.500
+Language Support for Camel, Quarkus
+
+00:40:21.500 --> 00:40:24.665
+Dark Theme if you want
+in Visual Studio Code,
+
+00:40:24.665 --> 00:40:27.604
+and even example snippets.
+
+00:40:27.604 --> 00:40:33.739
+The one that is required though is Quarkus
+Tools for Visual Studio Code,
+
+00:40:33.739 --> 00:40:36.485
+which you can either install from
+
+00:40:36.485 --> 00:40:41.614
+the marketplace or from a
+locally provided archive.
+
+00:40:41.614 --> 00:40:45.200
+You can run and debug your
+application within VSCodium
+
+00:40:45.200 --> 00:40:50.510
+because of the Quarkus extension
+and the way it integrates with Maven,
+
+00:40:50.510 --> 00:40:53.914
+which is already pre-installed
+on our system as well.
+
+00:40:53.914 --> 00:40:59.375
+You can open any project by clicking
+on File and selecting Open Folder.
+
+00:40:59.375 --> 00:41:04.789
+Then simply browse to the
+project location and click OK.
+
+00:41:04.789 --> 00:41:06.770
+We've already done this ahead of time.
+
+00:41:06.770 --> 00:41:08.209
+The first time you do it,
+
+00:41:08.209 --> 00:41:12.229
+a lot of Maven dependencies are going
+to be downloaded, so it may take
+
+00:41:12.229 --> 00:41:13.849
+a couple of minutes before
+
+00:41:13.849 --> 00:41:17.430
+the project becomes fully
+responsive and functional.
+
+00:41:17.680 --> 00:41:22.429
+Then once the project is open,
+
+00:41:22.429 --> 00:41:24.875
+you will see it in the File Explorer.
+
+00:41:24.875 --> 00:41:28.834
+You see all the files in
+this project in here,
+
+00:41:28.834 --> 00:41:31.579
+starting from pom.xml
+
+00:41:31.579 --> 00:41:35.929
+but also the source code files and
+
+00:41:35.929 --> 00:41:41.180
+the additional generated artifacts such
+as a target subdirectory and so on.
+
+00:41:41.180 --> 00:41:43.865
+There is also a Java projects perspective,
+
+00:41:43.865 --> 00:41:47.089
+which you can use to
+limit the display only to
+
+00:41:47.089 --> 00:41:52.009
+the relevant Java related
+artifacts or Java source code.
+
+00:41:52.009 --> 00:41:55.324
+Any additional resources
+in src/main/resources,
+
+00:41:55.324 --> 00:41:58.579
+and of course, a view of Maven
+Dependencies if you need
+
+00:41:58.579 --> 00:42:02.849
+to manipulate them directly
+from the project view.
+
+00:42:03.730 --> 00:42:07.924
+Once the project has finished importing,
+
+00:42:07.924 --> 00:42:13.430
+you can run and debug the application
+from the Command Palette.
+
+00:42:13.430 --> 00:42:19.160
+You can simply press Control
+Shift P for the palette to open
+
+00:42:19.160 --> 00:42:22.729
+or alternatively, you can click on
+
+00:42:22.729 --> 00:42:27.905
+View and Command Palette as
+the first item in the menu.
+
+00:42:27.905 --> 00:42:30.184
+Then you can select Quarkus,
+
+00:42:30.184 --> 00:42:32.959
+just start typing Quarkus
+
+00:42:32.959 --> 00:42:34.849
+and there you go.
+
+00:42:34.849 --> 00:42:37.760
+There's a Debug current Quarkus project,
+
+00:42:37.760 --> 00:42:40.219
+which will start the Quarkus application in
+
+00:42:40.219 --> 00:42:45.034
+development mode and connect
+the ID 2 to the Quarkus runtime.
+
+00:42:45.034 --> 00:42:48.350
+That means whatever changes you make in
+
+00:42:48.350 --> 00:42:53.149
+the development environment will
+automatically be reloaded by Quarkus.
+
+00:42:53.149 --> 00:42:56.579
+I can show you a quick demo of that.
+
+00:43:04.570 --> 00:43:10.140
+So at the bottom here we
+have the Quarkus Terminal
+
+00:43:10.300 --> 00:43:12.965
+as you can see it here.
+
+00:43:12.965 --> 00:43:18.935
+It says it's greeting and tells us
+that the Live Coding is activated.
+
+00:43:18.935 --> 00:43:26.134
+Now, I can test this by simply
+connecting to localhost port 8080.
+
+00:43:26.134 --> 00:43:31.714
+If I just quickly review the source
+code in the ExpenseResource,
+
+00:43:31.714 --> 00:43:34.429
+the @Path is expenses,
+
+00:43:34.429 --> 00:43:39.545
+and the @GET method without any parameters
+will simply list all expenses.
+
+00:43:39.545 --> 00:43:42.059
+So let's do that.
+
+00:43:48.090 --> 00:43:50.275
+There they are.
+
+00:43:50.275 --> 00:43:56.410
+Now, if I want to change
+something about this method,
+
+00:43:56.410 --> 00:43:59.530
+let's say register it
+under a different path,
+
+00:43:59.530 --> 00:44:05.980
+I can add a new annotation like this.
+
+00:44:05.980 --> 00:44:07.930
+And as I save the file,
+
+00:44:07.930 --> 00:44:12.609
+you will see that upon my next request
+it will be automatically reloaded.
+
+00:44:12.609 --> 00:44:16.479
+So now I'm no longer going
+to get a response at
+
+00:44:16.479 --> 00:44:19.779
+/expenses because the file
+
+00:44:19.779 --> 00:44:23.590
+was reloaded and the new @Path
+was immediately activated.
+
+00:44:23.590 --> 00:44:27.890
+It says here Hot replace total time was 0.621s.
+
+00:44:27.890 --> 00:44:30.589
+Of course now I have to add the list and
+
+00:44:30.589 --> 00:44:34.234
+point to get the same functionality back.
+
+00:44:34.234 --> 00:44:36.890
+Is the simple, quick example
+
+00:44:36.890 --> 00:44:44.015
+of how live reloading makes it
+really easy to test applications.
+
+00:44:44.015 --> 00:44:47.180
+You can add break points to your code by
+
+00:44:47.180 --> 00:44:51.649
+clicking on the red dot
+
+00:44:51.649 --> 00:44:55.174
+that appears if you hover to
+the left of the line number
+
+00:44:55.174 --> 00:44:57.439
+as you can see here, if you click it in,
+
+00:44:57.439 --> 00:44:58.789
+and a Breakpoint is added.
+
+00:44:58.789 --> 00:45:01.279
+If you click it again, it is removed.
+
+00:45:01.279 --> 00:45:05.480
+Of course that means when you're running
+your application in development mode,
+
+00:45:05.480 --> 00:45:08.450
+if you send the request that
+
+00:45:08.450 --> 00:45:11.360
+activates the line where
+you've marked a Breakpoint,
+
+00:45:11.360 --> 00:45:16.190
+the execution will stop
+and the IDE will show you,
+
+00:45:16.190 --> 00:45:18.380
+will prompt you for attention
+
+00:45:18.380 --> 00:45:23.959
+and we will show you the view of
+the variables of all the values.
+
+00:45:23.959 --> 00:45:29.659
+And you will be able to use the toolbar
+at the top here to step over the code,
+
+00:45:29.659 --> 00:45:34.294
+step into it, step out of it as any
+normal debugger would allow you to do.
+
+00:45:34.294 --> 00:45:37.099
+Let's move on with our very first exercise,
+
+00:45:37.099 --> 00:45:39.200
+where we develop a RESTful Microservice
+
+00:45:39.200 --> 00:45:41.630
+and practice using the tools and
+
+00:45:41.630 --> 00:45:45.149
+methods that we have just discussed.
+See you in the next video.
 

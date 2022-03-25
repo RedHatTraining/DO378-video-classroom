@@ -1,5 +1,1342 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:02.610
+In this chapter we are going to have
+a look at how to build
 
+00:00:02.610 --> 00:00:05.100
+and deploy native Quarkus applications.
+
+00:00:05.100 --> 00:00:10.005
+We are going to start with how
+native compilation works?
+
+00:00:10.005 --> 00:00:12.435
+What are the requirements
+and limitations for it?
+
+00:00:12.435 --> 00:00:16.185
+And then check that out
+live in a guided exercise.
+
+00:00:16.185 --> 00:00:18.840
+Then we are going to have a
+look at how to containerize
+
+00:00:18.840 --> 00:00:23.625
+natively built applications and have
+an exercise about that as well.
+
+00:00:23.625 --> 00:00:28.110
+Java applications traditionally
+running a Java virtual machine.
+
+00:00:28.110 --> 00:00:32.940
+While there has been a native
+compilation option ages ago,
+
+00:00:32.940 --> 00:00:34.990
+it was way too complicated,
+
+00:00:34.990 --> 00:00:39.620
+required writing, or at least
+modifying C and C ++ code
+
+00:00:39.620 --> 00:00:42.320
+and it was very low level operation with
+
+00:00:42.320 --> 00:00:47.555
+the resulting binaries being quite
+complex and difficult to produce.
+
+00:00:47.555 --> 00:00:54.590
+So pretty much most of the efforts
+over the coming years went into
+
+00:00:54.590 --> 00:00:58.190
+making the just-in-time compiler and
+
+00:00:58.190 --> 00:01:02.330
+the virtual machine itself
+as efficient as possible.
+
+00:01:02.330 --> 00:01:09.440
+And actually, thanks to endless
+efforts of great experts in the area
+
+00:01:09.440 --> 00:01:12.080
+of adaptive compilation and
+
+00:01:12.080 --> 00:01:17.300
+memory management and all the
+other techniques involved in that,
+
+00:01:17.300 --> 00:01:18.890
+we have got a very,
+
+00:01:18.890 --> 00:01:22.025
+very efficient Java virtual
+machine these days.
+
+00:01:22.025 --> 00:01:26.610
+Even if you look just at the
+standard hotspot virtual machine
+
+00:01:26.680 --> 00:01:32.210
+but also all the alternative implementations
+produced by various vendors are
+
+00:01:32.210 --> 00:01:36.050
+extremely efficient and really fast.
+
+00:01:36.050 --> 00:01:37.640
+It does help that
+
+00:01:37.640 --> 00:01:42.305
+the modern CPUs are becoming
+faster and faster as well.
+
+00:01:42.305 --> 00:01:44.795
+So for the most part,
+
+00:01:44.795 --> 00:01:46.655
+in many use cases,
+
+00:01:46.655 --> 00:01:47.990
+running an application in
+
+00:01:47.990 --> 00:01:50.855
+a Java virtual machine is not
+really that much of a problem.
+
+00:01:50.855 --> 00:01:54.110
+However, there are use cases
+where you absolutely cannot
+
+00:01:54.110 --> 00:02:00.035
+afford 1 second startup time
+and the memory footprint.
+
+00:02:00.035 --> 00:02:04.940
+Moreover, that the loading of
+a Java virtual machine and
+
+00:02:04.940 --> 00:02:12.420
+all its additional functions represents
+or impresses on the system.
+
+00:02:13.810 --> 00:02:22.070
+So just in time compilation also
+becomes tricky in certain use cases.
+
+00:02:22.070 --> 00:02:29.015
+We just simply do not want
+the virtual machine to be
+
+00:02:29.015 --> 00:02:32.480
+translating Java byte code into
+
+00:02:32.480 --> 00:02:37.775
+machine code just before
+the CPU needs it to execute.
+
+00:02:37.775 --> 00:02:43.535
+We want to do something more
+permanent and more preemptive.
+
+00:02:43.535 --> 00:02:47.165
+And that is called native compilation.
+
+00:02:47.165 --> 00:02:54.035
+And one of the most popular
+currently
+
+00:02:54.035 --> 00:02:59.630
+native compilation toolkits
+for Java is called GraalVM.
+
+00:02:59.630 --> 00:03:01.910
+GraalVM is actually both, it's
+
+00:03:01.910 --> 00:03:04.970
+a Java virtual machine and
+a software development kit.
+
+00:03:04.970 --> 00:03:10.670
+It's been developed and is owned by
+Oracle and has a vast set of tools.
+
+00:03:10.670 --> 00:03:15.110
+It's actually a polyglot
+execution environment,
+
+00:03:15.110 --> 00:03:19.685
+among other things, which supports
+many, many different languages.
+
+00:03:19.685 --> 00:03:23.555
+But the function that
+is most important for
+
+00:03:23.555 --> 00:03:27.545
+Quarkus is its Native Image support,
+
+00:03:27.545 --> 00:03:32.825
+which is actually a process
+of compiling bytecode,
+
+00:03:32.825 --> 00:03:35.420
+or compiling source code into bytecode,
+
+00:03:35.420 --> 00:03:38.795
+and then that Java bytecode
+into machine code
+
+00:03:38.795 --> 00:03:40.370
+ahead of time,
+
+00:03:40.370 --> 00:03:42.710
+which is ahead of time
+compilation is basically
+
+00:03:42.710 --> 00:03:47.760
+just a different term for producing
+a native executable, right?
+
+00:03:47.830 --> 00:03:51.455
+So what happens is that GraalVM
+
+00:03:51.455 --> 00:03:56.180
+performs extensive static code
+analysis in order to try and
+
+00:03:56.180 --> 00:04:01.520
+identify any possible
+execution path in our program.
+
+00:04:01.520 --> 00:04:07.160
+And when it does identify
+any possible execution path,
+
+00:04:07.160 --> 00:04:10.280
+it then takes the code that could
+
+00:04:10.280 --> 00:04:13.880
+get activated during the
+execution of a program,
+
+00:04:13.880 --> 00:04:17.190
+it just simply throws away anything else.
+
+00:04:18.820 --> 00:04:23.465
+It basically removes code that it
+
+00:04:23.465 --> 00:04:27.980
+considers to be unreachable
+in, under any circumstances
+
+00:04:27.980 --> 00:04:32.070
+and then compiles what's
+left into native code.
+
+00:04:33.250 --> 00:04:36.380
+That makes it possible to run
+
+00:04:36.380 --> 00:04:39.380
+the application independently
+of the Java virtual machine.
+
+00:04:39.380 --> 00:04:45.200
+And the result is a tiny
+executable compared to what it
+
+00:04:45.200 --> 00:04:47.765
+would take if we had
+to load the entire JVM
+
+00:04:47.765 --> 00:04:51.140
+with extremely fast response
+times and startup time.
+
+00:04:51.140 --> 00:04:59.540
+So of course, Quarkus then adds to
+the picture a little bit,
+
+00:04:59.540 --> 00:05:01.190
+because with GraalVM,
+
+00:05:01.190 --> 00:05:02.915
+it's not all so simple.
+
+00:05:02.915 --> 00:05:06.110
+You would normally have
+to provide GraalVM with
+
+00:05:06.110 --> 00:05:11.180
+a configuration file telling it
+where reflection is being used,
+
+00:05:11.180 --> 00:05:14.835
+what are the other special cases
+that it needs to consider and so on.
+
+00:05:14.835 --> 00:05:16.250
+A Quarkus does that for you.
+
+00:05:16.250 --> 00:05:20.780
+Quarkus is, as we initially mentioned,
+
+00:05:20.780 --> 00:05:25.565
+build with the goal of
+being able to strip down
+
+00:05:25.565 --> 00:05:30.920
+the Java classes to the bare
+minimum to begin with anyway.
+
+00:05:30.920 --> 00:05:32.360
+And it does take some,
+
+00:05:32.360 --> 00:05:36.920
+it does cut some corners in
+in trying to achieve that.
+
+00:05:36.920 --> 00:05:39.545
+That's why we had some limitations,
+
+00:05:39.545 --> 00:05:42.365
+so far, such as for example,
+
+00:05:42.365 --> 00:05:47.570
+trying to have or striving to have field access
+
+00:05:47.570 --> 00:05:53.790
+or restrictions as either
+package, private or public.
+
+00:05:53.920 --> 00:05:59.540
+Because it just makes it easier to have
+insight into class and not have to use
+
+00:05:59.540 --> 00:06:04.940
+reflection to get acquainted
+with the classes data model.
+
+00:06:04.940 --> 00:06:10.460
+Now, doing that with Java to begin
+with makes it possible for Quarkus to
+
+00:06:10.460 --> 00:06:13.220
+actually provide instructions to GraalVM
+
+00:06:13.220 --> 00:06:17.940
+instead of us having to
+write the configuration files.
+
+00:06:18.010 --> 00:06:21.275
+And then the next step,
+
+00:06:21.275 --> 00:06:25.700
+so Graal and Quarkus work
+very well together.
+
+00:06:25.700 --> 00:06:31.835
+But the entire GraalVM ecosystem
+is actually not necessary.
+
+00:06:31.835 --> 00:06:33.995
+Quarkus only needs the Native Image
+
+00:06:33.995 --> 00:06:37.850
+part of the functionality. It does
+not need the Truffle language,
+
+00:06:37.850 --> 00:06:40.850
+the different runtimes a
+GraalVM comes with and so on
+
+00:06:40.850 --> 00:06:47.000
+so. Actually, Red Hat and
+the GraalVM community have
+
+00:06:47.000 --> 00:06:50.330
+managed to produce the
+stripped down open source and
+
+00:06:50.330 --> 00:06:54.245
+Red Hat supported distribution
+of GraalVM called Mandrel.
+
+00:06:54.245 --> 00:07:00.890
+And Mandrel just simply, it uses
+OpenJDK instead of GraalVM's JDK.
+
+00:07:00.890 --> 00:07:04.340
+And it simply uses the Native
+Image functionality of
+
+00:07:04.340 --> 00:07:09.119
+GraalVM to be able to perform
+native ahead of time compilation.
+
+00:07:09.370 --> 00:07:11.810
+Now, as we said,
+
+00:07:11.810 --> 00:07:17.945
+there are some severe caveat when
+developing native applications.
+
+00:07:17.945 --> 00:07:23.525
+First of all, there is the
+ability to write native tests.
+
+00:07:23.525 --> 00:07:29.360
+Of course, you want to test code as it's
+being compiled into native binaries.
+
+00:07:29.360 --> 00:07:34.010
+But the problem is that no
+injection works in native binaries.
+
+00:07:34.010 --> 00:07:37.460
+You cannot use the code
+injection facility that
+
+00:07:37.460 --> 00:07:41.660
+java allows you to do
+with native applications,
+
+00:07:41.660 --> 00:07:43.955
+with natively compiled applications.
+
+00:07:43.955 --> 00:07:46.535
+Because it's not running in a JVM,
+
+00:07:46.535 --> 00:07:48.260
+so there are no JVM facilities.
+
+00:07:48.260 --> 00:07:52.955
+You can only test an exercise, a
+native application from without.
+
+00:07:52.955 --> 00:07:56.090
+So just as if you would, if you were a client.
+
+00:07:56.090 --> 00:08:00.170
+Second thing is we need to
+
+00:08:00.170 --> 00:08:03.260
+register all classes that are used
+
+00:08:03.260 --> 00:08:06.964
+in the code during the
+static code analysis.
+
+00:08:06.964 --> 00:08:11.990
+Now, if a class, a method or a field can be
+
+00:08:11.990 --> 00:08:16.985
+used by reflection and is
+actually used by reflection only,
+
+00:08:16.985 --> 00:08:21.590
+it will not become a part of the code
+tree because reflection is indirect
+
+00:08:21.590 --> 00:08:27.965
+access to contents of objects and
+classes, of course structure of classes.
+
+00:08:27.965 --> 00:08:30.005
+And it is as such,
+
+00:08:30.005 --> 00:08:33.065
+invisible to static code analysis.
+
+00:08:33.065 --> 00:08:35.120
+You will have to exercise
+code dynamically,
+
+00:08:35.120 --> 00:08:40.040
+which is incredibly expensive if
+you want to do it thoroughly.
+
+00:08:40.040 --> 00:08:41.540
+So a common use case,
+
+00:08:41.540 --> 00:08:43.710
+why am I mentioning this
+is a common use case for
+
+00:08:43.710 --> 00:08:47.210
+a reflection is serializing data.
+
+00:08:47.210 --> 00:08:50.780
+Serialization and deserialization
+frameworks do not know
+
+00:08:50.780 --> 00:08:53.720
+ahead of time what kind of objects
+they are going to be dealing with.
+
+00:08:53.720 --> 00:08:57.770
+So they have to discover the
+structure before they serialize them
+
+00:08:57.770 --> 00:09:03.365
+and they can only do this with
+an unknown object by reflection.
+
+00:09:03.365 --> 00:09:09.080
+So JsonB is one such example
+where reflection is used heavily.
+
+00:09:09.080 --> 00:09:11.720
+Now, for this purpose,
+
+00:09:11.720 --> 00:09:14.029
+there is a solution.
+
+00:09:14.029 --> 00:09:17.765
+If you look at the following code sample,
+
+00:09:17.765 --> 00:09:19.730
+there is an example code,
+
+00:09:19.730 --> 00:09:22.700
+there is an ExampleResource object which
+
+00:09:22.700 --> 00:09:25.805
+uses an inner class called Data, right?
+
+00:09:25.805 --> 00:09:28.625
+That's not in and of itself a problem.
+
+00:09:28.625 --> 00:09:33.710
+It has a list and the list of
+
+00:09:33.710 --> 00:09:38.690
+instances of objects of type
+ExampleResource.Data.
+
+00:09:38.690 --> 00:09:39.950
+As all fine,
+
+00:09:39.950 --> 00:09:43.430
+in the constructor, we initialize
+the list with 2 items
+
+00:09:43.430 --> 00:09:53.570
+and then the GET endpoint method returns
+a list of items in the internal list.
+
+00:09:53.570 --> 00:09:59.460
+And for that it uses
+responses builder method.
+
+00:10:00.100 --> 00:10:06.635
+And the response actually, because
+it's not a type-safe method,
+
+00:10:06.635 --> 00:10:10.820
+it uses reflection to
+discover the structure
+
+00:10:10.820 --> 00:10:16.160
+of this data that we are passing
+to the ok method right?
+
+00:10:16.160 --> 00:10:18.440
+Now,
+
+00:10:18.440 --> 00:10:20.300
+it's all fine,
+
+00:10:20.300 --> 00:10:24.755
+if we are running this application in a
+Java virtual machine. Reflection works,
+
+00:10:24.755 --> 00:10:28.504
+response class can actually introspect
+
+00:10:28.504 --> 00:10:33.065
+the object and serialize
+it properly to JSON,
+
+00:10:33.065 --> 00:10:36.815
+which is actually stated here
+at the top of the class, right?
+
+00:10:36.815 --> 00:10:38.435
+It produces JSON.
+
+00:10:38.435 --> 00:10:41.180
+The moment we do ahead
+of time compilation,
+
+00:10:41.180 --> 00:10:46.280
+produce native code for this program,
+
+00:10:46.280 --> 00:10:49.460
+Response cannot do reflection anymore.
+
+00:10:49.460 --> 00:10:52.804
+So during static code analysis,
+
+00:10:52.804 --> 00:10:57.320
+this method would have actually not
+
+00:10:57.320 --> 00:11:04.680
+triggered the registration of the
+data class as something that we need.
+
+00:11:05.530 --> 00:11:09.860
+And therefore, if we were
+running this class natively,
+
+00:11:09.860 --> 00:11:13.745
+the result of this response
+would be an empty list.
+
+00:11:13.745 --> 00:11:17.780
+Luckily, there is an annotation
+which helps Quarkus
+
+00:11:17.780 --> 00:11:23.480
+register additional classes with the
+Graal or with Mandrel Native Image,
+
+00:11:23.480 --> 00:11:28.310
+such that they still get
+added to the code list.
+
+00:11:28.310 --> 00:11:30.440
+And if you annotate the inner class
+
+00:11:30.440 --> 00:11:32.675
+with the register for
+reflection annotation,
+
+00:11:32.675 --> 00:11:36.020
+it will actually end up in the
+list of classes included in
+
+00:11:36.020 --> 00:11:41.015
+the native code and we will
+be able to work. Ofcourse,
+
+00:11:41.015 --> 00:11:45.020
+the same problem happens 
+when you're using
+
+00:11:45.020 --> 00:11:49.685
+private access modifiers for
+fields and then use injection.
+
+00:11:49.685 --> 00:11:53.915
+Injecting into a private field
+again requires reflection,
+
+00:11:53.915 --> 00:12:00.635
+so Quarkus DI actually needs it if
+you're marking your fields as private.
+
+00:12:00.635 --> 00:12:02.765
+Again, another,
+
+00:12:02.765 --> 00:12:05.000
+so there are 2 solutions
+to this problem.
+
+00:12:05.000 --> 00:12:07.010
+You either do not use
+
+00:12:07.010 --> 00:12:12.500
+private access modifiers and keep
+them package-private or even public,
+
+00:12:12.500 --> 00:12:17.120
+or register the member
+class for reflection,
+
+00:12:17.120 --> 00:12:21.020
+which means that it will be
+included in the code path.
+
+00:12:21.020 --> 00:12:24.260
+But wildly registering
+things for reflection
+
+00:12:24.260 --> 00:12:28.985
+just produces more bloat than you
+actually need in the final image.
+
+00:12:28.985 --> 00:12:33.110
+Because, well then we could
+just simply register everything
+
+00:12:33.110 --> 00:12:37.040
+for reflection and end up with
+the 20-megabyte executable
+
+00:12:37.040 --> 00:12:39.965
+instead of having something
+on the order of a 100,
+
+00:12:39.965 --> 00:12:45.320
+200 kilobytes. Using package-
+private modifiers instead of private, class
+
+00:12:45.320 --> 00:12:51.800
+private is a recommendation
+for injection points,
+
+00:12:51.800 --> 00:12:57.995
+constructors, initializers,
+observer methods,
+
+00:12:57.995 --> 00:13:00.155
+producer methods and fields,
+
+00:13:00.155 --> 00:13:02.480
+disposers and interceptors. In short,
+
+00:13:02.480 --> 00:13:07.430
+any common CDI service is
+best made package-private,
+
+00:13:07.430 --> 00:13:10.745
+if not just protected.
+
+00:13:10.745 --> 00:13:13.370
+Third-party libraries are
+obviously going to be
+
+00:13:13.370 --> 00:13:15.920
+a big problem because you
+cannot modify their code.
+
+00:13:15.920 --> 00:13:21.320
+So you cannot explicitly register certain
+classes and methods for reflection.
+
+00:13:21.320 --> 00:13:25.940
+So there is the ability to use reflection-
+
+00:13:25.940 --> 00:13:30.695
+config.json file in your /src/main/resources/
+directory in the project.
+
+00:13:30.695 --> 00:13:33.995
+And it is just essentially a list of
+
+00:13:33.995 --> 00:13:37.325
+all the classes that you want to
+
+00:13:37.325 --> 00:13:41.330
+register for reflection that are
+external to the application.
+
+00:13:41.330 --> 00:13:46.115
+The structure of the dictionaries
+in that list is simply the name,
+
+00:13:46.115 --> 00:13:47.270
+which is the fully,
+
+00:13:47.270 --> 00:13:49.895
+qualified name of the
+class you want to register.
+
+00:13:49.895 --> 00:13:52.400
+And then a list of choices of
+
+00:13:52.400 --> 00:13:55.970
+which elements of the class
+you want to register.
+
+00:13:55.970 --> 00:13:59.630
+So you want constructors
+that are declared or
+
+00:13:59.630 --> 00:14:05.940
+just the public ones or both the same
+for methods and the same for fields.
+
+00:14:06.580 --> 00:14:09.125
+That is one part,
+
+00:14:09.125 --> 00:14:12.650
+so writing the reflection-config.json 
+file is one part.
+
+00:14:12.650 --> 00:14:15.095
+The other part is that
+you then need to provide
+
+00:14:15.095 --> 00:14:18.350
+the reflection file as a parameter for
+
+00:14:18.350 --> 00:14:20.480
+ReflectionConfigurationFiles on
+
+00:14:20.480 --> 00:14:25.415
+the build argument on
+the build command line.
+
+00:14:25.415 --> 00:14:30.380
+And you can do that by using quarkus.
+native.additional-build-args,
+
+00:14:30.380 --> 00:14:33.260
+providing a -H colon option,
+
+00:14:33.260 --> 00:14:35.600
+setting the attribute of
+
+00:14:35.600 --> 00:14:40.505
+ReflectionConfigurationFiles
+and pointing to that file.
+
+00:14:40.505 --> 00:14:44.030
+There are many use cases
+for native applications.
+
+00:14:44.030 --> 00:14:46.040
+Of course, we went
+through some of them,
+
+00:14:46.040 --> 00:14:52.805
+Serverless architectures are one applications
+that have an extremely high density
+
+00:14:52.805 --> 00:14:59.400
+and of course have memory bound workloads.
+
+00:14:59.980 --> 00:15:07.055
+Deployments that are deployed
+to orchestration platforms,
+
+00:15:07.055 --> 00:15:11.030
+where it's kind of important
+to preserve resources,
+
+00:15:11.030 --> 00:15:12.380
+both memory and CPU,
+
+00:15:12.380 --> 00:15:14.795
+and of course, because of dynamic scaling,
+
+00:15:14.795 --> 00:15:17.615
+it's also good to have fast startup times
+
+00:15:17.615 --> 00:15:20.930
+and not least, command line applications.
+
+00:15:20.930 --> 00:15:23.075
+If you have ever written a script
+
+00:15:23.075 --> 00:15:26.585
+that invokes a Java tool in the loop,
+
+00:15:26.585 --> 00:15:28.295
+you know how much time is lost,
+
+00:15:28.295 --> 00:15:31.100
+just simply waiting for that tool to
+
+00:15:31.100 --> 00:15:34.220
+load over and over and
+over and over again,
+
+00:15:34.220 --> 00:15:38.600
+performing repetitive actions
+hundreds of times, for example.
+
+00:15:38.600 --> 00:15:43.480
+In that case, your script would
+immensely benefit from having
+
+00:15:43.480 --> 00:15:48.535
+a native version of that tool.
+
+00:15:48.535 --> 00:15:50.020
+Of course, as we said, in addition to
+
+00:15:50.020 --> 00:15:54.325
+the restrictions that are
+presented by the ahead of time,
+
+00:15:54.325 --> 00:15:57.730
+static code analysis and
+compilation, which is,
+
+00:15:57.730 --> 00:16:03.235
+we need to be able to identify the
+entire code execution tree and add
+
+00:16:03.235 --> 00:16:06.370
+all the member classes 
+and methods that
+
+00:16:06.370 --> 00:16:10.015
+are involved to the code
+that we've compiled.
+
+00:16:10.015 --> 00:16:13.179
+There is no Just In Time compilation,
+
+00:16:13.179 --> 00:16:17.475
+which means there are no
+optimization during runtime.
+
+00:16:17.475 --> 00:16:23.430
+So we're back to the good old days
+of compile-time optimization.
+
+00:16:23.430 --> 00:16:28.580
+So we need to actually, for example,
+
+00:16:28.580 --> 00:16:31.070
+when building a native application,
+
+00:16:31.070 --> 00:16:37.325
+we need to know in advance what is the
+important outcome of this application.
+
+00:16:37.325 --> 00:16:40.850
+Do we want to achieve 
+faster execution
+
+00:16:40.850 --> 00:16:46.235
+over at the price of a
+slightly larger executable,
+
+00:16:46.235 --> 00:16:49.505
+more memory consumption,
+slightly slower load time.
+
+00:16:49.505 --> 00:16:53.750
+So then we can tell the compiler to
+perform certain types of optimization,
+
+00:16:53.750 --> 00:16:55.460
+such as unrolling loops,
+
+00:16:55.460 --> 00:16:58.595
+instead of creating loops which might
+
+00:16:58.595 --> 00:17:03.660
+cost a little bit more
+in terms of CPU time.
+
+00:17:03.820 --> 00:17:08.165
+So these, while they do
+happen automatically in
+
+00:17:08.165 --> 00:17:12.350
+Just In Time compilers and
+in Java virtual machines,
+
+00:17:12.350 --> 00:17:15.845
+they cannot happen in native code.
+
+00:17:15.845 --> 00:17:19.625
+Code limitations, we've
+already talked about,
+
+00:17:19.625 --> 00:17:21.560
+so private access modifiers,
+
+00:17:21.560 --> 00:17:23.315
+reflection, and so on.
+
+00:17:23.315 --> 00:17:27.005
+Build time is probably
+the biggest hit here.
+
+00:17:27.005 --> 00:17:29.450
+It takes, I'm not going to say forever,
+
+00:17:29.450 --> 00:17:34.370
+but it takes extremely long for
+native application to build.
+
+00:17:34.370 --> 00:17:36.125
+If it takes, for example,
+
+00:17:36.125 --> 00:17:38.840
+let's say 25 seconds to
+
+00:17:38.840 --> 00:17:42.710
+build a Java application from
+source code to Java bytecode,
+
+00:17:42.710 --> 00:17:45.395
+native compilation will completely depend
+
+00:17:45.395 --> 00:17:47.960
+on the complexity of the
+code that you're building,
+
+00:17:47.960 --> 00:17:49.250
+not the amount of it.
+
+00:17:49.250 --> 00:17:54.380
+And it might take anywhere up to 10
+minutes to produce native executable.
+
+00:17:54.380 --> 00:17:58.310
+Of course, the benefits must outweigh
+
+00:17:58.310 --> 00:18:02.495
+this amount of time that they
+spend during compilation.
+
+00:18:02.495 --> 00:18:06.845
+The compilation process
+is quite CPU intensive.
+
+00:18:06.845 --> 00:18:09.365
+It is quite memory intensive too.
+
+00:18:09.365 --> 00:18:14.075
+So native compilation
+may be better suited for
+
+00:18:14.075 --> 00:18:15.950
+production use rather than
+
+00:18:15.950 --> 00:18:20.525
+obviously recompiling in native
+mode during development time,
+
+00:18:20.525 --> 00:18:21.920
+75 times a day.
+
+00:18:21.920 --> 00:18:24.300
+That is just a waste of time.
+
+00:18:24.550 --> 00:18:35.600
+Perhaps also one relatively severe hit
+is that profiling code, debugging code,
+
+00:18:35.600 --> 00:18:37.805
+You cannot do this with the Java tools.
+
+00:18:37.805 --> 00:18:40.040
+Just like with any other
+native executable,
+
+00:18:40.040 --> 00:18:47.300
+you have to plan ahead of time to create
+a native executable that includes
+
+00:18:47.300 --> 00:18:50.780
+debugging symbols so
+that you can use GDB or
+
+00:18:50.780 --> 00:18:56.015
+other native debugging tools for
+tracing through the applications.
+
+00:18:56.015 --> 00:19:00.965
+Otherwise, you would just have code
+addresses and assembly code to deal with.
+
+00:19:00.965 --> 00:19:07.430
+So, especially with automated
+compilation framework such as Native Image
+
+00:19:07.430 --> 00:19:13.820
+actually is, the native code
+that is generated is very,
+
+00:19:13.820 --> 00:19:15.829
+very difficult to understand.
+
+00:19:15.829 --> 00:19:19.940
+So debugging is going to
+be a bit of an issue.
+
+00:19:19.940 --> 00:19:23.450
+Profiling even more so because
+obviously the code that you're
+
+00:19:23.450 --> 00:19:27.350
+profiling has no direct
+source counterpart.
+
+00:19:27.350 --> 00:19:30.980
+So you will get some symbols that may
+
+00:19:30.980 --> 00:19:35.315
+not actually tie into the application
+that you've initially written.
+
+00:19:35.315 --> 00:19:39.470
+And it's going to be very difficult to
+correlate the profile information from
+
+00:19:39.470 --> 00:19:41.450
+the native application back into
+
+00:19:41.450 --> 00:19:44.360
+your original source code and
+perform any optimization.
+
+00:19:44.360 --> 00:19:49.220
+So these are quite big challenges
+in native applications.
+
+00:19:49.220 --> 00:19:52.190
+But as they said benefits sometimes
+
+00:19:52.190 --> 00:19:55.895
+immensely outweigh
+these disadvantages.
+
+00:19:55.895 --> 00:19:59.675
+So how do you build a native
+application? It's really easy.
+
+00:19:59.675 --> 00:20:04.835
+You simply tell Maven to
+use the native profile.
+
+00:20:04.835 --> 00:20:08.570
+This of course, does
+depend on Mandrel being
+
+00:20:08.570 --> 00:20:12.470
+installed on the machine
+that you're performing,
+
+00:20:12.470 --> 00:20:15.300
+the compilation, the build on.
+
+00:20:16.870 --> 00:20:21.875
+If installing Mandrel as an external tool,
+
+00:20:21.875 --> 00:20:23.825
+you have to set
+
+00:20:23.825 --> 00:20:28.655
+GraalVM home environment variable and
+point it to where Mandrel is installed.
+
+00:20:28.655 --> 00:20:33.470
+You also have to download
+the native image,
+
+00:20:33.470 --> 00:20:37.640
+the native image addon using GU,
+
+00:20:37.640 --> 00:20:42.125
+which is GraalVM packaging
+command, package management command.
+
+00:20:42.125 --> 00:20:45.365
+There are a couple of steps,
+but most importantly,
+
+00:20:45.365 --> 00:20:49.700
+you must take extreme care
+that the Java virtual
+
+00:20:49.700 --> 00:20:54.620
+machine that you're using and
+Mandrel are a compatible version.
+
+00:20:54.620 --> 00:20:56.810
+Generally, when you're downloading Mandrel,
+
+00:20:56.810 --> 00:20:59.390
+you will have had notes in the release
+
+00:20:59.390 --> 00:21:04.145
+notes telling you which particular
+OpenJDK it is compatible with.
+
+00:21:04.145 --> 00:21:07.460
+And make triple sure that
+
+00:21:07.460 --> 00:21:11.315
+the Mandrel version does match the
+OpenJDK version that you're using.
+
+00:21:11.315 --> 00:21:14.630
+Otherwise, you will get
+weird errors out of
+
+00:21:14.630 --> 00:21:18.215
+the blue and a lot of erratic behavior.
+
+00:21:18.215 --> 00:21:21.050
+Now, probably the easiest way to use
+
+00:21:21.050 --> 00:21:26.045
+native compilation with Mandrel is
+to use it's containerized image.
+
+00:21:26.045 --> 00:21:30.785
+You can actually tell Quarkus
+to use a Mandrel container
+
+00:21:30.785 --> 00:21:35.690
+by setting the quarkus.native.container-build parameter to true.
+
+00:21:35.690 --> 00:21:40.040
+It can either be set on the command
+line or in application properties.
+
+00:21:40.040 --> 00:21:43.685
+And if you want to use a
+custom Mandrel image,
+
+00:21:43.685 --> 00:21:47.840
+we can also set the quarkus.native.builder-image parameter to
+
+00:21:47.840 --> 00:21:52.100
+the URL where that image can be found.
+
+00:21:52.100 --> 00:21:55.610
+Of course, you need a container
+runtime to be able to do this.
+
+00:21:55.610 --> 00:21:58.010
+So depending on which one you're using,
+
+00:21:58.010 --> 00:22:00.485
+you will commonly use
+
+00:22:00.485 --> 00:22:02.720
+or you commonly set quarkus.
+
+00:22:02.720 --> 00:22:04.670
+native.container-runtime to
+
+00:22:04.670 --> 00:22:09.090
+either podman or docker, if
+that's what you're using.
+
+00:22:09.220 --> 00:22:14.645
+An example build command
+is displayed in the book.
+
+00:22:14.645 --> 00:22:18.815
+So here we are triggering
+on the containerized
+
+00:22:18.815 --> 00:22:24.350
+native build using podman to create
+that container using registry.access.
+
+00:22:24.350 --> 00:22:27.485
+redhat.com/quarkus/mandrel-20,
+
+00:22:27.485 --> 00:22:32.060
+that is version 20 based
+on rhel8 as base image.
+
+00:22:32.060 --> 00:22:36.290
+The Pnative makes this a native build.
+
+00:22:36.290 --> 00:22:39.845
+This process generates a number of files
+
+00:22:39.845 --> 00:22:43.670
+and then places them into the target
+subdirectory within your project.
+
+00:22:43.670 --> 00:22:47.780
+So that is no different
+from any other build.
+
+00:22:47.780 --> 00:22:50.510
+If you're looking for the
+actual results of the build,
+
+00:22:50.510 --> 00:22:54.170
+you will see it inside
+the target directory.
+
+00:22:54.170 --> 00:22:57.530
+You're going to be called
+whatever your artifact ID is,
+
+00:22:57.530 --> 00:23:02.790
+minus version, minus
+RUNNER in all capitals.
+
+00:23:02.830 --> 00:23:06.020
+If you want to containerize
+the native application,
+
+00:23:06.020 --> 00:23:10.295
+that's something that we're going to look
+at more closely in the next section.
+
+00:23:10.295 --> 00:23:15.350
+You can use Dquarkus.container-image.build,
+
+00:23:15.350 --> 00:23:19.970
+just like if you were containerizing
+a normal Quarkus application,
+
+00:23:19.970 --> 00:23:24.470
+just that, you simply add
+the Pnative profile switch
+
+00:23:24.470 --> 00:23:26.885
+and that's that. Alternative to that,
+
+00:23:26.885 --> 00:23:30.110
+is to use the one of the Docker files.
+
+00:23:30.110 --> 00:23:32.210
+If you use the Quarkus create,
+
+00:23:32.210 --> 00:23:36.215
+quarkus maven plugins create
+goal to initialize the project,
+
+00:23:36.215 --> 00:23:40.505
+in src/main, you will have a
+subdirectory called Docker.
+
+00:23:40.505 --> 00:23:43.970
+And inside it, there's going
+to be a couple of files
+
+00:23:43.970 --> 00:23:47.930
+among which there's also
+a Dockerfile.native
+
+00:23:47.930 --> 00:23:51.200
+and that one would do the same thing as
+
+00:23:51.200 --> 00:23:54.800
+this above command would
+have done with Maven.
+
+00:23:54.800 --> 00:23:58.655
+You'd invoke it using podman build,
+
+00:23:58.655 --> 00:24:01.715
+pointing it to src/main/docker/
+
+00:24:01.715 --> 00:24:03.980
+Dockerfile.native and tagging
+
+00:24:03.980 --> 00:24:06.890
+the image with whatever
+name you want to give it.
+
+00:24:06.890 --> 00:24:08.690
+Let's have a look at how to build
+
+00:24:08.690 --> 00:24:12.690
+native applications with
+Quarkus in the next exercise.
 

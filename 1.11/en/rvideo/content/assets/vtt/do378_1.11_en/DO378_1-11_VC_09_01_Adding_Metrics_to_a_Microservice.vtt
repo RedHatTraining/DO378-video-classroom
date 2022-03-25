@@ -1,5 +1,577 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:01.155
+Welcome back!
 
+00:00:01.155 --> 00:00:03.750
+Let's move on to monitoring
+Quarkus microservices,
+
+00:00:03.750 --> 00:00:08.205
+where we are going to look at how to
+generate metrics using micrometer add-on
+
+00:00:08.205 --> 00:00:11.835
+the micrometer extension, and have
+a guided exercise about that.
+
+00:00:11.835 --> 00:00:15.435
+And then we are going to also look
+at how to trace traffic between
+
+00:00:15.435 --> 00:00:19.770
+microservices using SmallRye OpenTracing extension.
+
+00:00:19.770 --> 00:00:21.945
+There is an exercise about that as well.
+
+00:00:21.945 --> 00:00:25.365
+As usual at the end of
+chapter we have a review lab.
+
+00:00:25.365 --> 00:00:27.990
+It's critical that we can
+monitor our applications,
+
+00:00:27.990 --> 00:00:31.365
+especially when running in production.
+
+00:00:31.365 --> 00:00:35.460
+And it gives us incredible insights into
+
+00:00:35.460 --> 00:00:40.229
+what exactly it is that those applications
+are facing in terms of workloads.
+
+00:00:40.229 --> 00:00:43.640
+And of course then subsequently
+also allows us to optimize them
+
+00:00:43.640 --> 00:00:48.155
+according to where their stress areas are.
+
+00:00:48.155 --> 00:00:52.280
+Now to collect metrics,
+
+00:00:52.280 --> 00:00:54.380
+there are several different ways,
+
+00:00:54.380 --> 00:00:56.300
+especially when running in OpenShift
+
+00:00:56.300 --> 00:00:59.450
+or any other Kubernetes based platform.
+
+00:00:59.450 --> 00:01:02.840
+There are add-ons such as Prometheus that
+
+00:01:02.840 --> 00:01:06.035
+are or can be configured
+to automatically collect
+
+00:01:06.035 --> 00:01:08.840
+metrics, that our
+applications can provide and
+
+00:01:08.840 --> 00:01:11.780
+then allow us to build dashboards
+
+00:01:11.780 --> 00:01:18.350
+which give us some timeline
+and trend based insights.
+
+00:01:18.350 --> 00:01:23.270
+Quarkus provides the quarkus-micrometer extension,
+
+00:01:23.270 --> 00:01:26.435
+which gives us an API,
+
+00:01:26.435 --> 00:01:32.030
+which is essentially a MicroProfile metrics compatible API.
+
+00:01:32.030 --> 00:01:35.195
+And on the other side produces metrics
+
+00:01:35.195 --> 00:01:38.300
+output automatically
+registers some endpoints
+
+00:01:38.300 --> 00:01:41.030
+in the application and produces
+output that can be digested
+
+00:01:41.030 --> 00:01:48.300
+by Prometheus when collecting
+information about our application.
+
+00:01:48.490 --> 00:01:52.910
+We can integrate those
+metrics with Prometheus using
+
+00:01:52.910 --> 00:01:57.725
+a quarkus-micrometer-registry-prometheus extension.
+
+00:01:57.725 --> 00:02:06.680
+And essentially that causes the metrics
+to be output in a special format
+
+00:02:06.680 --> 00:02:09.580
+that Prometheus recognizes as its own,
+
+00:02:09.580 --> 00:02:13.565
+and then allows us to obviously also diagram,
+
+00:02:13.565 --> 00:02:17.750
+visually display those metrics
+in tools like Grafana. quarkus-
+
+00:02:17.750 --> 00:02:21.845
+micrometer extension enables you
+to collect both the built-in metrics,
+
+00:02:21.845 --> 00:02:24.260
+also known as the base runtime metrics.
+
+00:02:24.260 --> 00:02:25.865
+Such as for example,
+
+00:02:25.865 --> 00:02:28.730
+Java virtual machines, memory utilization,
+
+00:02:28.730 --> 00:02:31.520
+garbage collection statistics,
+thread information,
+
+00:02:31.520 --> 00:02:35.435
+but also system load
+averages and other info.
+
+00:02:35.435 --> 00:02:39.500
+And then on the other hand, the
+application custom metrics related to
+
+00:02:39.500 --> 00:02:43.820
+business logic using data
+types like counters,
+
+00:02:43.820 --> 00:02:46.985
+timers, gauges, and summaries.
+
+00:02:46.985 --> 00:02:50.870
+There are 4 different metric types
+that Prometheus supports.
+
+00:02:50.870 --> 00:02:55.205
+And of course, the micrometer extension
+enables, what is called a counter.
+
+00:02:55.205 --> 00:02:57.710
+A counter is always growing,
+
+00:02:57.710 --> 00:03:00.680
+metrics are cumulative,
+metric that represents
+
+00:03:00.680 --> 00:03:08.435
+a single variable that is either set to
+0 initially or to some specific value,
+
+00:03:08.435 --> 00:03:11.330
+and then only increases
+throughout the lifetime.
+
+00:03:11.330 --> 00:03:14.225
+You can use a counter, for example, to
+
+00:03:14.225 --> 00:03:16.910
+represent the number of
+invocations of a method,
+
+00:03:16.910 --> 00:03:18.485
+the number of requests served,
+
+00:03:18.485 --> 00:03:21.275
+the number of errors
+encountered, and so on.
+
+00:03:21.275 --> 00:03:24.140
+And then a similar,
+
+00:03:24.140 --> 00:03:28.310
+albeit slightly different metric
+type is called the gauge.
+
+00:03:28.310 --> 00:03:33.140
+A guage is opposed to a counter,
+can both grow and decrease and
+
+00:03:33.140 --> 00:03:38.360
+it's basically a snapshot of a certain
+value in time, such as, for example,
+
+00:03:38.360 --> 00:03:41.000
+the number of requests in a queue,
+
+00:03:41.000 --> 00:03:44.270
+the number of sessions
+currently registered,
+
+00:03:44.270 --> 00:03:46.745
+the number of records in
+a database and so on.
+
+00:03:46.745 --> 00:03:48.605
+These values
+
+00:03:48.605 --> 00:03:54.020
+can change in time both upwards and
+downwards and guage is the type that you can,
+
+00:03:54.020 --> 00:03:56.615
+use to represent that.
+
+00:03:56.615 --> 00:04:00.770
+Histogram is a sample,
+
+00:04:00.770 --> 00:04:04.820
+basically it's a type of sampling.
+
+00:04:04.820 --> 00:04:09.530
+It collects information and then
+sorts them in configurable buckets.
+
+00:04:09.530 --> 00:04:12.140
+It also provides a sum of all values.
+
+00:04:12.140 --> 00:04:13.520
+You could use a histogram,
+
+00:04:13.520 --> 00:04:19.025
+for example, to aggregate requests,
+
+00:04:19.025 --> 00:04:21.455
+if you are, for example,
+timing your request,
+
+00:04:21.455 --> 00:04:23.510
+you can use a histogram to aggregate
+
+00:04:23.510 --> 00:04:26.345
+requests based on percentiles
+or for example,
+
+00:04:26.345 --> 00:04:30.740
+based on the amount of time that it
+took for a request to be completed,
+
+00:04:30.740 --> 00:04:32.360
+such as say request that
+
+00:04:32.360 --> 00:04:39.215
+took less than a 100 milliseconds between 100 and half a second and over half a second.
+
+00:04:39.215 --> 00:04:42.320
+And these will be categories
+in the histogram.
+
+00:04:42.320 --> 00:04:45.980
+And of course, each will
+
+00:04:45.980 --> 00:04:50.150
+represent the number of requests
+that fall into each category
+
+00:04:50.150 --> 00:04:52.820
+and then you have also, we
+could get an average out of
+
+00:04:52.820 --> 00:04:56.855
+it and similar aggregations.
+
+00:04:56.855 --> 00:05:01.410
+A summary is similar to a histogram.
+
+00:05:01.840 --> 00:05:04.325
+It's samples values.
+
+00:05:04.325 --> 00:05:06.500
+However, a summary also calculates
+
+00:05:06.500 --> 00:05:10.055
+configurable values over
+sliding time window.
+
+00:05:10.055 --> 00:05:14.750
+Now, the difference, the
+important difference also is
+
+00:05:14.750 --> 00:05:19.370
+that histogram buckets are
+categorized on Prometheus server,
+
+00:05:19.370 --> 00:05:22.760
+whereas the summary is
+calculated on the client side.
+
+00:05:22.760 --> 00:05:25.940
+So you have much more control
+
+00:05:25.940 --> 00:05:29.825
+in configuring a summary
+as opposed to a histogram.
+
+00:05:29.825 --> 00:05:32.300
+If you want to enable metrics in Quarkus,
+
+00:05:32.300 --> 00:05:33.980
+you simply have to add
+
+00:05:33.980 --> 00:05:39.800
+the micrometer-registry-prometheus
+extension to your pom.xml,
+
+00:05:39.800 --> 00:05:43.190
+either using quarkus:add-extension or manually.
+
+00:05:43.190 --> 00:05:48.695
+Then import the required classes that
+you will use in your service.
+
+00:05:48.695 --> 00:05:52.790
+And most importantly, to
+register those meters,
+
+00:05:52.790 --> 00:05:56.690
+you need an instance of
+the MeterRegistry class,
+
+00:05:56.690 --> 00:06:00.680
+which you can simply inject
+into your code like this.
+
+00:06:00.680 --> 00:06:04.775
+So once you have injected
+the MeterRegistry,
+
+00:06:04.775 --> 00:06:08.420
+you can add relevant metrics
+by simply annotating
+
+00:06:08.420 --> 00:06:11.360
+your methods and choosing
+
+00:06:11.360 --> 00:06:14.840
+what kind of a metric they are
+going to be associated with.
+
+00:06:14.840 --> 00:06:19.685
+You generally give the metric a name, 
+an optional description
+
+00:06:19.685 --> 00:06:22.040
+and then for a specific metric types,
+
+00:06:22.040 --> 00:06:25.235
+there are also additional
+fields that you can configure.
+
+00:06:25.235 --> 00:06:26.720
+Instead of using an annotation,
+
+00:06:26.720 --> 00:06:28.295
+you can also register a
+
+00:06:28.295 --> 00:06:36.500
+specific counter by asking the registry
+to give you an instance of it.
+
+00:06:36.500 --> 00:06:39.710
+So again, the counter in this case,
+
+00:06:39.710 --> 00:06:44.375
+will have a name and a description
+
+00:06:44.375 --> 00:06:48.485
+and would give you an instance of
+
+00:06:48.485 --> 00:06:55.430
+an counter object which you can then
+manipulate whenever you need to, manually.
+
+00:06:55.430 --> 00:06:58.520
+Timers are also interesting metric.
+
+00:06:58.520 --> 00:07:02.285
+You can annotate methods as timed methods.
+
+00:07:02.285 --> 00:07:07.205
+In that case, there will be a timer
+associated with the method that will
+
+00:07:07.205 --> 00:07:12.530
+show you what is the execution
+time of that method.
+
+00:07:12.530 --> 00:07:16.370
+But you can also ask for
+timers to be given to you,
+
+00:07:16.370 --> 00:07:18.950
+asking a metering registry.
+
+00:07:18.950 --> 00:07:24.080
+So just basically invoking the
+timer method and configuring it.
+
+00:07:24.080 --> 00:07:26.630
+What would that do?
+
+00:07:26.630 --> 00:07:29.450
+Just like in the previous counter example,
+
+00:07:29.450 --> 00:07:31.385
+it will give you a timer instance,
+
+00:07:31.385 --> 00:07:35.810
+which you can then invoke by setting
+
+00:07:35.810 --> 00:07:40.770
+the record methods parameter to a lambda,
+
+00:07:40.770 --> 00:07:44.710
+which is essentially the
+code that you want to time,
+
+00:07:44.710 --> 00:07:47.440
+the code that you want to execute and
+
+00:07:47.440 --> 00:07:52.360
+express how much time it took to execute.
+
+00:07:52.360 --> 00:07:57.640
+So in addition to using this
+shorthand lambda expression,
+
+00:07:57.640 --> 00:08:05.260
+you can also provide a supplier to the
+timer by again asking the registry
+
+00:08:05.260 --> 00:08:08.605
+to give you a timer and
+then immediately appending
+
+00:08:08.605 --> 00:08:13.975
+a wrap method whereby you
+use a method reference.
+
+00:08:13.975 --> 00:08:18.655
+And this causes basically this method to
+
+00:08:18.655 --> 00:08:24.980
+execute and return to you the
+amount of time that it took
+
+00:08:24.980 --> 00:08:32.510
+of course. You can also record the
+runnable interface implementation.
+
+00:08:32.510 --> 00:08:34.669
+You can record a callable.
+
+00:08:34.669 --> 00:08:37.850
+So there are many different
+ways you can recall
+
+00:08:37.850 --> 00:08:41.660
+the amount of time that a
+method invocation takes.
+
+00:08:41.660 --> 00:08:46.220
+As we say, gauges are
+used to track the count,
+
+00:08:46.220 --> 00:08:49.070
+they can either increase or decrease.
+
+00:08:49.070 --> 00:08:53.900
+So you can request gauges
+from the registry again,
+
+00:08:53.900 --> 00:08:59.120
+specify what kind of a datatype
+they are going to be using
+
+00:08:59.120 --> 00:09:03.065
+and then simply set the value explicitly
+whenever it needs to be set
+
+00:09:03.065 --> 00:09:07.474
+or you can also configure a gauge,
+
+00:09:07.474 --> 00:09:10.550
+for example to monitor the size,
+
+00:09:10.550 --> 00:09:15.800
+the current size of a collection by
+invoking the gaugeCollectionSize,
+
+00:09:15.800 --> 00:09:17.390
+giving it a name,
+
+00:09:17.390 --> 00:09:22.650
+and specifying what collection
+you want to measure.
+
+00:09:22.990 --> 00:09:27.200
+As we said, gauges are
+used for quantities that
+
+00:09:27.200 --> 00:09:31.940
+have variable non-monotonic tendency,
+
+00:09:31.940 --> 00:09:35.030
+but a variable one, they can
+both increase and decrease.
+
+00:09:35.030 --> 00:09:37.730
+And generally gauges have an upper bound.
+
+00:09:37.730 --> 00:09:41.240
+If you want to monitor something
+that monotonically increases,
+
+00:09:41.240 --> 00:09:44.360
+then you should be using a counter.
+
+00:09:44.360 --> 00:09:48.830
+By default, Quarkus makes
+the metrics available at
+
+00:09:48.830 --> 00:09:54.305
+the /q/metrics endpoint
+in plain text Prometheus data format.
+
+00:09:54.305 --> 00:09:58.115
+If you want the metrics
+endpoint to produce JSON,
+
+00:09:58.115 --> 00:10:03.200
+you can add the quarkus.micrometer.export.
+
+00:10:03.200 --> 00:10:05.720
+json.enabled property to
+
+00:10:05.720 --> 00:10:08.480
+your application.properties file and set that to true,
+
+00:10:08.480 --> 00:10:12.500
+which will switch to JSON
+instead of Prometheus format,
+
+00:10:12.500 --> 00:10:14.270
+Let's have a look at how to add
+
+00:10:14.270 --> 00:10:17.670
+metrics your microservice
+in the next exercise.
 

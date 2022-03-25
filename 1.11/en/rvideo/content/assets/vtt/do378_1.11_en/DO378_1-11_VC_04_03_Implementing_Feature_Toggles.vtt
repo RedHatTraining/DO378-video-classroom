@@ -1,5 +1,315 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:02.910
+Now we know how to inject
+configuration data.
 
+00:00:02.910 --> 00:00:05.985
+Let's have a look at how to
+implement Feature Toggles.
+
+00:00:05.985 --> 00:00:07.770
+Why would we do that?
+
+00:00:07.770 --> 00:00:12.090
+Simply because in an
+Agile development process
+
+00:00:12.090 --> 00:00:14.760
+its critical to be able
+to push new features,
+
+00:00:14.760 --> 00:00:18.600
+new versions, new updates into
+production as soon as possible.
+
+00:00:18.600 --> 00:00:21.210
+But that does not mean that we want
+
+00:00:21.210 --> 00:00:25.200
+to enable all of the functionality
+that we are working on
+
+00:00:25.200 --> 00:00:28.290
+now. Of course, there's
+always the option of creating
+
+00:00:28.290 --> 00:00:31.980
+a development branch and working on
+an unstable feature on that branch,
+
+00:00:31.980 --> 00:00:34.830
+but long-lived branches are not something
+
+00:00:34.830 --> 00:00:38.230
+desirable because of the merge
+problems they tend to create.
+
+00:00:38.230 --> 00:00:43.490
+So a popular solution to that
+problem is simply encapsulating
+
+00:00:43.490 --> 00:00:45.860
+a new feature that we are working on in
+
+00:00:45.860 --> 00:00:48.995
+a so-called Feature Toggle
+or Feature Switch,
+
+00:00:48.995 --> 00:00:52.880
+or as it's also known as Feature Flags.
+
+00:00:52.880 --> 00:00:55.940
+It's especially useful to control
+
+00:00:55.940 --> 00:00:58.820
+the visibility of features
+in the user interface
+
+00:00:58.820 --> 00:01:02.735
+but it can also be used
+simply to turn on and off
+
+00:01:02.735 --> 00:01:06.530
+specific endpoints in
+microservice in a web service,
+
+00:01:06.530 --> 00:01:13.415
+for example, if we need to. In a user
+interface that is part of the application,
+
+00:01:13.415 --> 00:01:18.245
+like a multiservice application that
+is implemented using Feature Toggles,
+
+00:01:18.245 --> 00:01:20.030
+we have to be careful to not
+
+00:01:20.030 --> 00:01:23.030
+accidentally use an endpoint
+that is currently hidden.
+
+00:01:23.030 --> 00:01:25.190
+So it's a common approach to have
+
+00:01:25.190 --> 00:01:28.985
+an additional endpoint in
+our application that returns
+
+00:01:28.985 --> 00:01:37.010
+all the available APIs that are present
+in a particular microservice. Of course,
+
+00:01:37.010 --> 00:01:39.380
+we have to be careful with
+that last option because
+
+00:01:39.380 --> 00:01:42.080
+it can inadvertently expose
+
+00:01:42.080 --> 00:01:47.344
+the internal state of development
+to the outside clients.
+
+00:01:47.344 --> 00:01:52.175
+We can combine the Feature Toggles
+with the so-called A/B testing,
+
+00:01:52.175 --> 00:01:57.170
+which enables some new features
+to a specific subset users
+
+00:01:57.170 --> 00:02:03.230
+and then lets all the others still use
+the old version of the application.
+
+00:02:03.230 --> 00:02:05.030
+Of course,
+
+00:02:05.030 --> 00:02:08.270
+although you can use Feature Toggles to
+
+00:02:08.270 --> 00:02:11.240
+solve problems in the Agile
+development processes,
+
+00:02:11.240 --> 00:02:13.625
+you have to be aware
+that you're introducing
+
+00:02:13.625 --> 00:02:19.310
+technical debt into your code in the
+form of numerous conditional blocks
+
+00:02:19.310 --> 00:02:22.790
+and that debt has to be
+repaid at some point,
+
+00:02:22.790 --> 00:02:26.030
+otherwise, we will create a code,
+
+00:02:26.030 --> 00:02:30.330
+we'll end up with code that is
+enormously complex to read.
+
+00:02:31.150 --> 00:02:35.420
+Now with Quarkus, Feature
+Toggles are extremely simple.
+
+00:02:35.420 --> 00:02:37.370
+We just simply have to define
+
+00:02:37.370 --> 00:02:44.075
+a @ConfigProperty which tests for a
+feature, for features availability.
+
+00:02:44.075 --> 00:02:47.825
+And then simply in a conditional block,
+
+00:02:47.825 --> 00:02:49.850
+if that feature is enabled,
+
+00:02:49.850 --> 00:02:52.325
+we enable that features new code,
+
+00:02:52.325 --> 00:02:55.790
+otherwise we just do not, we just skip that block.
+
+00:02:55.790 --> 00:02:59.315
+Or if we are replacing old
+functionality with new one,
+
+00:02:59.315 --> 00:03:02.015
+rather than just adding something on top,
+
+00:03:02.015 --> 00:03:06.965
+we would have a conditional block
+where if the new feature is enabled,
+
+00:03:06.965 --> 00:03:08.825
+we would use a part of the code,
+
+00:03:08.825 --> 00:03:12.285
+otherwise, we would fall
+back to the old code.
+
+00:03:12.285 --> 00:03:15.625
+It is common when using Feature Toggles
+
+00:03:15.625 --> 00:03:19.840
+to aggregate all the toggles in
+a single configuration class
+
+00:03:19.840 --> 00:03:22.150
+and of course, that reduces
+
+00:03:22.150 --> 00:03:25.360
+the duplicate code when the feature
+
+00:03:25.360 --> 00:03:29.125
+is used or a Feature Toggle
+affects several different places,
+
+00:03:29.125 --> 00:03:30.820
+locations in the code.
+
+00:03:30.820 --> 00:03:33.610
+So we can define a prefix,
+
+00:03:33.610 --> 00:03:36.625
+let's say in this example features
+
+00:03:36.625 --> 00:03:41.620
+and then use @ConfigProperties
+with referring to that prefix
+
+00:03:41.620 --> 00:03:48.610
+and simply either use a class or have
+an interface implemented on the fly,
+
+00:03:48.610 --> 00:03:51.355
+injecting that class wherever we need it,
+
+00:03:51.355 --> 00:03:54.930
+and then testing for the
+features availability.
+
+00:03:54.930 --> 00:04:00.875
+One additional recommendation which
+will also simplify the testing code,
+
+00:04:00.875 --> 00:04:04.865
+you see that we inject the features class
+
+00:04:04.865 --> 00:04:09.800
+into the code where we check for
+new features availability and then
+
+00:04:09.800 --> 00:04:14.690
+use a conditional referring
+to the field and directly
+
+00:04:14.690 --> 00:04:19.775
+accessing the the inner
+field of the features class.
+
+00:04:19.775 --> 00:04:26.750
+It is recommended to also implement
+the getters for the Boolean features,
+
+00:04:26.750 --> 00:04:30.005
+especially if it's about
+combined features and
+
+00:04:30.005 --> 00:04:35.090
+say functionality that depends on 1 or
+2 or 3 features being enabled.
+
+00:04:35.090 --> 00:04:38.450
+It allows us to simplify
+
+00:04:38.450 --> 00:04:41.900
+the access rather than writing
+complex conditions in our code.
+
+00:04:41.900 --> 00:04:44.120
+So in this case,
+
+00:04:44.120 --> 00:04:47.525
+if a certain bit of functionality,
+
+00:04:47.525 --> 00:04:49.415
+let's call it feature A,
+
+00:04:49.415 --> 00:04:52.100
+depends on a new interface feature
+
+00:04:52.100 --> 00:04:55.340
+being enabled and an
+alternativeAlgorithmEnabled,
+
+00:04:55.340 --> 00:04:58.880
+we can define a method
+called isFeatureAEnabled
+
+00:04:58.880 --> 00:05:00.230
+and then in the code,
+
+00:05:00.230 --> 00:05:05.570
+simply refer to that method that
+returns the state of both toggles.
+
+00:05:05.570 --> 00:05:07.670
+Then of course in other
+locations in the code
+
+00:05:07.670 --> 00:05:09.995
+which only test for one or the other,
+
+00:05:09.995 --> 00:05:13.460
+we could access those 2 fields directly.
+
+00:05:13.460 --> 00:05:18.060
+Let's have a look at how to implement
+Feature Toggles in the next exercise.
 

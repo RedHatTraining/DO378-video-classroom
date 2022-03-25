@@ -1,5 +1,767 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:02.880
+Of course, any complex
+application is going to be
 
+00:00:02.880 --> 00:00:07.050
+a composition of multiple microservices
+where some services simply
+
+00:00:07.050 --> 00:00:11.160
+provide API endpoints for others
+to consume and others act as
+
+00:00:11.160 --> 00:00:15.615
+clients to those services
+in chained responses,
+
+00:00:15.615 --> 00:00:19.530
+chained request response relationships.
+
+00:00:19.530 --> 00:00:25.410
+Now, we know by now how to
+write REST web services,
+
+00:00:25.410 --> 00:00:30.705
+so microservice applications that
+expose REST endpoints to consumers.
+
+00:00:30.705 --> 00:00:33.150
+Now, how do we write consumers
+
+00:00:33.150 --> 00:00:34.845
+in our applications?
+
+00:00:34.845 --> 00:00:42.295
+The client-side API is implemented
+using quarkus-rest-client extension,
+
+00:00:42.295 --> 00:00:45.360
+which is based on RESTEasy.
+
+00:00:45.550 --> 00:00:48.150
+Actually
+
+00:00:48.160 --> 00:00:51.500
+RESTEasy being an
+open source implementation of
+
+00:00:51.500 --> 00:00:55.410
+the MicroProfile Rest
+Client specification,
+
+00:00:55.420 --> 00:00:58.580
+it is very easy to use.
+
+00:00:58.580 --> 00:01:02.795
+You can add the qaurkus-rest-client extension using the
+
+00:01:02.795 --> 00:01:07.040
+standard quarkus:add-
+extension mvn command,
+
+00:01:07.040 --> 00:01:11.570
+or simply add it to your pom.xml 
+as a dependency manually.
+
+00:01:11.570 --> 00:01:17.735
+Now the thing is, for a Quarkus
+Rest Clients application to work,
+
+00:01:17.735 --> 00:01:21.350
+we need to obtain an interface
+
+00:01:21.350 --> 00:01:25.295
+describing the web service
+that we are about to invoke,
+
+00:01:25.295 --> 00:01:27.380
+that we are about to consume. Generally,
+
+00:01:27.380 --> 00:01:30.545
+it's a good approach to actually annotate
+
+00:01:30.545 --> 00:01:36.815
+the microservices web service
+implementation in an interface,
+
+00:01:36.815 --> 00:01:39.740
+and then extend that interface
+
+00:01:39.740 --> 00:01:43.235
+in an implementation class
+without any annotations.
+
+00:01:43.235 --> 00:01:47.030
+That way it's easier to
+create clients by simply
+
+00:01:47.030 --> 00:01:52.055
+taking the interface class and
+putting it next to the client code.
+
+00:01:52.055 --> 00:01:54.530
+However, it does not have to be
+
+00:01:54.530 --> 00:01:57.905
+a complete interface definition
+
+00:01:57.905 --> 00:02:00.815
+of the microservice that
+we are about to consume,
+
+00:02:00.815 --> 00:02:03.560
+just the endpoints that we actually
+
+00:02:03.560 --> 00:02:07.805
+need, have to be placed into an
+interface and annotated properly.
+
+00:02:07.805 --> 00:02:13.400
+For example, we start by
+defining an interface as
+
+00:02:13.400 --> 00:02:15.680
+opposed to the interface
+that would have been
+
+00:02:15.680 --> 00:02:19.085
+present in the implementation
+code of the web service.
+
+00:02:19.085 --> 00:02:24.665
+We have to add @RegisterRestClient
+annotation on top of it and that triggers
+
+00:02:24.665 --> 00:02:28.400
+the RESTEasy client functionality which
+
+00:02:28.400 --> 00:02:32.240
+generates a Rest Client on
+the fly at compilation time,
+
+00:02:32.240 --> 00:02:33.904
+thanks to this annotation.
+
+00:02:33.904 --> 00:02:35.870
+The rest of the interface
+can be exactly the
+
+00:02:35.870 --> 00:02:38.240
+same as the implementation
+of the web service
+
+00:02:38.240 --> 00:02:41.750
+or of course, just the
+subset as far as we need.
+
+00:02:41.750 --> 00:02:47.135
+Now, the path defines where the
+requests are going to be sent,
+
+00:02:47.135 --> 00:02:50.000
+and then all the standard
+REST annotations,
+
+00:02:50.000 --> 00:02:57.860
+such as the sub-directory or sub URL
+of the implementation method the Produces,
+
+00:02:57.860 --> 00:03:00.350
+Consumes annotations, the GET, Post,
+
+00:03:00.350 --> 00:03:04.745
+Delete, Patch, PUT methods and so on.
+
+00:03:04.745 --> 00:03:08.360
+And of course, any
+parameter annotations that
+
+00:03:08.360 --> 00:03:12.140
+are already present in the web
+service implementation code anyway.
+
+00:03:12.140 --> 00:03:15.065
+So how do we use that REST
+client then in our code.
+
+00:03:15.065 --> 00:03:17.810
+This is the interface that simply
+
+00:03:17.810 --> 00:03:21.230
+needs an additional annotation
+of register as client.
+
+00:03:21.230 --> 00:03:27.245
+We can use that client by
+injecting it into our client code.
+
+00:03:27.245 --> 00:03:29.735
+There's a semicolon
+missing here at the end.
+
+00:03:29.735 --> 00:03:33.455
+So simply injecting the RestClient
+
+00:03:33.455 --> 00:03:38.150
+into a field that matches
+the type of the interface
+
+00:03:38.150 --> 00:03:39.980
+and it's going to be
+
+00:03:39.980 --> 00:03:44.465
+an actual implementation of the RestClient 
+that is injected into that field.
+
+00:03:44.465 --> 00:03:48.050
+Additionally, the class that we are using
+
+00:03:48.050 --> 00:03:52.130
+the RestClient in, has to be some
+sort of CDI bean either with
+
+00:03:52.130 --> 00:03:56.120
+an explicit scope annotation
+or any other annotation that
+
+00:03:56.120 --> 00:04:01.350
+activates CDI managed bean functionality.
+
+00:04:01.660 --> 00:04:05.030
+Do bear in mind the scope,
+
+00:04:05.030 --> 00:04:08.180
+the lifecycle scope of the client class,
+
+00:04:08.180 --> 00:04:11.630
+we are going to come back to
+this in a couple of moments.
+
+00:04:11.630 --> 00:04:14.375
+Now, once you've injected the client,
+
+00:04:14.375 --> 00:04:19.160
+you simply use it as if
+it was a local method.
+
+00:04:19.160 --> 00:04:23.225
+So no need to perform any sort of magic,
+
+00:04:23.225 --> 00:04:26.630
+you will get a functional
+REST client injected
+
+00:04:26.630 --> 00:04:30.350
+into the field and then you simply
+use it as if it was a local one.
+
+00:04:30.350 --> 00:04:32.840
+Now of course it need some
+additional configuration
+
+00:04:32.840 --> 00:04:35.015
+because the client needs
+to connect somewhere
+
+00:04:35.015 --> 00:04:40.460
+and that is performed in the
+application.properties file.
+
+00:04:40.460 --> 00:04:44.660
+There is only one field that needs
+to be placed into that file,
+
+00:04:44.660 --> 00:04:50.825
+which is field that starts with the fully
+qualified name of the client class,
+
+00:04:50.825 --> 00:04:55.279
+so of the interface that we've
+added to our application.
+
+00:04:55.279 --> 00:05:00.755
+Then the /mp-rest/ bit
+is literal, hard-coded
+
+00:05:00.755 --> 00:05:05.870
+and then we have a set of properties of
+which only the URL is necessary and it
+
+00:05:05.870 --> 00:05:10.805
+should point to the base path of
+where the rest service is running.
+
+00:05:10.805 --> 00:05:12.350
+So if, for example,
+
+00:05:12.350 --> 00:05:14.960
+if the rest service defines slash
+
+00:05:14.960 --> 00:05:19.190
+expenses contexts that is
+going to listen under,
+
+00:05:19.190 --> 00:05:21.800
+you do not have to specify it
+
+00:05:21.800 --> 00:05:25.400
+here because it's already
+defined in the interface,
+
+00:05:25.400 --> 00:05:27.990
+so whatever context,
+
+00:05:28.050 --> 00:05:32.335
+it's listening app is not necessary.
+
+00:05:32.335 --> 00:05:34.675
+We just need the base path.
+
+00:05:34.675 --> 00:05:38.350
+We can use that setting
+with profiles as well,
+
+00:05:38.350 --> 00:05:41.420
+so this would be the prod profile
+
+00:05:42.300 --> 00:05:47.215
+but for dev, of course we will
+be using a different endpoint.
+
+00:05:47.215 --> 00:05:48.160
+For dev
+
+00:05:48.160 --> 00:05:54.040
+we are going to be defining the
+alternative by prefixing the setting with
+
+00:05:54.040 --> 00:05:58.675
+the percent dev prefix or percent test or
+
+00:05:58.675 --> 00:06:04.000
+whatever other specific profiles
+you have defined and are using.
+
+00:06:04.000 --> 00:06:08.215
+I have mentioned lifecycle
+scope of the client object,
+
+00:06:08.215 --> 00:06:14.000
+the client class where you actually
+consuming the service, the scope property.
+
+00:06:14.000 --> 00:06:17.765
+So whatever your class's fully
+qualified domain name is,
+
+00:06:17.765 --> 00:06:21.305
+that is the REST client
+interface is fully qualified,
+
+00:06:21.305 --> 00:06:25.355
+name is /mp-rest/scope annotation
+
+00:06:25.355 --> 00:06:30.545
+defines the injection scope for the
+clients that are going to be generated in,
+
+00:06:30.545 --> 00:06:33.004
+injected into your clients.
+
+00:06:33.004 --> 00:06:36.695
+Default if you do not
+specify this is Dependent,
+
+00:06:36.695 --> 00:06:41.930
+which means that if you are injecting
+REST client implementation into
+
+00:06:41.930 --> 00:06:45.470
+an applications code being
+that client is going to
+
+00:06:45.470 --> 00:06:49.295
+be used for the remainder of the
+lifecycle of the application.
+
+00:06:49.295 --> 00:06:53.105
+If you are injecting it
+into request scope bean,
+
+00:06:53.105 --> 00:06:55.220
+then after the request had finished,
+
+00:06:55.220 --> 00:06:57.380
+this client would have
+been garbage collected
+
+00:06:57.380 --> 00:06:59.900
+in the next time, the client code in
+
+00:06:59.900 --> 00:07:03.710
+your application is invoked, the implementation class,
+
+00:07:03.710 --> 00:07:06.905
+the implementation object is
+going to be injected a fresh.
+
+00:07:06.905 --> 00:07:09.425
+So it's important in some use cases
+
+00:07:09.425 --> 00:07:13.265
+that's why we are pointing it out. Now,
+
+00:07:13.265 --> 00:07:16.370
+it's all nice and easy when you are running
+
+00:07:16.370 --> 00:07:20.134
+Quarkus instances locally on
+your development workstation,
+
+00:07:20.134 --> 00:07:21.980
+you know which ports have been assigned,
+
+00:07:21.980 --> 00:07:23.345
+it's easy to configure
+
+00:07:23.345 --> 00:07:30.770
+the REST client base path by simply
+saying localhost port 8075.
+
+00:07:30.770 --> 00:07:32.885
+In OpenShift Container Platform,
+
+00:07:32.885 --> 00:07:35.480
+the service discovery is
+a little bit different,
+
+00:07:35.480 --> 00:07:38.690
+but there are 2 options
+that we can choose.
+
+00:07:38.690 --> 00:07:43.910
+So any application running in
+OpenShift is useless
+
+00:07:43.910 --> 00:07:49.265
+unless we create a Kubernetes service
+as its load balancing front end.
+
+00:07:49.265 --> 00:07:53.570
+Because a pod has a shorter life
+cycle than the overall application,
+
+00:07:53.570 --> 00:07:55.580
+pod is just 1 instance of
+
+00:07:55.580 --> 00:07:59.780
+1 version of 1 collection
+of configuration settings.
+
+00:07:59.780 --> 00:08:01.130
+Every time we change that,
+
+00:08:01.130 --> 00:08:02.750
+we have to redeploy the pod,
+
+00:08:02.750 --> 00:08:05.060
+the application lives on.
+
+00:08:05.060 --> 00:08:09.650
+Kubernetes services, are load
+balancing front ends that allow
+
+00:08:09.650 --> 00:08:14.540
+us to have a stable reference
+point to whatever IP the pod has
+
+00:08:14.540 --> 00:08:17.315
+and however many pods we have,
+
+00:08:17.315 --> 00:08:19.280
+through that Kubernetes service,
+
+00:08:19.280 --> 00:08:22.430
+we will be able to land on some pod.
+
+00:08:22.430 --> 00:08:24.215
+We don't really know which one,
+
+00:08:24.215 --> 00:08:26.510
+but it essentially load balances incoming
+
+00:08:26.510 --> 00:08:28.940
+requests across the available
+collection of pods.
+
+00:08:28.940 --> 00:08:32.510
+Now the name of the
+Kubernetes service is very
+
+00:08:32.510 --> 00:08:36.740
+important because it determines
+how we are going to connect to it.
+
+00:08:36.740 --> 00:08:39.470
+The first option of discovering
+
+00:08:39.470 --> 00:08:44.209
+a Kubernetes service is to use
+injected environment variables.
+
+00:08:44.209 --> 00:08:47.180
+So environment variables
+get injected into pods
+
+00:08:47.180 --> 00:08:51.470
+automatically for all services
+that exist in the same project.
+
+00:08:51.470 --> 00:08:54.470
+For example, if the service
+is called calculator,
+
+00:08:54.470 --> 00:08:57.860
+the environment variable
+is going to be called
+
+00:08:57.860 --> 00:09:05.000
+CALCULATOR_SERVICE_HOST
+
+00:09:05.000 --> 00:09:09.500
+and CALCULATOR_SERVICE_POST.
+
+00:09:09.500 --> 00:09:11.390
+So the service,
+
+00:09:11.390 --> 00:09:14.135
+the CALCULATOR_SERVICE_HOST variable
+
+00:09:14.135 --> 00:09:17.495
+will contain the IP
+address of the service
+
+00:09:17.495 --> 00:09:20.990
+and of course, the calculator
+underscore service port will contain
+
+00:09:20.990 --> 00:09:25.175
+the port that we need to connect
+to be able to use that service.
+
+00:09:25.175 --> 00:09:29.720
+Since these variables are
+already injected into the pod,
+
+00:09:29.720 --> 00:09:33.860
+you can use them in application.
+properties directly by
+
+00:09:33.860 --> 00:09:37.235
+simply configuring your REST client
+
+00:09:37.235 --> 00:09:41.525
+with whatever the interface
+fully qualified class name is,
+
+00:09:41.525 --> 00:09:44.180
+/mp-rest/url=http
+
+00:09:44.180 --> 00:09:46.480
+dollar curly brace CALCULATOR_
+
+00:09:49.830 --> 00:10:00.370
+SERVICE_HOST closing
+curly brace and then colon
+
+00:10:00.370 --> 00:10:05.290
+and another curly brace for
+CALCULATOR_SERVICE_PORT
+
+00:10:05.290 --> 00:10:07.465
+That is one option.
+
+00:10:07.465 --> 00:10:12.010
+The other option is actually
+much simpler because it
+
+00:10:12.010 --> 00:10:17.004
+relies on the built-in DNS server
+as it's also known SkyDNS.
+
+00:10:17.004 --> 00:10:20.035
+It's also known the internal
+OpenShift DNS server.
+
+00:10:20.035 --> 00:10:22.300
+It's present in many Kubernetes clusters,
+
+00:10:22.300 --> 00:10:26.140
+but in all OpenShift deployments as well.
+
+00:10:26.140 --> 00:10:31.020
+It's only visible to pods
+running inside OpenShift,
+
+00:10:31.020 --> 00:10:33.470
+but thanks to that DNS server,
+
+00:10:33.470 --> 00:10:35.000
+we can actually treat
+
+00:10:35.000 --> 00:10:39.380
+a services name as if it was
+a host name of that service.
+
+00:10:39.380 --> 00:10:43.595
+So if we have a calculator service
+that is running on port 8080,
+
+00:10:43.595 --> 00:10:45.890
+we can just simply connect to
+
+00:10:45.890 --> 00:10:55.280
+http://calculator port 8080.
+
+00:10:55.280 --> 00:11:00.185
+That is, if the calculator service is
+running in the same project,
+
+00:11:00.185 --> 00:11:02.360
+if it's not running in the same project,
+
+00:11:02.360 --> 00:11:06.170
+but it's, let's say running in a project called Math,
+
+00:11:06.170 --> 00:11:09.755
+then we can connect it
+by simply referring to
+
+00:11:09.755 --> 00:11:14.070
+http://calculator.
+
+00:11:17.190 --> 00:11:22.990
+math:port 8080,
+
+00:11:22.990 --> 00:11:24.505
+like this.
+
+00:11:24.505 --> 00:11:29.095
+Because of the configuration
+of the pods, both work.
+
+00:11:29.095 --> 00:11:33.310
+So if the calculator service is
+in the same project,
+
+00:11:33.310 --> 00:11:34.765
+we can use the short name.
+
+00:11:34.765 --> 00:11:37.090
+If the calculator service is
+in another project,
+
+00:11:37.090 --> 00:11:39.430
+we simply use the project
+name as if it was
+
+00:11:39.430 --> 00:11:43.789
+the domain name of the target service.
+
+00:11:44.250 --> 00:11:48.310
+Because then you would obviously
+apply different settings,
+
+00:11:48.310 --> 00:11:51.325
+different profiles to the dev and the
+
+00:11:51.325 --> 00:11:55.465
+prod configuration profiles in
+your application properties.
+
+00:11:55.465 --> 00:11:58.210
+Because in development, in dev mode,
+
+00:11:58.210 --> 00:11:59.475
+obviously in of course,
+
+00:11:59.475 --> 00:12:02.060
+in many cases in test mode as well,
+
+00:12:02.060 --> 00:12:09.455
+you will actually be connecting to
+some service running on localhost,
+
+00:12:09.455 --> 00:12:11.870
+listening on a specific port.
+
+00:12:11.870 --> 00:12:15.170
+By the way, quarkus.
+
+00:12:15.170 --> 00:12:20.600
+http.port determines what
+port this particular service
+
+00:12:20.600 --> 00:12:23.210
+that we are configuring in application
+properties is going to use.
+
+00:12:23.210 --> 00:12:27.605
+So this microservice is
+listening on port 8085
+
+00:12:27.605 --> 00:12:29.255
+and then in dev,
+
+00:12:29.255 --> 00:12:34.145
+our client, our AdderService
+will be connecting to
+
+00:12:34.145 --> 00:12:37.490
+another service running on port 8084.
+
+00:12:37.490 --> 00:12:41.660
+This is in dev mode because
+we are running everything locally.
+
+00:12:41.660 --> 00:12:46.009
+In production of course we will
+be running things in OpenShift,
+
+00:12:46.009 --> 00:12:49.355
+we will be using port 8080 
+for both ourselves
+
+00:12:49.355 --> 00:12:53.210
+and the remote services because those
+will have different IP addresses.
+
+00:12:53.210 --> 00:12:58.355
+And in prod, or you could
+even leave out these two,
+
+00:12:58.355 --> 00:13:01.190
+just use absolute property names.
+
+00:13:01.190 --> 00:13:03.890
+In prod, we will be connecting to
+
+00:13:03.890 --> 00:13:06.935
+a Kubernetes service
+called adder in this case,
+
+00:13:06.935 --> 00:13:10.130
+that is listening on port 8080.
+
+00:13:10.130 --> 00:13:15.170
+Let's have a look at how to implement
+these relationships in practice.
+
+00:13:15.170 --> 00:13:16.715
+Join us in the next video,
+
+00:13:16.715 --> 00:13:18.870
+which is an exercise.
 

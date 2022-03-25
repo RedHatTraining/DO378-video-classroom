@@ -1,5 +1,126 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:02.370
+My name is Grega Bremec
+and I am an instructor for Red
 
+00:00:02.370 --> 00:00:04.020
+Hat Training. In the past
+
+00:00:04.020 --> 00:00:06.465
+I have been a developer,
+and a system engineer.
+
+00:00:06.465 --> 00:00:08.460
+I have been working with Linux, Unix,
+
+00:00:08.460 --> 00:00:10.470
+and open source software
+for over 2 decades
+
+00:00:10.470 --> 00:00:14.789
+by now. I'd like to invite
+you to join us in D0378,
+
+00:00:14.789 --> 00:00:19.290
+the Red Hat Cloud Native microservices
+development with Quarkus,
+
+00:00:19.290 --> 00:00:21.900
+where we are going to be learning
+about the principles of
+
+00:00:21.900 --> 00:00:25.020
+architecture and
+implementing microservices
+
+00:00:25.020 --> 00:00:27.840
+based on Red Hat Build of Quarkus 1.11
+
+00:00:27.840 --> 00:00:30.900
+and OpenShift Container
+Platform 4.6
+
+00:00:30.900 --> 00:00:37.240
+We will be building on Java EE
+application development fundamentals.
+
+00:00:37.240 --> 00:00:41.585
+And we will be learning about
+how to develop, monitor, test,
+
+00:00:41.585 --> 00:00:45.860
+and deploy the Cloud Native
+Architecture microservice in
+
+00:00:45.860 --> 00:00:48.680
+both local environment
+and OpenShift. Quarkus is
+
+00:00:48.680 --> 00:00:51.859
+an exciting new technology
+because it brings the maturity,
+
+00:00:51.859 --> 00:00:56.570
+the familiarity, and the reliability
+of Enterprise Java to our Cloud native,
+
+00:00:56.570 --> 00:00:58.610
+Container native framework that has
+
+00:00:58.610 --> 00:01:02.315
+super fast startup times and
+extremely small binaries.
+
+00:01:02.315 --> 00:01:06.590
+This course is meant for application
+developers that already have
+
+00:01:06.590 --> 00:01:11.150
+a basic understanding and familiarity
+of web application development in Java,
+
+00:01:11.150 --> 00:01:15.725
+or have taken the Red Hat
+Application Development 1 course,
+
+00:01:15.725 --> 00:01:17.240
+programming in Java EE,
+
+00:01:17.240 --> 00:01:19.490
+which is known as JB183,
+
+00:01:19.490 --> 00:01:22.865
+or have an equivalent
+Enterprise Java experience.
+
+00:01:22.865 --> 00:01:27.830
+And who are proficient in
+using Visual Studio Code or
+
+00:01:27.830 --> 00:01:33.140
+Red Hat code ready Studio or any other
+IDE in developing their applications.
+
+00:01:33.140 --> 00:01:36.050
+In addition, experience with Maven and
+
+00:01:36.050 --> 00:01:39.290
+version control is
+recommended but not required.
+
+00:01:39.290 --> 00:01:42.305
+And also, having a look
+at the introduction to
+
+00:01:42.305 --> 00:01:47.450
+OpenShift applications DO101
+is recommended but not required either.
+
+00:01:47.450 --> 00:01:50.660
+If you're excited to start learning
+about this cool new technology,
+
+00:01:50.660 --> 00:01:54.420
+join me in the DO378 course.
 

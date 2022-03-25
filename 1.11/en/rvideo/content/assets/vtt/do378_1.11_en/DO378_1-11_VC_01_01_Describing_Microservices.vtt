@@ -1,5 +1,1372 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:04.470
+Welcome to the first chapter, where we
+describe the microservice architecture.
 
+00:00:04.470 --> 00:00:07.860
+We're first going to have a
+look at what microservices
+
+00:00:07.860 --> 00:00:11.730
+are and what are the guiding
+principles behind their creation.
+
+00:00:11.730 --> 00:00:17.535
+Have a quiz about that to reinforce
+and clear up any terminology
+
+00:00:17.535 --> 00:00:20.400
+and then we're going
+to have a look at what
+
+00:00:20.400 --> 00:00:25.650
+the major patterns implemented in
+microservice architectures would be and
+
+00:00:25.650 --> 00:00:27.175
+a quiz about that as well.
+
+00:00:27.175 --> 00:00:28.640
+As a last thing in this chapter,
+
+00:00:28.640 --> 00:00:31.700
+we login and verify OpenShift credentials,
+
+00:00:31.700 --> 00:00:35.010
+which is a guided exercise.
+
+00:00:36.640 --> 00:00:42.590
+Microservices are method of dividing
+
+00:00:42.590 --> 00:00:45.440
+domains of the business logic of
+
+00:00:45.440 --> 00:00:48.965
+a larger application into
+self-contained processes,
+
+00:00:48.965 --> 00:00:52.565
+which communicate with other
+processes, with other,
+
+00:00:52.565 --> 00:00:58.220
+say, logical units of
+functionality through the network.
+
+00:00:58.220 --> 00:01:01.925
+Each service revolves around
+the specific business domain,
+
+00:01:01.925 --> 00:01:03.455
+such as, for example,
+
+00:01:03.455 --> 00:01:08.329
+customer information, inventory, control,
+
+00:01:08.329 --> 00:01:12.530
+and pricing, stock management and so on.
+
+00:01:12.530 --> 00:01:14.900
+And you can create and
+
+00:01:14.900 --> 00:01:19.520
+deploy microservices with different
+tools and programming languages.
+
+00:01:19.520 --> 00:01:24.260
+So one of the big
+advantages of implementing
+
+00:01:24.260 --> 00:01:27.110
+microservices architecture
+is that each team can
+
+00:01:27.110 --> 00:01:30.170
+actually use the tool they
+think is best for the job.
+
+00:01:30.170 --> 00:01:34.640
+And yet still, that one building
+block of a larger application
+
+00:01:34.640 --> 00:01:39.350
+will be able to communicate with
+the rest of the functionality.
+
+00:01:39.350 --> 00:01:45.050
+Microservices can be managed
+independently deployed using automation.
+
+00:01:45.050 --> 00:01:48.020
+They run in unique processes.
+
+00:01:48.020 --> 00:01:50.960
+They communicate using a
+lightweight mechanisms such
+
+00:01:50.960 --> 00:01:54.350
+as HTTP client calls to REST API.
+
+00:01:54.350 --> 00:01:58.715
+And of course they also expose
+REST API endpoints as well.
+
+00:01:58.715 --> 00:02:01.760
+That modularity means
+that microservices are
+
+00:02:01.760 --> 00:02:04.805
+very suitable for running
+inside a cloud environment
+
+00:02:04.805 --> 00:02:10.460
+and are natural fit for containerized
+deployment and orchestration platforms
+
+00:02:10.460 --> 00:02:12.770
+such as Kubernetes and OpenShift.
+
+00:02:12.770 --> 00:02:18.020
+Additionally, microservices generally
+have a couple of key characteristics,
+
+00:02:18.020 --> 00:02:20.420
+such as the fact they're modeled around
+
+00:02:20.420 --> 00:02:23.585
+a single business problem or
+a single business domain.
+
+00:02:23.585 --> 00:02:27.440
+They implement their own business
+logic, persistent storage,
+
+00:02:27.440 --> 00:02:33.500
+and expose external collaboration
+systems such as REST API endpoints.
+
+00:02:33.500 --> 00:02:38.930
+Microservice will have an individually
+published contract for consumption,
+
+00:02:38.930 --> 00:02:40.805
+known also as the API,
+
+00:02:40.805 --> 00:02:44.405
+and they're capable of
+running in isolation.
+
+00:02:44.405 --> 00:02:47.285
+They should be independent of
+
+00:02:47.285 --> 00:02:51.875
+other services and loosely coupled
+with them whenever that is necessary.
+
+00:02:51.875 --> 00:02:59.075
+So they should not depend on the
+services they consume too tightly.
+
+00:02:59.075 --> 00:03:03.320
+That all makes them easy
+to replace or upgrade and
+
+00:03:03.320 --> 00:03:07.760
+also scale and deploy
+independently of other services.
+
+00:03:07.760 --> 00:03:11.150
+Some of the reasons for
+the implementation and
+
+00:03:11.150 --> 00:03:14.555
+adoption of microservices
+would be faster deployment.
+
+00:03:14.555 --> 00:03:15.920
+Because there are, first of all,
+
+00:03:15.920 --> 00:03:19.235
+smaller than traditional
+monolithic applications,
+
+00:03:19.235 --> 00:03:24.575
+which mean they're more easily iterated
+over continuous integration cycles.
+
+00:03:24.575 --> 00:03:28.850
+Smaller changes in the code base
+mean less conflict when emerging,
+
+00:03:28.850 --> 00:03:33.155
+mean faster analysis of source code,
+
+00:03:33.155 --> 00:03:39.350
+less time required to fix bugs and
+new features being added tested.
+
+00:03:39.350 --> 00:03:45.830
+Testing is a very important part of a
+microservice release cycle and released,
+
+00:03:45.830 --> 00:03:47.660
+of course, much quicker.
+
+00:03:47.660 --> 00:03:52.010
+Microservices are generally developed
+and maintained by small teams.
+
+00:03:52.010 --> 00:03:56.765
+Small teams typically focus on
+one or two microservices at most.
+
+00:03:56.765 --> 00:03:58.790
+And as commonly said,
+
+00:03:58.790 --> 00:04:03.920
+it is a 2 pizza team concept, when
+
+00:04:03.920 --> 00:04:06.710
+2 large pizzas should be enough to
+
+00:04:06.710 --> 00:04:09.785
+provide lunch for all
+the members of the team.
+
+00:04:09.785 --> 00:04:15.500
+So traditionally, rather than going
+for a large team of programmers and
+
+00:04:15.500 --> 00:04:18.260
+a large or medium team
+of business analysts
+
+00:04:18.260 --> 00:04:22.714
+and then project managers that
+oversee individual projects.
+
+00:04:22.714 --> 00:04:25.010
+So to put it in another terms
+
+00:04:25.010 --> 00:04:29.570
+instead of having silos of competencies in
+
+00:04:29.570 --> 00:04:35.675
+the organization of a development
+environment of a development unit
+
+00:04:35.675 --> 00:04:37.205
+inside a company,
+
+00:04:37.205 --> 00:04:39.290
+we rather build cross-functional
+
+00:04:39.290 --> 00:04:42.350
+teams according to an
+application's requirements,
+
+00:04:42.350 --> 00:04:43.370
+such as, for example,
+
+00:04:43.370 --> 00:04:47.330
+a team that consists of
+3 developers, 1 DBA,
+
+00:04:47.330 --> 00:04:52.550
+1 business analyst, perhaps
+1 or 2 operators,
+
+00:04:52.550 --> 00:04:55.625
+and Quality Assurance Engineer.
+
+00:04:55.625 --> 00:04:59.960
+And together they can sit
+behind the same table and
+
+00:04:59.960 --> 00:05:04.370
+discuss their application from main 
+different points of view, at the same time
+
+00:05:04.370 --> 00:05:07.235
+there's much less noise because
+of the size of the team.
+
+00:05:07.235 --> 00:05:10.640
+And yet each of the team
+members contributes to
+
+00:05:10.640 --> 00:05:14.795
+the overall solution from
+their own perspective,
+
+00:05:14.795 --> 00:05:16.775
+of course, making the solution
+
+00:05:16.775 --> 00:05:20.870
+a lot better. Size of microservices is much,
+
+00:05:20.870 --> 00:05:24.035
+much lower than the traditional
+monolithic application
+
+00:05:24.035 --> 00:05:29.030
+and that means that the code base
+is a lot less complex and there's
+
+00:05:29.030 --> 00:05:34.520
+a lot lower learning curve,
+
+00:05:34.520 --> 00:05:36.650
+if you want it that way, for
+
+00:05:36.650 --> 00:05:41.315
+new members on-boarded on the
+team to start being productive.
+
+00:05:41.315 --> 00:05:44.090
+That also means that microservices,
+
+00:05:44.090 --> 00:05:46.490
+because of smaller codebase,
+
+00:05:46.490 --> 00:05:49.670
+can be tested individually.
+
+00:05:49.670 --> 00:05:51.680
+They can have their own release schedule.
+
+00:05:51.680 --> 00:05:56.720
+They can be integrated in their
+own separate environments,
+
+00:05:56.720 --> 00:05:59.990
+which all means that they're all easier to
+
+00:05:59.990 --> 00:06:04.290
+deploy and easier to manage
+once running in production.
+
+00:06:04.780 --> 00:06:08.120
+That also means that
+they're easier to scale.
+
+00:06:08.120 --> 00:06:15.155
+So if we compare traditional monolithic
+applications and microservices,
+
+00:06:15.155 --> 00:06:18.425
+monolithic applications tend to be
+
+00:06:18.425 --> 00:06:23.810
+many functional units all joined
+in the same deployment unit,
+
+00:06:23.810 --> 00:06:27.470
+such as an Enterprise Archive, EAR file,
+
+00:06:27.470 --> 00:06:29.345
+as we know from Java.
+
+00:06:29.345 --> 00:06:35.150
+And even if that application
+is perfectly tested,
+
+00:06:35.150 --> 00:06:39.830
+integrated and then of course
+maintained in production,
+
+00:06:39.830 --> 00:06:43.235
+when it comes to performance, bottlenecks,
+
+00:06:43.235 --> 00:06:45.440
+it is always 1 or2 of
+
+00:06:45.440 --> 00:06:49.295
+these components that are the
+culprit for the bottleneck.
+
+00:06:49.295 --> 00:06:51.410
+However, if you want to use
+
+00:06:51.410 --> 00:06:56.900
+scale-out approach to improve the
+throughput of the application,
+
+00:06:56.900 --> 00:06:59.060
+you will end up with a couple of issues.
+
+00:06:59.060 --> 00:07:04.759
+First of all, it is the only unit of
+scaling is the entire application.
+
+00:07:04.759 --> 00:07:08.105
+So you have to have x number of times
+
+00:07:08.105 --> 00:07:11.480
+the entire applications functional units
+
+00:07:11.480 --> 00:07:15.485
+deployed just to solve an
+issue with maybe 1 or 2.
+
+00:07:15.485 --> 00:07:21.230
+Additionally, you may have singletons
+that do not collaborate well,
+
+00:07:21.230 --> 00:07:25.609
+if there are multiple instances of that
+functionality in your infrastructure,
+
+00:07:25.609 --> 00:07:27.920
+which is a very difficult
+problem to solve.
+
+00:07:27.920 --> 00:07:31.970
+And it's commonly in the
+monolithic approach,
+
+00:07:31.970 --> 00:07:37.025
+resolved by having some sort of
+a feature toggle that turns off
+
+00:07:37.025 --> 00:07:41.995
+functionality in all but one instance
+of the monolithic application.
+
+00:07:41.995 --> 00:07:43.850
+Those kinds of things are very difficult
+
+00:07:43.850 --> 00:07:48.290
+to not only implement, but also oversee
+
+00:07:48.290 --> 00:07:55.595
+as the operations cycles
+continue into the future.
+
+00:07:55.595 --> 00:07:59.360
+With microservices we
+generally stick, it is
+
+00:07:59.360 --> 00:08:03.844
+a rule, to one single functional
+unit per deployment,
+
+00:08:03.844 --> 00:08:07.295
+which means that those
+units are much simpler.
+
+00:08:07.295 --> 00:08:11.045
+They are a separate
+service in their own right.
+
+00:08:11.045 --> 00:08:12.815
+And when it comes to scaling,
+
+00:08:12.815 --> 00:08:16.310
+we simply need to provide
+as many instances of
+
+00:08:16.310 --> 00:08:18.860
+an individual services as
+
+00:08:18.860 --> 00:08:23.525
+required for its optimal
+performance and resiliency.
+
+00:08:23.525 --> 00:08:27.200
+Singletons, that is, applications
+that cannot exist in
+
+00:08:27.200 --> 00:08:30.515
+more than 1 instance can be
+managed much more easily as well.
+
+00:08:30.515 --> 00:08:33.560
+It is simply a matter
+of using, for example,
+
+00:08:33.560 --> 00:08:38.100
+an orchestrators capacity
+to automatically provision
+
+00:08:38.100 --> 00:08:40.840
+or reprovision a container that is
+
+00:08:40.840 --> 00:08:44.515
+non-responsive or is not
+reporting aliveness
+
+00:08:44.515 --> 00:08:47.620
+state, that would be favorable.
+
+00:08:47.620 --> 00:08:52.645
+Also generally because microservices
+tend to be small and stateless,
+
+00:08:52.645 --> 00:08:56.050
+there are a few of them
+that actually are stateful,
+
+00:08:56.050 --> 00:08:59.110
+but again, as we said,
+
+00:08:59.110 --> 00:09:02.590
+this is more of an
+exception than the rule
+
+00:09:02.590 --> 00:09:08.860
+and if they are stateful then they
+typically have a backing store,
+
+00:09:08.860 --> 00:09:12.235
+which is a database that
+belongs only to them.
+
+00:09:12.235 --> 00:09:15.955
+So the service itself
+can be made stateless
+
+00:09:15.955 --> 00:09:20.725
+with the use of database
+that backs it, for example.
+
+00:09:20.725 --> 00:09:23.920
+So because they're small
+and stateless, scale
+
+00:09:23.920 --> 00:09:26.290
+out process is much quicker and much
+
+00:09:26.290 --> 00:09:30.610
+easier than it would've been
+in a monolithic application.
+
+00:09:30.610 --> 00:09:36.265
+There are a couple of principles
+that crucial to implement,
+
+00:09:36.265 --> 00:09:39.070
+if you want to ensure the
+success of microservices
+
+00:09:39.070 --> 00:09:42.415
+based deployments such as
+reorganizing to DevOps.
+
+00:09:42.415 --> 00:09:45.430
+Which means essentially that
+that cross-functional team
+
+00:09:45.430 --> 00:09:48.639
+that we were looking at just before, owns
+
+00:09:48.639 --> 00:09:51.310
+a specific product, a
+
+00:09:51.310 --> 00:09:55.510
+specific microservice from its
+inception to its production.
+
+00:09:55.510 --> 00:10:00.730
+So they are in charge of the
+entire applications lifecycle,
+
+00:10:00.730 --> 00:10:04.670
+which gives them the autonomy
+and the speed they need to
+
+00:10:04.670 --> 00:10:08.960
+be able to respond to various conditions.
+
+00:10:08.960 --> 00:10:11.360
+Packaging your service
+as a container is also
+
+00:10:11.360 --> 00:10:14.720
+a good idea because a container is a set
+
+00:10:14.720 --> 00:10:16.970
+of isolated processes, which provides
+
+00:10:16.970 --> 00:10:20.600
+all the necessary dependencies
+for an application to run.
+
+00:10:20.600 --> 00:10:26.090
+So by using tools like container engines
+and container orchestration systems,
+
+00:10:26.090 --> 00:10:32.390
+the deployment platforms can be
+packaged and deployed as a container,
+
+00:10:32.390 --> 00:10:39.200
+which means that there is full confidence
+that the execution environment,
+
+00:10:39.200 --> 00:10:41.780
+ultimate execution
+environment will be exactly
+
+00:10:41.780 --> 00:10:45.335
+as engineered during the
+development process.
+
+00:10:45.335 --> 00:10:47.225
+And add on top of that
+
+00:10:47.225 --> 00:10:49.370
+an elastic infrastructure such as,
+
+00:10:49.370 --> 00:10:51.995
+for example, OpenShift Container Platform,
+
+00:10:51.995 --> 00:10:56.960
+you can rely on the
+automated provisioning,
+
+00:10:56.960 --> 00:11:01.040
+management and scaling of
+containerized applications.
+
+00:11:01.040 --> 00:11:04.895
+Automatic detection of
+readiness and liveness,
+
+00:11:04.895 --> 00:11:06.980
+which improves the customer's,
+
+00:11:06.980 --> 00:11:12.095
+the end user's experience by
+ensuring that they never or much,
+
+00:11:12.095 --> 00:11:13.835
+much, much more rarely
+
+00:11:13.835 --> 00:11:16.820
+receive unfavorable responses from
+
+00:11:16.820 --> 00:11:19.970
+applications because the
+platform itself can take care
+
+00:11:19.970 --> 00:11:22.520
+of when an application is
+not responding correctly
+
+00:11:22.520 --> 00:11:26.180
+and automatically replace
+it with a new instance.
+
+00:11:26.180 --> 00:11:28.295
+Automatic scaling, for example,
+
+00:11:28.295 --> 00:11:32.900
+is a great feature as well because it can
+
+00:11:32.900 --> 00:11:36.215
+respond to the application's load
+
+00:11:36.215 --> 00:11:39.440
+based on the metrics of the
+application that it monitors
+
+00:11:39.440 --> 00:11:43.310
+and automatically create new
+instances of the application
+
+00:11:43.310 --> 00:11:47.630
+to satisfy minimum service
+level requirements.
+
+00:11:47.630 --> 00:11:53.045
+Automating deployments is
+also a great way to ensure
+
+00:11:53.045 --> 00:11:59.749
+that microservices can work in a
+stable and favorable environment.
+
+00:11:59.749 --> 00:12:06.770
+So it makes it easier to
+spin up new environments,
+
+00:12:06.770 --> 00:12:11.105
+spin up new instances of the service
+without depending on other teams.
+
+00:12:11.105 --> 00:12:14.930
+So for example, if you have
+
+00:12:14.930 --> 00:12:19.084
+an automated process and you've already
+used it successfully in development,
+
+00:12:19.084 --> 00:12:23.825
+then it's not a terrific effort to push or
+
+00:12:23.825 --> 00:12:26.930
+promote that process
+into the testing phase,
+
+00:12:26.930 --> 00:12:31.370
+adjusting it ever so slightly
+to have the end-to-end tests,
+
+00:12:31.370 --> 00:12:36.980
+for example, execute in stable and
+clean what's most important environment.
+
+00:12:36.980 --> 00:12:39.830
+Infrastructure As Code is
+one of such approaches
+
+00:12:39.830 --> 00:12:44.420
+that allows us to use the
+descriptive language to code
+
+00:12:44.420 --> 00:12:49.040
+various requirements for the environment
+
+00:12:49.040 --> 00:12:52.025
+that we want to provision
+the applications in.
+
+00:12:52.025 --> 00:12:59.615
+It uses tools like Ansible, Puppet or
+Jenkins to provide this functionality.
+
+00:12:59.615 --> 00:13:05.885
+And it also has the
+added benefit of having
+
+00:13:05.885 --> 00:13:08.960
+the information about
+our infrastructure
+
+00:13:08.960 --> 00:13:13.280
+stored generally in a
+single source of truth,
+
+00:13:13.280 --> 00:13:18.530
+as we call it Git repository or some
+other version control system that
+
+00:13:18.530 --> 00:13:21.530
+contains all the declarative
+bits that need to be
+
+00:13:21.530 --> 00:13:25.205
+applied to an environment when
+you're trying to provision it.
+
+00:13:25.205 --> 00:13:32.645
+Of course, continuous integration
+being one good practice to follow,
+
+00:13:32.645 --> 00:13:38.929
+continuous delivery is also a great
+practice and both of them combined,
+
+00:13:38.929 --> 00:13:41.195
+they give us the ability to,
+
+00:13:41.195 --> 00:13:46.625
+at each point in time have
+the capacity to build,
+
+00:13:46.625 --> 00:13:54.515
+test, and deliver software in a workable
+state as the code is being developed.
+
+00:13:54.515 --> 00:13:56.750
+Key to continuous delivery is to
+
+00:13:56.750 --> 00:14:00.665
+automate all the steps
+involved from first of all,
+
+00:14:00.665 --> 00:14:06.485
+compiling and building the application
+artifacts, to testing them in
+
+00:14:06.485 --> 00:14:09.410
+a series of unit tests
+to test the integration
+
+00:14:09.410 --> 00:14:12.860
+of that application component
+with other external dependencies,
+
+00:14:12.860 --> 00:14:16.580
+however many there may be and ultimately,
+
+00:14:16.580 --> 00:14:18.020
+even to a degree,
+
+00:14:18.020 --> 00:14:23.389
+automate the roll out into production
+through continuous release processes.
+
+00:14:23.389 --> 00:14:24.830
+To build this into
+
+00:14:24.830 --> 00:14:32.150
+one comprehensive pipeline is a key
+effort that needs to be in place
+
+00:14:32.150 --> 00:14:38.150
+because that gives us the
+ability to detect failures in
+
+00:14:38.150 --> 00:14:40.400
+the code on whatever level they may
+
+00:14:40.400 --> 00:14:44.240
+appear before any new
+development task starts,
+
+00:14:44.240 --> 00:14:47.990
+before focus turns
+elsewhere and before
+
+00:14:47.990 --> 00:14:52.925
+most obviously, before those errors
+are promoted to production.
+
+00:14:52.925 --> 00:14:55.535
+Microservice architecture,
+
+00:14:55.535 --> 00:15:01.520
+however many benefits it has can
+occasionally become challenging and complex.
+
+00:15:01.520 --> 00:15:04.520
+The sheer number of application
+components that we now have
+
+00:15:04.520 --> 00:15:07.955
+to manage is quite large.
+
+00:15:07.955 --> 00:15:11.305
+And of course,
+
+00:15:11.305 --> 00:15:15.229
+if you look at it just from the
+perspective of a single microservice,
+
+00:15:15.229 --> 00:15:19.580
+it all sounds very nice and very easy.
+
+00:15:19.580 --> 00:15:23.480
+But then when we start building
+a more complex infrastructure,
+
+00:15:23.480 --> 00:15:25.625
+more complex application environment
+
+00:15:25.625 --> 00:15:28.415
+with multiple services
+depending on each other,
+
+00:15:28.415 --> 00:15:31.340
+we need to test them together,
+
+00:15:31.340 --> 00:15:36.155
+which leads to increasingly more complex
+integration testing environments.
+
+00:15:36.155 --> 00:15:38.570
+Or the need to mock
+
+00:15:38.570 --> 00:15:43.085
+more and more and more external dependencies
+in the integration service phase,
+
+00:15:43.085 --> 00:15:49.955
+integration test phase, and
+then use more complex scripts,
+
+00:15:49.955 --> 00:15:51.365
+more complex scenarios,
+
+00:15:51.365 --> 00:15:54.000
+in end-to-end testing.
+
+00:15:54.750 --> 00:16:03.235
+Additionally, maintaining data
+consistency might be a bit tricky in
+
+00:16:03.235 --> 00:16:06.850
+such large distributed systems
+because we need to be able to pin
+
+00:16:06.850 --> 00:16:11.545
+down the exact ownership of
+each bit of information.
+
+00:16:11.545 --> 00:16:17.620
+And then for the purposes of performance,
+
+00:16:17.620 --> 00:16:19.600
+for the purposes of loose coupling,
+
+00:16:19.600 --> 00:16:25.570
+we might still choose to have redundancies
+in the data in some of the modules,
+
+00:16:25.570 --> 00:16:28.630
+in some of the components
+that will deploy,
+
+00:16:28.630 --> 00:16:32.905
+which leads to issues
+with data consistency.
+
+00:16:32.905 --> 00:16:35.620
+So maintaining data models,
+
+00:16:35.620 --> 00:16:43.100
+maintaining domain object model in that
+scenario is also a big issue because
+
+00:16:43.100 --> 00:16:46.820
+while a single application can contain
+
+00:16:46.820 --> 00:16:52.970
+all the conceivable attributes that
+a certain data objects such as,
+
+00:16:52.970 --> 00:16:55.055
+for example, a customer may have
+
+00:16:55.055 --> 00:16:59.375
+another application which needs a
+bit of redundancy in that area,
+
+00:16:59.375 --> 00:17:01.715
+may not have the need
+
+00:17:01.715 --> 00:17:05.930
+to hold the complete set of
+attributes of a customer.
+
+00:17:05.930 --> 00:17:07.850
+It may need to just have
+
+00:17:07.850 --> 00:17:12.440
+a single attribute such as loyalty
+level available at all times
+
+00:17:12.440 --> 00:17:19.115
+and thinking your way around how
+to model these objects and how to
+
+00:17:19.115 --> 00:17:26.495
+prevent discrepancies in the data
+is obviously a challenging task.
+
+00:17:26.495 --> 00:17:29.225
+In microservice based applications,
+
+00:17:29.225 --> 00:17:30.245
+it's also
+
+00:17:30.245 --> 00:17:33.380
+much more difficult to trace the path of
+
+00:17:33.380 --> 00:17:37.205
+a single user's request through the
+infrastructure before it's completed,
+
+00:17:37.205 --> 00:17:38.945
+before it returns a result.
+
+00:17:38.945 --> 00:17:43.235
+That also means bottlenecks,
+transient failures,
+
+00:17:43.235 --> 00:17:44.675
+silent
+
+00:17:44.675 --> 00:17:48.125
+errors in the data are much
+more difficult to pinpoint.
+
+00:17:48.125 --> 00:17:49.550
+But luckily for that,
+
+00:17:49.550 --> 00:17:51.710
+we have a number of tools that we're also
+
+00:17:51.710 --> 00:17:54.530
+going to look at and
+discuss in this course.
+
+00:17:54.530 --> 00:17:57.260
+Collecting all the
+logging information from
+
+00:17:57.260 --> 00:18:02.795
+your individual application components
+also becomes a challenging task.
+
+00:18:02.795 --> 00:18:09.110
+And of course, visualizing it is quite
+complex in a larger infrastructure.
+
+00:18:09.110 --> 00:18:15.200
+Finally, securing micro-services
+can also be a complicated task
+
+00:18:15.200 --> 00:18:22.760
+because whereas the users authenticate
+with the end-user application,
+
+00:18:22.760 --> 00:18:24.575
+typically a web front-end,
+
+00:18:24.575 --> 00:18:27.440
+just like if it was a
+monolithic application,
+
+00:18:27.440 --> 00:18:30.890
+individual services also
+need to authenticate
+
+00:18:30.890 --> 00:18:35.780
+the request delegated to them
+by individual components.
+
+00:18:35.780 --> 00:18:40.130
+So it's not really viable to have each of
+
+00:18:40.130 --> 00:18:43.445
+the microservices use its
+
+00:18:43.445 --> 00:18:47.150
+own completely disconnected,
+separate authentication process.
+
+00:18:47.150 --> 00:18:50.464
+They need to be able to
+share some information
+
+00:18:50.464 --> 00:18:54.740
+and verify it with the
+degree of confidence.
+
+00:18:54.740 --> 00:18:58.340
+So designing a successful
+microservice architectures,
+
+00:18:58.340 --> 00:19:01.610
+sometimes even requires you
+to forget some of the
+
+00:19:01.610 --> 00:19:06.530
+bad practices that teens may
+have followed for a long time.
+
+00:19:06.530 --> 00:19:10.010
+And restructure the thinking
+
+00:19:10.010 --> 00:19:15.720
+around good practices such as the main
+driven design and bounded contexts.
+
+00:19:15.910 --> 00:19:19.325
+Advantages of doing so,
+
+00:19:19.325 --> 00:19:25.430
+for example, that changes when you're
+doing bounded domain model,
+
+00:19:25.430 --> 00:19:29.720
+changes in the domain model only affect
+a very limited number of services
+
+00:19:29.720 --> 00:19:34.025
+whereas in a monolithic application,
+
+00:19:34.025 --> 00:19:36.890
+the tendencies to overshare,
+
+00:19:36.890 --> 00:19:42.800
+overuse and rely on shared
+data model far too much.
+
+00:19:42.800 --> 00:19:46.610
+This also means that the
+services that are built around
+
+00:19:46.610 --> 00:19:51.605
+the bounded domain model are more
+autonomous than they would otherwise be.
+
+00:19:51.605 --> 00:19:52.625
+Of course,
+
+00:19:52.625 --> 00:19:57.755
+the disadvantages of using the bounded
+domain model approach are, that
+
+00:19:57.755 --> 00:19:59.990
+excellent domain knowledge is
+
+00:19:59.990 --> 00:20:03.110
+required to define the
+context in the first place.
+
+00:20:03.110 --> 00:20:09.740
+It needs to be a clean cut
+between one domain and another domain.
+
+00:20:09.740 --> 00:20:12.395
+And that is sometimes quite difficult.
+
+00:20:12.395 --> 00:20:18.424
+And of course, with communication
+across the main contexts,
+
+00:20:18.424 --> 00:20:24.994
+the complexity in maintaining the
+consistency of systems increases.
+
+00:20:24.994 --> 00:20:26.930
+Being able to deploy microservices
+
+00:20:26.930 --> 00:20:30.665
+independently is one of the
+most critical principles.
+
+00:20:30.665 --> 00:20:33.020
+It means that a microservice must be
+
+00:20:33.020 --> 00:20:36.380
+a self-contained deployment to be
+
+00:20:36.380 --> 00:20:40.940
+stateless and maintain state outside
+of the application in a database,
+
+00:20:40.940 --> 00:20:45.830
+in a data grid, in some sort
+of independent data store.
+
+00:20:45.830 --> 00:20:52.655
+And that allows them to scale more
+easily and deploy independently.
+
+00:20:52.655 --> 00:20:57.695
+Such they are good candidates for
+lightweight and embedded runtimes
+
+00:20:57.695 --> 00:21:01.040
+and unlike fully blown
+application servers,
+
+00:21:01.040 --> 00:21:04.820
+microservices do not need that ton of
+
+00:21:04.820 --> 00:21:07.535
+functionality that our fully
+blown application server
+
+00:21:07.535 --> 00:21:09.020
+comes with. Microservices are
+
+00:21:09.020 --> 00:21:12.800
+small, compact, single-purpose
+components, and it's
+
+00:21:12.800 --> 00:21:15.440
+typically, they have very,
+
+00:21:15.440 --> 00:21:17.645
+very low requirements in terms of
+
+00:21:17.645 --> 00:21:23.735
+the runtime platform functionality
+that they exploit.
+
+00:21:23.735 --> 00:21:27.200
+The most commonly used
+runtime environments
+
+00:21:27.200 --> 00:21:30.260
+for microservices like that are Quarkus,
+
+00:21:30.260 --> 00:21:33.620
+Eclipse's, Vert.x, Spring Boot,
+
+00:21:33.620 --> 00:21:36.380
+even JBoss Enterprise
+Application Platform,
+
+00:21:36.380 --> 00:21:39.515
+which is a fully blown application server,
+
+00:21:39.515 --> 00:21:44.420
+Java EE application server is considered
+lightweight for most of purposes
+
+00:21:44.420 --> 00:21:50.390
+because the majority of its
+components startup on demand only.
+
+00:21:50.390 --> 00:21:54.530
+However, there's even a project
+called WildFly Bootable JAR,
+
+00:21:54.530 --> 00:21:58.370
+which aims to allow us to use
+
+00:21:58.370 --> 00:22:02.975
+JBoss EAP subsystems
+embedded into a Bootable JAR,
+
+00:22:02.975 --> 00:22:05.465
+much like Spring Boot does.
+
+00:22:05.465 --> 00:22:11.480
+Microservices that are developed using
+these lightweight runtimes can then be
+
+00:22:11.480 --> 00:22:13.550
+packaged and delivered as containers
+
+00:22:13.550 --> 00:22:16.865
+that include the runtime
+and its dependencies.
+
+00:22:16.865 --> 00:22:21.965
+Because these runtimes are
+extremely small in terms of footprint,
+
+00:22:21.965 --> 00:22:26.735
+they are also much easier to distribute,
+
+00:22:26.735 --> 00:22:28.550
+much quicker to spin up,
+
+00:22:28.550 --> 00:22:31.325
+and of course much much easier to scale.
+
+00:22:31.325 --> 00:22:33.410
+Microservices can obviously fail,
+
+00:22:33.410 --> 00:22:37.100
+there is no magic wand that will
+make them somehow unbreakable.
+
+00:22:37.100 --> 00:22:41.855
+So it's best if you plan
+for these failures
+
+00:22:41.855 --> 00:22:48.169
+at the start, so early in the
+life cycle of the application
+
+00:22:48.169 --> 00:22:51.230
+and there are various patterns
+
+00:22:51.230 --> 00:22:54.380
+some of which we are going to
+discuss even in the next section.
+
+00:22:54.380 --> 00:22:56.720
+But then also revisit
+throughout the course,
+
+00:22:56.720 --> 00:23:03.560
+such as create highly available
+deployments whenever possible.
+
+00:23:03.560 --> 00:23:06.785
+Using circuit breaker patterns to prevent
+
+00:23:06.785 --> 00:23:11.820
+cascading failures upstream
+to other services.
+
+00:23:11.860 --> 00:23:17.405
+Bulkhead for example, is also an interesting
+pattern that prevents overloading
+
+00:23:17.405 --> 00:23:19.190
+an individual service which has
+
+00:23:19.190 --> 00:23:22.715
+a known capacity and cannot
+easily be scaled out.
+
+00:23:22.715 --> 00:23:24.110
+And then of course,
+
+00:23:24.110 --> 00:23:27.980
+there are various approaches such as
+fallback responses, cached responses,
+
+00:23:27.980 --> 00:23:33.890
+and others that allow our
+users to still get service,
+
+00:23:33.890 --> 00:23:37.040
+even though that service may be known to
+
+00:23:37.040 --> 00:23:41.840
+the user to be incomplete
+at a certain point in time.
+
+00:23:41.840 --> 00:23:45.590
+Of course, we need to employ excessive,
+
+00:23:45.590 --> 00:23:51.380
+extensive tests to make
+sure that these approaches,
+
+00:23:51.380 --> 00:23:56.420
+that these failures that we can
+identify and the approaches in order to
+
+00:23:56.420 --> 00:24:02.240
+mitigate them actually do
+fulfill a certain purpose.
+
+00:24:02.240 --> 00:24:06.725
+So real-time monitoring is absolutely
+necessary to detect those failures.
+
+00:24:06.725 --> 00:24:09.440
+And of course, using
+
+00:24:09.440 --> 00:24:12.965
+a self-healing infrastructure
+such as Kubernetes and OpenShift
+
+00:24:12.965 --> 00:24:15.530
+Container Platform also helps
+
+00:24:15.530 --> 00:24:19.700
+removing non-functional components
+and replacing them with new ones.
+
+00:24:19.700 --> 00:24:22.340
+We'll discuss these later in the course.
+
+00:24:22.340 --> 00:24:24.350
+So for now, head on to the quiz to review
+
+00:24:24.350 --> 00:24:26.960
+the section's terminology and principles
+
+00:24:26.960 --> 00:24:29.480
+and then join us in the next
+video where we're going to have
+
+00:24:29.480 --> 00:24:33.330
+a look at some of these
+fault tolerance patterns.
 

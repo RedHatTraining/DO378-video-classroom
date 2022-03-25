@@ -1,5 +1,592 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:01.005
+Welcome back!
 
+00:00:01.005 --> 00:00:03.300
+In this exercise, we are going to apply
+
+00:00:03.300 --> 00:00:07.215
+some fault tolerance policies
+to an example application.
+
+00:00:07.215 --> 00:00:11.325
+Starting with lab
+tolerance-policies start,
+
+00:00:11.325 --> 00:00:15.885
+which populates our source code
+and create directory called
+
+00:00:15.885 --> 00:00:20.820
+DO378/labs/tolerance-policies/istio-tutorial.
+
+00:00:20.820 --> 00:00:24.045
+That's where the code is
+coming from, an example code.
+
+00:00:24.045 --> 00:00:25.470
+There are 2 scripts here,
+
+00:00:25.470 --> 00:00:29.295
+parallel and sequential, which
+we will use during testing.
+
+00:00:29.295 --> 00:00:33.090
+Parallel just sends a number
+of parallel requests to
+
+00:00:33.090 --> 00:00:36.750
+the service that we are running and
+sequential keeps doing one by one
+
+00:00:36.750 --> 00:00:38.125
+in sequence.
+
+00:00:38.125 --> 00:00:41.630
+The application we will be testing
+is called recommendation.
+
+00:00:41.630 --> 00:00:43.805
+And if we have a look at it,
+
+00:00:43.805 --> 00:00:47.930
+there's just 1 file
+RecommendationResource
+
+00:00:47.930 --> 00:00:52.865
+there. Now looking at the
+endpoints in that source code file,
+
+00:00:52.865 --> 00:00:57.650
+we see that there is a getRecommendations function or
+
+00:00:57.650 --> 00:01:03.110
+method which returns the 
+recommended number, something.
+
+00:01:03.110 --> 00:01:10.235
+There are also behavior altering
+endpoints here, such as reset,
+
+00:01:10.235 --> 00:01:13.280
+which clears All Flags, misbehave,
+
+00:01:13.280 --> 00:01:17.210
+which causes the application to misbehave
+
+00:01:17.210 --> 00:01:21.650
+between or flip between 200 and 503.
+
+00:01:21.650 --> 00:01:25.400
+There is a timeout endpoint which
+
+00:01:25.400 --> 00:01:31.610
+causes 1 second delay on 50%
+of the requests or responses.
+
+00:01:31.610 --> 00:01:34.760
+And there is a crash which causes
+
+00:01:34.760 --> 00:01:39.440
+50 percent of responses to
+throw an exception, right!
+
+00:01:39.440 --> 00:01:42.499
+So let's start the application.
+
+00:01:42.499 --> 00:01:42.980
+First,
+
+00:01:42.980 --> 00:01:45.125
+we are going to add this smallrye-
+
+00:01:45.125 --> 00:01:48.095
+fault-tolerance extension to the project.
+
+00:01:48.095 --> 00:01:51.005
+Then we are going to start the application
+
+00:01:51.005 --> 00:01:55.265
+without any additional fault
+tolerance implemented.
+
+00:01:55.265 --> 00:02:01.174
+So as it starts, reporting
+listening on port 8080,
+
+00:02:01.174 --> 00:02:05.600
+we can start by turning on the crash mode.
+
+00:02:05.600 --> 00:02:08.780
+So using the parallel script,
+
+00:02:08.780 --> 00:02:13.190
+we will send 10 concurrent
+requests to localhost 8080.
+
+00:02:13.190 --> 00:02:16.940
+And we can see that in some
+cases we get a nice response.
+
+00:02:16.940 --> 00:02:23.855
+In some cases we just get unhandled
+exception called RuntimeException,
+
+00:02:23.855 --> 00:02:28.475
+reporting a Resource failure and
+it will just randomly crash,
+
+00:02:28.475 --> 00:02:31.115
+as we said about 50 percent of the time.
+
+00:02:31.115 --> 00:02:33.650
+In some cases it will
+still return a value,
+
+00:02:33.650 --> 00:02:38.225
+but about half the time it won't.
+
+00:02:38.225 --> 00:02:40.970
+I tried to fix this in the code.
+
+00:02:40.970 --> 00:02:45.215
+So opening the RecommendationResource.
+
+00:02:45.215 --> 00:02:49.985
+java, what we will do is, we will add a Retry.
+
+00:02:49.985 --> 00:02:54.650
+So we need to add an import for
+the Retry annotation and simply
+
+00:02:54.650 --> 00:03:00.320
+annotate getRecommendations method with
+the maximum number of retries of 10.
+
+00:03:00.320 --> 00:03:02.720
+If we retry that,
+
+00:03:02.720 --> 00:03:04.010
+this will cause a reload,
+
+00:03:04.010 --> 00:03:08.330
+so we have to retoggle the
+crash mode back to true.
+
+00:03:08.330 --> 00:03:10.880
+If we try to rerun the application,
+
+00:03:10.880 --> 00:03:13.625
+we see that now 10 out of 10 times,
+
+00:03:13.625 --> 00:03:15.680
+we get a nice response.
+
+00:03:15.680 --> 00:03:24.425
+Let's reset the behavior and go back
+to our regularly scheduled program.
+
+00:03:24.425 --> 00:03:28.130
+We now have a working
+more or less application,
+
+00:03:28.130 --> 00:03:31.145
+but it still has a condition.
+
+00:03:31.145 --> 00:03:33.335
+In concurrent invocations,
+
+00:03:33.335 --> 00:03:36.619
+it will repeat the same result
+
+00:03:36.619 --> 00:03:40.040
+or it will return the same
+recommendation multiple times,
+
+00:03:40.040 --> 00:03:42.515
+which is not what it was designed to do.
+
+00:03:42.515 --> 00:03:49.160
+So we need to prevent that if we
+send a 100 parallel requests here,
+
+00:03:49.160 --> 00:03:53.510
+we see that many of them
+are multiple responses.
+
+00:03:53.510 --> 00:03:57.110
+The 90 was actually even returned 22 times
+
+00:03:57.110 --> 00:03:58.340
+in my case, in your case,
+
+00:03:58.340 --> 00:03:59.660
+these numbers will be different.
+
+00:03:59.660 --> 00:04:02.930
+You might not even have such
+a large number of responses,
+
+00:04:02.930 --> 00:04:05.210
+but anything above one,
+
+00:04:05.210 --> 00:04:10.910
+which we explicitly filter out
+in this regular expression,
+
+00:04:10.910 --> 00:04:13.355
+anything but 1 is incorrect behaviour.
+
+00:04:13.355 --> 00:04:17.405
+So if we return back and try to fix this,
+
+00:04:17.405 --> 00:04:21.215
+let's open the RecommendationResource.java and add,
+
+00:04:21.215 --> 00:04:24.530
+in addition, just replace the Retry.
+
+00:04:24.530 --> 00:04:30.500
+Actually simply add the
+Bulkhead annotation,
+
+00:04:30.500 --> 00:04:35.180
+setting it to a maximum of
+1 invocation at a time.
+
+00:04:35.180 --> 00:04:36.635
+Looking at the behavior,
+
+00:04:36.635 --> 00:04:40.429
+after resetting any flags,
+
+00:04:40.429 --> 00:04:45.320
+we can see that now if we
+invoke a 100 parallel sessions,
+
+00:04:45.320 --> 00:04:47.630
+we do not get any duplicates.
+
+00:04:47.630 --> 00:04:51.350
+However, we do get a lot of
+
+00:04:51.350 --> 00:04:57.515
+Internal Server Errors because concurrent
+requests are rejected from bulkhead.
+
+00:04:57.515 --> 00:05:01.850
+We did not configure any
+queue for pending requests,
+
+00:05:01.850 --> 00:05:07.490
+so we fixed 1 problem but introduced
+another 1 at the same time.
+
+00:05:07.490 --> 00:05:09.920
+So we now have an application that can
+
+00:05:09.920 --> 00:05:12.230
+resolve exactly 1 request at a time and
+
+00:05:12.230 --> 00:05:16.925
+will fail any other requests that
+arise while it's working on it.
+
+00:05:16.925 --> 00:05:18.755
+Let's try to fix that.
+
+00:05:18.755 --> 00:05:22.280
+Let's open the RecommendationResource
+once more.
+
+00:05:22.280 --> 00:05:25.520
+And in addition to the
+Bulkhead annotation,
+
+00:05:25.520 --> 00:05:27.530
+add the Fallback as well.
+
+00:05:27.530 --> 00:05:33.770
+We will be configuring the fallbackMethod
+as getFallbackRecommendations.
+
+00:05:33.770 --> 00:05:37.670
+The annotation goes on to get
+recommendations methods, so
+
+00:05:37.670 --> 00:05:41.630
+the one we are invoking in the getfallbackRecommendations
+was already here.
+
+00:05:41.630 --> 00:05:46.460
+We just weren't using it before because
+there was no @Fallback annotation.
+
+00:05:46.460 --> 00:05:49.085
+So let's see how everything behaves now.
+
+00:05:49.085 --> 00:05:51.710
+Sending a reset request,
+
+00:05:51.710 --> 00:05:56.645
+if we invoke the parallel script
+with a 100 parallel clients,
+
+00:05:56.645 --> 00:06:00.785
+we see that each and every
+one of those is serviced.
+
+00:06:00.785 --> 00:06:04.895
+But some of them are reporting
+a fallback response,
+
+00:06:04.895 --> 00:06:07.250
+which means that they would have otherwise
+
+00:06:07.250 --> 00:06:11.329
+failed because they would
+exceed the bulkhead capacity.
+
+00:06:11.329 --> 00:06:13.050
+But now at least they return,
+
+00:06:13.050 --> 00:06:15.980
+some sort of a cached
+response or something.
+
+00:06:15.980 --> 00:06:20.555
+If we try and have a look
+at the concurrency issues,
+
+00:06:20.555 --> 00:06:25.040
+so by resetting the state and
+running parallel the script again,
+
+00:06:25.040 --> 00:06:29.195
+sorting the responses and
+looking for any duplicates,
+
+00:06:29.195 --> 00:06:33.810
+we see normal duplicate responses exist.
+
+00:06:35.050 --> 00:06:36.305
+Right!
+
+00:06:36.305 --> 00:06:40.025
+Let's remove the Bulkhead
+annotation from our code,
+
+00:06:40.025 --> 00:06:43.280
+so opening the RecommendationResource and
+
+00:06:43.280 --> 00:06:46.640
+removing the import in
+the @Bulkhead annotation.
+
+00:06:46.640 --> 00:06:49.850
+Let's go back to revisit another problem.
+
+00:06:49.850 --> 00:06:54.710
+Resetting the state of the application
+and turning on timeout will
+
+00:06:54.710 --> 00:06:59.720
+get about 50 percent of requests
+that take longer than a second.
+
+00:06:59.720 --> 00:07:02.585
+We can see here that 7, 8, 9,
+
+00:07:02.585 --> 00:07:05.810
+these first couple of requests
+were returned really quickly,
+
+00:07:05.810 --> 00:07:11.855
+whereas these took more
+than 1 second to fulfill.
+
+00:07:11.855 --> 00:07:16.039
+We can fairly easily
+save that by reopening
+
+00:07:16.039 --> 00:07:19.010
+the RecommendationResource
+file and adding
+
+00:07:19.010 --> 00:07:22.520
+the Timeout annotation in
+addition to the Fallback,
+
+00:07:22.520 --> 00:07:24.890
+so leaving the fallback in, let's set
+
+00:07:24.890 --> 00:07:28.805
+the Timeout to an acceptable
+value, let's say half a second.
+
+00:07:28.805 --> 00:07:31.760
+And after resetting the state
+
+00:07:31.760 --> 00:07:34.640
+of the application and
+turning on timeouts again,
+
+00:07:34.640 --> 00:07:39.230
+if we have a look at the output of
+the parallel script with 10 clients,
+
+00:07:39.230 --> 00:07:40.520
+we see that there's still
+
+00:07:40.520 --> 00:07:44.345
+about 50 percent of the requests
+that finishes really quickly.
+
+00:07:44.345 --> 00:07:47.360
+But then we had about 3 of them that
+
+00:07:47.360 --> 00:07:50.390
+took more than slightly more than half a second
+
+00:07:50.390 --> 00:07:54.434
+but then resorted to a fallback response.
+
+00:07:54.434 --> 00:08:00.730
+Right! So let us remove
+
+00:08:00.730 --> 00:08:09.025
+the Timeout annotation and the import as
+well and have a look at last problem,
+
+00:08:09.025 --> 00:08:12.730
+resetting the state of the
+service and turning on
+
+00:08:12.730 --> 00:08:17.110
+50 percent crashes and
+50 percent timeouts.
+
+00:08:17.110 --> 00:08:20.050
+If you run a sequential script,
+
+00:08:20.050 --> 00:08:22.345
+which will just run until we stop it,
+
+00:08:22.345 --> 00:08:24.970
+you see that every now and then,
+
+00:08:24.970 --> 00:08:30.009
+we do get a fallback response
+which is there due to a timeout.
+
+00:08:30.009 --> 00:08:35.260
+But these fallback responses
+which all take more than a second,
+
+00:08:35.260 --> 00:08:41.155
+they are all spread out
+through the response list.
+
+00:08:41.155 --> 00:08:45.129
+And each, and every time when
+we get a fallback response,
+
+00:08:45.129 --> 00:08:48.580
+it takes 1 second for the
+request to be fulfilled.
+
+00:08:48.580 --> 00:08:52.465
+So we are wasting a lot of
+time by simply waiting
+
+00:08:52.465 --> 00:08:57.070
+until a fallback happens and
+it never happens any quicker.
+
+00:08:57.070 --> 00:09:00.265
+So let's improve this.
+
+00:09:00.265 --> 00:09:03.850
+Let's improve sub-sequence fallback
+
+00:09:03.850 --> 00:09:09.385
+responses to take less time by
+introducing circuit breaker.
+
+00:09:09.385 --> 00:09:13.945
+So editing the recommendation
+resource once more,
+
+00:09:13.945 --> 00:09:17.410
+we will be adding the
+CircuitBreaker annotation
+
+00:09:17.410 --> 00:09:19.725
+to the getRecommendations method,
+
+00:09:19.725 --> 00:09:25.070
+saying that 40 percent out
+of 5 consecutive requests
+
+00:09:25.070 --> 00:09:31.955
+may fail before we open the circuit
+and stop using the backend service.
+
+00:09:31.955 --> 00:09:35.135
+Looking at the behavior again now,
+
+00:09:35.135 --> 00:09:40.025
+resetting the state, turning
+on, crashing and timeouts,
+
+00:09:40.025 --> 00:09:47.030
+we can see that a first couple
+requests finish really quickly.
+
+00:09:47.030 --> 00:09:51.380
+Then we have 2 fallback
+responses which take 1 second.
+
+00:09:51.380 --> 00:09:55.220
+But 2 is 40% of 5,
+
+00:09:55.220 --> 00:09:59.465
+which means right now, we have
+broken the circuit open and
+
+00:09:59.465 --> 00:10:05.675
+no other requests actually have
+to wait for the timeout to occur.
+
+00:10:05.675 --> 00:10:10.670
+They just simply stop
+
+00:10:10.670 --> 00:10:13.370
+invoking the main method
+and just simply always
+
+00:10:13.370 --> 00:10:16.190
+resort to the fallback one, right!
+
+00:10:16.190 --> 00:10:20.870
+We have resolved the number of fault
+tolerance issues in this exercise.
+
+00:10:20.870 --> 00:10:22.940
+Let's just clean up and stop
+
+00:10:22.940 --> 00:10:26.765
+Quarkus instance by running lab
+tolerance-policies finish script.
+
+00:10:26.765 --> 00:10:30.410
+Then join us in the next section
+where we are going to look at how
+
+00:10:30.410 --> 00:10:34.430
+to implement health checks in OpenShift.
+
+00:10:34.430 --> 00:10:36.090
+See you there.
 

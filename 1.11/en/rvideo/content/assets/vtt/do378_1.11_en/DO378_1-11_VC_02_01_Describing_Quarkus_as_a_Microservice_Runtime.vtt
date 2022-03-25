@@ -1,5 +1,1011 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:01.095
+Welcome back!
 
+00:00:01.095 --> 00:00:04.230
+In this chapter we're going
+to have a look at the basics
+
+00:00:04.230 --> 00:00:07.305
+of implementing a
+microservice using Quarkus.
+
+00:00:07.305 --> 00:00:08.640
+First, we're going to have a look at
+
+00:00:08.640 --> 00:00:13.395
+the features that Quarkus brings
+and follow that up by a quiz.
+
+00:00:13.395 --> 00:00:15.900
+Then we're just going
+to immediately jump in
+
+00:00:15.900 --> 00:00:20.040
+by starting to implement
+a microservice using CDI,
+
+00:00:20.040 --> 00:00:22.260
+JAX-RS for REST endpoints,
+
+00:00:22.260 --> 00:00:26.265
+and JSON-P for JSON serialization
+and deserialization.
+
+00:00:26.265 --> 00:00:28.980
+Those are all nice profile specifications.
+
+00:00:28.980 --> 00:00:31.770
+We have an exercise for
+that coming up as well.
+
+00:00:31.770 --> 00:00:34.410
+And then we'll move on to persistence.
+
+00:00:34.410 --> 00:00:38.540
+So we're going to look at
+object relational mapping using
+
+00:00:38.540 --> 00:00:43.535
+simplified Panache Entities and
+have a exercise for that as well.
+
+00:00:43.535 --> 00:00:44.945
+At the end of the chapter,
+
+00:00:44.945 --> 00:00:49.010
+we have a end of chapter
+review lab as usual,
+
+00:00:49.010 --> 00:00:53.615
+so a fully blown microservice with Quarkus.
+
+00:00:53.615 --> 00:00:55.250
+First a bit of history.
+
+00:00:55.250 --> 00:00:57.785
+As the Java ecosystem matured,
+
+00:00:57.785 --> 00:01:03.605
+there has been an explosion of various
+vendors and server technologies
+
+00:01:03.605 --> 00:01:13.310
+and developers have a vastly varying
+background in Java application development.
+
+00:01:13.310 --> 00:01:16.730
+A lot of it is Enterprise Java, actually,
+
+00:01:16.730 --> 00:01:21.035
+because of its business value proposal.
+
+00:01:21.035 --> 00:01:25.130
+Enterprise Java had
+maintained the promise of
+
+00:01:25.130 --> 00:01:30.950
+abstracting the technicalities
+away from the developer,
+
+00:01:30.950 --> 00:01:34.235
+just like the standard
+Java has abstracted away
+
+00:01:34.235 --> 00:01:36.770
+the tedious details of how to
+
+00:01:36.770 --> 00:01:41.090
+perform low-level operations
+in an operating system.
+
+00:01:41.090 --> 00:01:44.930
+The Enterprise Java has
+abstracted away a lot of
+
+00:01:44.930 --> 00:01:49.190
+the boilerplate code that the
+developers had to write in order to,
+
+00:01:49.190 --> 00:01:54.500
+for example, open a socket and
+connect to a database server.
+
+00:01:54.500 --> 00:02:00.155
+The MicroProfile specification is
+
+00:02:00.155 --> 00:02:05.510
+a response by the Eclipse
+Foundation and many,
+
+00:02:05.510 --> 00:02:08.495
+many large vendors, including Red Hat,
+
+00:02:08.495 --> 00:02:13.520
+that defines a platform that
+optimizes Java even further.
+
+00:02:13.520 --> 00:02:19.805
+So it brings new youth if you
+want to the Java platform,
+
+00:02:19.805 --> 00:02:26.150
+because even though the Enterprise
+Java programming environment
+
+00:02:26.150 --> 00:02:28.415
+and execution environments of course,
+
+00:02:28.415 --> 00:02:31.700
+had been widely accepted,
+
+00:02:31.700 --> 00:02:40.145
+the containerization, the rapid
+small application deployments,
+
+00:02:40.145 --> 00:02:43.265
+serverless scaling to 0 and so on.
+
+00:02:43.265 --> 00:02:46.730
+Then of course, all the challenges that
+we discussed in the previous chapter,
+
+00:02:46.730 --> 00:02:49.985
+so fault tolerance, high
+availability, and so on.
+
+00:02:49.985 --> 00:02:53.345
+They have presented into
+Enterprise Java with new challenges.
+
+00:02:53.345 --> 00:02:59.645
+And the MicroProfile specification
+is essentially a platform that adds
+
+00:02:59.645 --> 00:03:04.235
+optimization for microservices
+based architectures
+
+00:03:04.235 --> 00:03:07.880
+and actually provides portability
+across multiple runtimes.
+
+00:03:07.880 --> 00:03:11.585
+It's not just limited to Enterprise Java.
+
+00:03:11.585 --> 00:03:16.835
+The intention of the MicroProfile
+specifications was to have
+
+00:03:16.835 --> 00:03:20.555
+loose annotation based
+framework to support
+
+00:03:20.555 --> 00:03:24.665
+many of the common patterns
+that we already used,
+
+00:03:24.665 --> 00:03:29.990
+but may have been complex or
+specific to individual environments
+
+00:03:29.990 --> 00:03:33.800
+and therefore not so widely used.
+
+00:03:33.800 --> 00:03:39.710
+It's, as such MicroProfile
+
+00:03:39.710 --> 00:03:43.340
+could have well become a
+JSR, Java Standards Request,
+
+00:03:43.340 --> 00:03:47.375
+but it actually is not meant
+to be such a full standard.
+
+00:03:47.375 --> 00:03:50.930
+These take years to finalize and are very,
+
+00:03:50.930 --> 00:03:52.565
+very awkward to update
+
+00:03:52.565 --> 00:03:56.960
+and because microservices
+are continuously evolving,
+
+00:03:56.960 --> 00:04:01.010
+it would've been obsolete probably
+before it was even released.
+
+00:04:01.010 --> 00:04:04.610
+By focusing only on the
+high level functionality,
+
+00:04:04.610 --> 00:04:09.935
+the common grounds found in various
+Java microservices applications
+
+00:04:09.935 --> 00:04:15.860
+the framework had actually
+evolved into a very,
+
+00:04:15.860 --> 00:04:22.370
+very lightweight specification
+and pretty much free to
+
+00:04:22.370 --> 00:04:25.490
+implementations to decide how they were
+
+00:04:25.490 --> 00:04:29.090
+going to perform certain details.
+
+00:04:29.090 --> 00:04:33.770
+The initial version of the
+ MicroProfile specification actually included
+
+00:04:33.770 --> 00:04:39.020
+only JAX-RS CDI and JSON-P
+specifications from Enterprise Java,
+
+00:04:39.020 --> 00:04:41.660
+which is the absolute
+bare minimum that you
+
+00:04:41.660 --> 00:04:44.390
+need to build a RESTful microservice,
+
+00:04:44.390 --> 00:04:46.355
+for example, in Java.
+
+00:04:46.355 --> 00:04:49.220
+And then additional functions were added.
+
+00:04:49.220 --> 00:04:51.755
+But the most important thing about
+
+00:04:51.755 --> 00:04:54.230
+the 3 specifications that
+were initially included is
+
+00:04:54.230 --> 00:04:58.940
+that practically any execution
+environment from Spring Boot
+
+00:04:58.940 --> 00:05:04.730
+to any sort of BYO type,
+
+00:05:04.730 --> 00:05:09.440
+build your own type of RESTful
+execution environment had to support
+
+00:05:09.440 --> 00:05:11.840
+some sort of JAX-RS
+
+00:05:11.840 --> 00:05:16.130
+implementation and of course JSON-P
+serialization and deserialization,
+
+00:05:16.130 --> 00:05:19.204
+or at least was using a similar framework,
+
+00:05:19.204 --> 00:05:22.220
+such as CDI. In SpringBoot,
+
+00:05:22.220 --> 00:05:24.770
+there is no CDI, but there
+is dependency injection,
+
+00:05:24.770 --> 00:05:28.520
+so that's relatively related
+
+00:05:28.520 --> 00:05:31.610
+so easy to migrate.
+
+00:05:31.610 --> 00:05:34.295
+MicroProfile essentially relies on
+
+00:05:34.295 --> 00:05:39.320
+those 3 traditional
+Java EE specifications
+
+00:05:39.320 --> 00:05:42.140
+because they are quite efficient,
+
+00:05:42.140 --> 00:05:46.745
+they have evolved over
+decades of optimization,
+
+00:05:46.745 --> 00:05:51.750
+but there's also the benefit
+of developer familiarity.
+
+00:05:51.750 --> 00:05:58.029
+And of course, these are widely
+used across the Java landscape.
+
+00:05:58.029 --> 00:06:01.330
+It is also one of the stated goals
+of the MicroProfile initiative
+
+00:06:01.330 --> 00:06:04.960
+to use existing API
+specifications where possible,
+
+00:06:04.960 --> 00:06:09.820
+and just add on top new ones and create
+
+00:06:09.820 --> 00:06:15.040
+a baseline platform optimized for
+developing microservices in the cloud.
+
+00:06:15.040 --> 00:06:19.510
+One of the first implementations of
+the MicroProfile specification was
+
+00:06:19.510 --> 00:06:25.660
+the Wildfly Swarm or as it was known later
+on the Thorntail application server,
+
+00:06:25.660 --> 00:06:30.535
+which actually was based on
+the Wildfly server code
+
+00:06:30.535 --> 00:06:34.880
+and in turn, Wildfly
+server code is actually very,
+
+00:06:34.880 --> 00:06:41.600
+very much related to JBoss EAP. It is derived
+from the same codebase, JBoss EAP
+
+00:06:41.600 --> 00:06:46.610
+namely. The nice thing about Wildfly
+
+00:06:46.610 --> 00:06:51.350
+Swarm and Thorntail was that
+they were meant to produce
+
+00:06:51.350 --> 00:06:53.990
+executable JAR files that are
+
+00:06:53.990 --> 00:06:58.505
+independent of any existing,
+pre-existing runtime environment.
+
+00:06:58.505 --> 00:07:02.450
+They bundle all the application
+server components in the Jar file
+
+00:07:02.450 --> 00:07:04.340
+and they do that only for
+
+00:07:04.340 --> 00:07:07.640
+those components that are necessary
+for the application to run.
+
+00:07:07.640 --> 00:07:10.625
+So in a sense, they were
+quite similar to SpringBoot,
+
+00:07:10.625 --> 00:07:14.749
+but with the add-on of being able
+to rely on well established,
+
+00:07:14.749 --> 00:07:20.270
+stable Enterprise Java standards wherever
+it needed them in the application.
+
+00:07:20.270 --> 00:07:23.390
+The only objective that the
+2 frameworks failed to
+
+00:07:23.390 --> 00:07:27.815
+achieve were the startup performance,
+
+00:07:27.815 --> 00:07:30.575
+in order for microservices
+
+00:07:30.575 --> 00:07:32.720
+orchestration environment, for example,
+
+00:07:32.720 --> 00:07:36.215
+to be able to scale applications
+to 0 and then respond
+
+00:07:36.215 --> 00:07:40.460
+by quickly scaling up and down
+according to the load.
+
+00:07:40.460 --> 00:07:43.550
+To achieve desired performance,
+
+00:07:43.550 --> 00:07:45.800
+these implementations would need
+
+00:07:45.800 --> 00:07:49.340
+a complete rewrite that would
+reduce the startup time,
+
+00:07:49.340 --> 00:07:51.800
+that would reduce the
+memory footprint that
+
+00:07:51.800 --> 00:07:56.300
+the application will cause
+in the execution environment.
+
+00:07:56.300 --> 00:08:01.219
+And actually it was done by
+
+00:08:01.219 --> 00:08:07.475
+relying on a more extensive
+build in compilation process,
+
+00:08:07.475 --> 00:08:10.670
+which performs various checking
+activities that are normally
+
+00:08:10.670 --> 00:08:13.850
+done during startup or during runtime
+
+00:08:13.850 --> 00:08:17.990
+even. It performs them
+during compilation time,
+
+00:08:17.990 --> 00:08:21.590
+including configuration, bootstrapping,
+reflection preparation.
+
+00:08:21.590 --> 00:08:23.630
+So any sort of,
+
+00:08:23.630 --> 00:08:26.900
+let's call it dirty
+techniques to be able to
+
+00:08:26.900 --> 00:08:30.560
+dynamically load code
+during runtime would be
+
+00:08:30.560 --> 00:08:33.440
+performed at compilation time in order to
+
+00:08:33.440 --> 00:08:38.420
+fully minimize the footprint
+of the resulting artifact,
+
+00:08:38.420 --> 00:08:40.220
+the resulting package.
+
+00:08:40.220 --> 00:08:43.370
+And Quarkus is actually what emerged as
+
+00:08:43.370 --> 00:08:45.980
+the collective effort from
+the different technologies
+
+00:08:45.980 --> 00:08:52.774
+that were involved in refactoring
+of these existing environments.
+
+00:08:52.774 --> 00:08:58.130
+A Quarkus focuses on a couple of
+key factors in order to provide,
+
+00:08:58.130 --> 00:09:01.205
+on one hand the best
+developer experience possible
+
+00:09:01.205 --> 00:09:05.780
+but on the other hand, still
+keep true to the goals that
+
+00:09:05.780 --> 00:09:11.270
+are basically produce a minimal
+executable that loads fast,
+
+00:09:11.270 --> 00:09:18.230
+occupies or consumes few resources and
+is basically cloud native as such.
+
+00:09:18.230 --> 00:09:24.425
+So first, Quarkus aims to be cloud-native,
+
+00:09:24.425 --> 00:09:29.285
+so that means the main deployment
+platform would be a container.
+
+00:09:29.285 --> 00:09:33.170
+To enable container
+first development, Quarkus
+
+00:09:33.170 --> 00:09:35.645
+actually focuses on a
+couple of properties.
+
+00:09:35.645 --> 00:09:39.290
+That is, Function as a Service requires
+
+00:09:39.290 --> 00:09:43.880
+Fast startups and Quarkus aims
+for startups under 1 second,
+
+00:09:43.880 --> 00:09:47.135
+regardless of what kind of
+an application you've built,
+
+00:09:47.135 --> 00:09:49.595
+it should start a really, really fast.
+
+00:09:49.595 --> 00:09:51.830
+It should have a small memory footprint.
+
+00:09:51.830 --> 00:09:56.495
+And by removing all the
+unnecessary classes at runtime,
+
+00:09:56.495 --> 00:10:01.250
+because we scan for them during
+compilation, during build time,
+
+00:10:01.250 --> 00:10:03.755
+Quarkus actually achieves a much,
+
+00:10:03.755 --> 00:10:07.970
+much smaller package size
+
+00:10:07.970 --> 00:10:12.470
+and therefore of course also a
+much smaller memory footprint.
+
+00:10:12.470 --> 00:10:16.355
+And of course that also brings
+us to disk utilization.
+
+00:10:16.355 --> 00:10:21.770
+It is not an inconsequential parameter,
+
+00:10:21.770 --> 00:10:24.350
+the size of the container
+image that you want to,
+
+00:10:24.350 --> 00:10:25.700
+that you are trying to deploy.
+
+00:10:25.700 --> 00:10:27.620
+Because the larger the image,
+
+00:10:27.620 --> 00:10:31.520
+the longer it takes for the node to
+download the image from a registry,
+
+00:10:31.520 --> 00:10:36.590
+which means it's not just about disk
+utilization, it's also about the time
+
+00:10:36.590 --> 00:10:41.525
+that it takes for you to start up the
+container for the very first time
+
+00:10:41.525 --> 00:10:47.300
+or another necessity that had to be
+implemented or had to be pursued
+
+00:10:47.300 --> 00:10:53.330
+in Quarkus was the unification of imperative
+and reactive programming models
+
+00:10:53.330 --> 00:10:57.439
+at the same time. Java
+developers
+
+00:10:57.439 --> 00:11:00.860
+can use the imperative programming
+model that they already know,
+
+00:11:00.860 --> 00:11:02.420
+but at the same time,
+
+00:11:02.420 --> 00:11:06.815
+they can take advantage of some
+paradigms such as event-driven,
+
+00:11:06.815 --> 00:11:09.290
+asynchronous and of course,
+
+00:11:09.290 --> 00:11:11.375
+reactive models as such.
+
+00:11:11.375 --> 00:11:14.779
+They co-exist in the same framework,
+
+00:11:14.779 --> 00:11:19.070
+so developers can always choose
+the best approach
+
+00:11:19.070 --> 00:11:22.010
+for their problem at hand.
+
+00:11:22.010 --> 00:11:26.480
+As a platform, Quarkus is
+extremely developer centric,
+
+00:11:26.480 --> 00:11:31.370
+so it brings together several technologies
+
+00:11:31.370 --> 00:11:36.619
+under a unified framework and attempts
+to make them work seamlessly.
+
+00:11:36.619 --> 00:11:41.120
+So it means that a couple of changes
+
+00:11:41.120 --> 00:11:46.325
+as opposed to what your normal assembly
+model would look like have been done.
+
+00:11:46.325 --> 00:11:48.545
+For example, the configuration of
+
+00:11:48.545 --> 00:11:52.070
+all the technologies that
+are used in the application
+
+00:11:52.070 --> 00:11:54.680
+is placed into the same configuration file
+
+00:11:54.680 --> 00:11:57.470
+or can be placed into the
+same configuration file,
+
+00:11:57.470 --> 00:11:58.730
+at least if you wanted to.
+
+00:11:58.730 --> 00:12:00.865
+Of course, you're not limited to that, but
+
+00:12:00.865 --> 00:12:03.215
+it can be as simple as that.
+
+00:12:03.215 --> 00:12:05.030
+In developer mode, which is
+
+00:12:05.030 --> 00:12:08.150
+a special mode that we're going
+to use a lot in this course,
+
+00:12:08.150 --> 00:12:11.510
+instant live reloading
+of any changes made to
+
+00:12:11.510 --> 00:12:16.235
+the source code is possible
+in the runtime.
+
+00:12:16.235 --> 00:12:20.420
+So if you start Quarkus in
+dev mode and you change,
+
+00:12:20.420 --> 00:12:24.274
+let's say REST endpoints behavior,
+
+00:12:24.274 --> 00:12:28.235
+the moment the Quarkus container 
+receives a new request,
+
+00:12:28.235 --> 00:12:30.575
+it will reload itself
+
+00:12:30.575 --> 00:12:36.200
+and of course, the new functionality
+will be immediately available.
+
+00:12:36.200 --> 00:12:39.875
+Opinionated seems to be
+a very popular word
+
+00:12:39.875 --> 00:12:45.320
+but it essentially means simply that
+the framework tries to use default,
+
+00:12:45.320 --> 00:12:52.595
+which make sense over the largest
+possible set of use cases, right?
+
+00:12:52.595 --> 00:12:57.410
+So you have to configure only
+the things that you care about
+
+00:12:57.410 --> 00:12:59.990
+because you can more or
+less rely on the fact that
+
+00:12:59.990 --> 00:13:03.754
+the framework will work
+correctly with defaults.
+
+00:13:03.754 --> 00:13:08.795
+And most importantly,
+there are native builds
+
+00:13:08.795 --> 00:13:14.315
+for all included libraries that
+are integrated into Quarkus.
+
+00:13:14.315 --> 00:13:19.940
+The MicroProfile add-ons to Quarkus
+make it really easy to transition from
+
+00:13:19.940 --> 00:13:23.150
+old school traditional Java EE
+development environments
+
+00:13:23.150 --> 00:13:26.330
+to a microservices development type.
+
+00:13:26.330 --> 00:13:28.190
+Because developers can use
+
+00:13:28.190 --> 00:13:30.620
+all the standards and
+
+00:13:30.620 --> 00:13:33.275
+frameworks that they're used
+to using in Enterprise Java
+
+00:13:33.275 --> 00:13:36.650
+but now with the focus on simply
+
+00:13:36.650 --> 00:13:40.265
+developing the functional
+requirements of the application,
+
+00:13:40.265 --> 00:13:44.210
+any additional microservices
+related functionalities can be added
+
+00:13:44.210 --> 00:13:48.305
+on top of that using a simple
+annotation driven approach,
+
+00:13:48.305 --> 00:13:51.350
+and even to a degree using
+
+00:13:51.350 --> 00:13:55.220
+configuration settings in the
+single configuration file.
+
+00:13:55.220 --> 00:13:58.730
+Since one of the main
+drivers in Quarkus design and
+
+00:13:58.730 --> 00:14:02.300
+development was to provide
+a platform which would
+
+00:14:02.300 --> 00:14:09.440
+enable all sorts of workloads from
+traditional to cloud-based, to Serverless,
+
+00:14:09.440 --> 00:14:11.610
+to Function as a Service,
+
+00:14:11.650 --> 00:14:14.900
+it was extremely important to pursue
+
+00:14:14.900 --> 00:14:19.534
+the low memory usage and fast
+startup time objectives.
+
+00:14:19.534 --> 00:14:23.030
+They are very, very
+important in such scenarios.
+
+00:14:23.030 --> 00:14:27.965
+Now, even though Quarkus
+in Java execution mode,
+
+00:14:27.965 --> 00:14:30.365
+so using a traditional JVM,
+
+00:14:30.365 --> 00:14:36.740
+which is the default mode,
+is actually incredible.
+
+00:14:36.740 --> 00:14:41.045
+It's a big improvement over the
+traditional execution environments.
+
+00:14:41.045 --> 00:14:44.510
+1 second startup times might
+still be unacceptable.
+
+00:14:44.510 --> 00:14:47.435
+You might need something
+a lot faster than that.
+
+00:14:47.435 --> 00:14:53.525
+And to this end, Quarkus has support for
+GraalVM's ahead-of-time compilation.
+
+00:14:53.525 --> 00:14:59.015
+GraalVM is a special polyglot
+JVM from Oracle which offers
+
+00:14:59.015 --> 00:15:01.175
+ahead-of-time compilation to
+
+00:15:01.175 --> 00:15:05.450
+executable Java applications
+among other features.
+
+00:15:05.450 --> 00:15:11.690
+But it uses a number of
+assumptions that require
+
+00:15:11.690 --> 00:15:13.835
+the Java virtual machine to know at
+
+00:15:13.835 --> 00:15:18.005
+compilation time which classes
+the application is going to use.
+
+00:15:18.005 --> 00:15:20.780
+This sounds very similar to what Quarkus
+
+00:15:20.780 --> 00:15:23.435
+had already been doing
+in its own way, right?
+
+00:15:23.435 --> 00:15:27.470
+But not at the low level of
+the Java virtual machine.
+
+00:15:27.470 --> 00:15:34.565
+So this closed world
+assumption, as it's called,
+
+00:15:34.565 --> 00:15:38.810
+that is made by
+GraalVM, that is required for
+
+00:15:38.810 --> 00:15:43.130
+ahead-of-time compilation
+is actually one of
+
+00:15:43.130 --> 00:15:48.260
+the foundation blocks that allow also for
+
+00:15:48.260 --> 00:15:51.170
+native compilation and the building of
+
+00:15:51.170 --> 00:15:54.320
+native executables from Java source code.
+
+00:15:54.320 --> 00:15:57.635
+This is never before happened
+in this particular way.
+
+00:15:57.635 --> 00:16:02.255
+There's always been Java to
+native compilation option.
+
+00:16:02.255 --> 00:16:06.050
+But it was very complex, low-level.
+
+00:16:06.050 --> 00:16:09.170
+It required the knowledge of C
+and C++ development.
+
+00:16:09.170 --> 00:16:14.645
+It required a lot of debugging and
+essentially didn't really pick,
+
+00:16:14.645 --> 00:16:17.120
+didn't really take off
+
+00:16:17.120 --> 00:16:21.080
+because it was simply too complex.
+
+00:16:21.080 --> 00:16:27.229
+GraalVM plus Quarkus actually achieve
+that because Quarkus provides
+
+00:16:27.229 --> 00:16:34.610
+its own library implementations for much
+of the frameworks that it supports.
+
+00:16:34.610 --> 00:16:39.575
+So essentially, as we discussed
+a couple of minutes before,
+
+00:16:39.575 --> 00:16:42.065
+Quarkus was a complete redesign,
+
+00:16:42.065 --> 00:16:45.980
+rebuild of certain standards from
+
+00:16:45.980 --> 00:16:51.210
+the Wildfly and Thorn tailed codebase
+and others of course as well.
+
+00:16:51.250 --> 00:16:55.700
+The rebuilds, the refactoring
+process had focused on
+
+00:16:55.700 --> 00:16:59.570
+providing classes that are as clean as
+
+00:16:59.570 --> 00:17:03.350
+possible and offers much insight into
+
+00:17:03.350 --> 00:17:08.330
+the potential code execution paths
+at compilation time as possible.
+
+00:17:08.330 --> 00:17:14.555
+This actually is an ideal
+match for GraalVMs AoT,
+
+00:17:14.555 --> 00:17:22.940
+because at compilation time GraalVM
+has actually not a difficult task,
+
+00:17:22.940 --> 00:17:26.585
+to see, which classes will be needed,
+
+00:17:26.585 --> 00:17:29.900
+removes all the unneeded classes from
+
+00:17:29.900 --> 00:17:35.135
+the application and of course from
+the dependent libraries as well.
+
+00:17:35.135 --> 00:17:44.300
+And this match is actually perfect
+combination for Cloud deployments.
+
+00:17:44.300 --> 00:17:49.445
+The Quarkus, compared to other Java-
+based cloud-native frameworks,
+
+00:17:49.445 --> 00:17:51.590
+offers a number of benefits.
+
+00:17:51.590 --> 00:17:55.355
+Faster response times in
+general, lower memory usage,
+
+00:17:55.355 --> 00:17:58.970
+higher throughput in reactive routes,
+
+00:17:58.970 --> 00:18:01.775
+and full container image support.
+
+00:18:01.775 --> 00:18:07.505
+On top of that, it is compliant with
+MicroProfile confirmance tests
+
+00:18:07.505 --> 00:18:12.455
+and it's really, really easy
+as we're about to see
+
+00:18:12.455 --> 00:18:13.834
+to use for programming.
+
+00:18:13.834 --> 00:18:16.160
+Especially if you're already used to
+
+00:18:16.160 --> 00:18:22.355
+existing Java EE standards used in
+microservices and web service applications.
+
+00:18:22.355 --> 00:18:25.760
+Let's have a look at the
+quiz and then join us in
+
+00:18:25.760 --> 00:18:31.110
+the next video, where we start by developing
+our very first Quarkus application.
 

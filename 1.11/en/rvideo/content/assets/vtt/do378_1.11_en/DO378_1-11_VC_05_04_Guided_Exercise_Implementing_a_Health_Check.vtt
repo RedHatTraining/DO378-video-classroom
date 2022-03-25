@@ -1,5 +1,449 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:02.280
+Let's implement a health check,
 
+00:00:02.280 --> 00:00:06.540
+that is two health checks actually,
+a liveness and the readiness probe.
+
+00:00:06.540 --> 00:00:10.290
+To start with, let's run the lab
+tolerance-health start script,
+
+00:00:10.290 --> 00:00:14.789
+which both populates our
+example source code directories
+
+00:00:14.789 --> 00:00:19.140
+and creates an OpenShift project
+for us to use a little bit later on.
+
+00:00:19.140 --> 00:00:24.225
+So the application is
+the monolith calculator.
+
+00:00:24.225 --> 00:00:30.405
+It's in DO378/labs/tolerance-health/quarkus-calculator-monolith.
+
+00:00:30.405 --> 00:00:31.800
+If you have a look at this,
+
+00:00:31.800 --> 00:00:34.895
+it's just a pom file and the source code.
+
+00:00:34.895 --> 00:00:41.375
+So what we are going to add first is
+the extension quarkus smallrye-health.
+
+00:00:41.375 --> 00:00:45.920
+And then what we are going to do is create
+
+00:00:45.920 --> 00:00:52.655
+a little cheat along with a way to
+report the application's health status.
+
+00:00:52.655 --> 00:00:57.245
+We're going to create a a LivenessResource.java file,
+
+00:00:57.245 --> 00:01:03.245
+where we are going to define a
+rest endpoint called /crash,
+
+00:01:03.245 --> 00:01:07.445
+which in the case that
+it is sent a GET request,
+
+00:01:07.445 --> 00:01:12.170
+will flip the application's
+liveness state from true,
+
+00:01:12.170 --> 00:01:15.480
+which is a default to false.
+
+00:01:15.580 --> 00:01:19.460
+This is actually what you would
+normally have here, right?
+
+00:01:19.460 --> 00:01:23.060
+So note this is an
+ApplicationScoped bean,
+
+00:01:23.060 --> 00:01:26.420
+which we will inject into
+the liveness probe and we
+
+00:01:26.420 --> 00:01:30.020
+will use it to report whether
+the service is alive or not.
+
+00:01:30.020 --> 00:01:34.410
+So this is where you would actually
+implement your checks right?
+
+00:01:34.540 --> 00:01:39.110
+Now let's implement the liveness
+probe as well, LivenessHealthResource as
+
+00:01:39.110 --> 00:01:44.930
+we are going to call it, simply
+annotating it with @Liveness annotation.
+
+00:01:44.930 --> 00:01:47.660
+And of course, some sort of a scope
+
+00:01:47.660 --> 00:01:50.345
+allows us to inject that
+LivenessResources we have
+
+00:01:50.345 --> 00:01:55.460
+just implemented and implement
+the health check requirement,
+
+00:01:55.460 --> 00:01:58.670
+which is the call method that
+returns a HealthCheckResponse.
+
+00:01:58.670 --> 00:02:03.260
+What we do is just simply check if
+the liveness returns isAlive,
+
+00:02:03.260 --> 00:02:05.750
+then we return up status,
+
+00:02:05.750 --> 00:02:07.970
+otherwise return down status.
+
+00:02:07.970 --> 00:02:12.275
+This, the combination of these
+two allows us to simply send
+
+00:02:12.275 --> 00:02:18.125
+a GET request to /crash of
+this application and start or have,
+
+00:02:18.125 --> 00:02:22.370
+have it start reporting that
+it's not a live anymore.
+
+00:02:22.370 --> 00:02:27.995
+So we can conveniently trip, it's
+liveness state for testing.
+
+00:02:27.995 --> 00:02:31.205
+What we'll also do is create another file,
+
+00:02:31.205 --> 00:02:34.070
+ReadinessHealthResource.java
+
+00:02:34.070 --> 00:02:36.905
+and it's going to be a readiness probe
+
+00:02:36.905 --> 00:02:40.249
+annotated with the @Readiness annotation.
+
+00:02:40.249 --> 00:02:42.440
+It is an @ApplicationScoped bean,
+
+00:02:42.440 --> 00:02:44.735
+and it implements a HealthCheck.
+
+00:02:44.735 --> 00:02:47.810
+What it does is actually simple as well.
+
+00:02:47.810 --> 00:02:50.525
+We are simulating slow start ups here,
+
+00:02:50.525 --> 00:02:55.085
+so we are implementing a counter
+that is initially set to 0.
+
+00:02:55.085 --> 00:03:01.910
+And in every invocation of the
+health check, it is increased
+
+00:03:01.910 --> 00:03:06.095
+and once we have performed 11 health checks,
+
+00:03:06.095 --> 00:03:09.455
+it starts reporting that it is ready.
+
+00:03:09.455 --> 00:03:11.990
+So it starts reporting up.
+
+00:03:11.990 --> 00:03:16.200
+Before that, it's reporting, that is down.
+
+00:03:16.660 --> 00:03:18.035
+Right!
+
+00:03:18.035 --> 00:03:22.925
+Let's start our quarkus instance
+and test things locally first.
+
+00:03:22.925 --> 00:03:26.165
+So once the application is up and running,
+
+00:03:26.165 --> 00:03:32.735
+we can simply send an inquiry
+to the health endpoint
+
+00:03:32.735 --> 00:03:36.485
+and we see that initially
+Readiness probe report is DOWN,
+
+00:03:36.485 --> 00:03:38.720
+whereas Liveness report is UP.
+
+00:03:38.720 --> 00:03:42.515
+So we have to perform at
+least 10 invocations,
+
+00:03:42.515 --> 00:03:49.130
+actually 11, before we see that the
+Readiness probe is actually reporting UP.
+
+00:03:49.130 --> 00:03:52.505
+Now, when we invoke the crash endpoint,
+
+00:03:52.505 --> 00:03:56.090
+the Service responds,
+I'm not alive anymore
+
+00:03:56.090 --> 00:03:58.145
+and from that point onwards,
+
+00:03:58.145 --> 00:04:00.635
+the health endpoint reports
+
+00:04:00.635 --> 00:04:04.820
+Liveness of DOWN and an overall
+status of DOWN. Do note
+
+00:04:04.820 --> 00:04:08.390
+the overall status actually is
+always an aggregation of both.
+
+00:04:08.390 --> 00:04:12.125
+So as long as either of
+the 2 report is down,
+
+00:04:12.125 --> 00:04:13.880
+the status is DOWN.
+
+00:04:13.880 --> 00:04:17.465
+That includes custom
+health checks as well.
+
+00:04:17.465 --> 00:04:19.730
+All right!
+
+00:04:19.730 --> 00:04:28.810
+So let us stop the local
+instance of Quarkus,
+
+00:04:28.810 --> 00:04:32.635
+load the OpenShift configuration and login
+
+00:04:32.635 --> 00:04:34.045
+as a developer user.
+
+00:04:34.045 --> 00:04:36.400
+We already have a tolerance-health project
+
+00:04:36.400 --> 00:04:39.655
+created with a username as the suffix.
+
+00:04:39.655 --> 00:04:43.600
+So what we need to make
+sure is that first of all,
+
+00:04:43.600 --> 00:04:47.050
+our application.properties file has
+
+00:04:47.050 --> 00:04:49.270
+a readiness-probe and  the liveness-probe
+
+00:04:49.270 --> 00:04:52.585
+configured both with a
+period of 2 seconds.
+
+00:04:52.585 --> 00:04:54.775
+Then if you haven't yet,
+
+00:04:54.775 --> 00:04:59.679
+make sure that you've added
+the OpenShift extension.
+
+00:04:59.679 --> 00:05:04.020
+So with quarkus:add-extension,
+Dextension equals openshift,
+
+00:05:04.020 --> 00:05:06.770
+we will add that one to pom.xml and
+
+00:05:06.770 --> 00:05:09.980
+then package the
+application with quarkus.
+
+00:05:09.980 --> 00:05:12.035
+kubernetes.deploy set to true.
+
+00:05:12.035 --> 00:05:15.110
+And because we want to be able
+to test the application from
+
+00:05:15.110 --> 00:05:18.710
+outside Dquarkus.openshift.expose 
+also set to true.
+
+00:05:18.710 --> 00:05:21.065
+It's going to take a little while,
+
+00:05:21.065 --> 00:05:23.959
+but then when it finishes,
+
+00:05:23.959 --> 00:05:31.144
+we can see that there is a
+quarkus-solver pod being created.
+
+00:05:31.144 --> 00:05:33.725
+Now, we do have a route here,
+
+00:05:33.725 --> 00:05:38.060
+I'm just going to copy the host
+name to use a little bit later.
+
+00:05:38.060 --> 00:05:43.460
+Now, we see on the second attempt
+that the pod is reported as Running,
+
+00:05:43.460 --> 00:05:46.295
+but it still says it's not ready.
+
+00:05:46.295 --> 00:05:47.075
+All right!
+
+00:05:47.075 --> 00:05:51.530
+So for the amount of time that
+it reports that it is not ready,
+
+00:05:51.530 --> 00:05:54.005
+we cannot access the application
+
+00:05:54.005 --> 00:05:57.110
+at the host name that it's
+been assigned because it's not
+
+00:05:57.110 --> 00:05:59.960
+ready and OpenShift will
+refuse to put it into
+
+00:05:59.960 --> 00:06:03.290
+service before it reports that it's ready.
+
+00:06:03.290 --> 00:06:07.745
+Now, I have to use a test from within.
+
+00:06:07.745 --> 00:06:10.025
+So it's still not ready.
+
+00:06:10.025 --> 00:06:13.445
+I have to use a test from
+within using oc exec,
+
+00:06:13.445 --> 00:06:18.230
+sending a curl command to
+localhost port 8080/
+
+00:06:18.230 --> 00:06:23.210
+q/health to be able
+to get its current status,
+
+00:06:23.210 --> 00:06:26.750
+which has just flipped the moment that
+I executed that curl command.
+
+00:06:26.750 --> 00:06:33.875
+So now the oc get pods command reports
+this pod as ready, fully ready.
+
+00:06:33.875 --> 00:06:37.760
+And the application will respond
+that the host name as well,
+
+00:06:37.760 --> 00:06:41.465
+because now it's UP and
+it's been put into service.
+
+00:06:41.465 --> 00:06:44.660
+Let's see what happens when we send
+
+00:06:44.660 --> 00:06:49.205
+a request to the crash endpoint
+flipping the liveness status, right?
+
+00:06:49.205 --> 00:06:52.280
+So the service reports
+it's not alive anymore.
+
+00:06:52.280 --> 00:06:55.130
+The liveness probe does not fail
+
+00:06:55.130 --> 00:06:57.755
+immediately because it's
+scheduled on a period.
+
+00:06:57.755 --> 00:07:03.455
+So only after 2 seconds do we
+see that there was a restart
+
+00:07:03.455 --> 00:07:10.700
+of this container in the pod and that
+is now not ready at this moment.
+
+00:07:10.700 --> 00:07:15.620
+If we have a look at the events
+associated with this pod,
+
+00:07:15.620 --> 00:07:20.060
+we can see that at some point in time,
+
+00:07:20.060 --> 00:07:25.280
+the Liveness probe had failed with
+a statuscode of 503.
+
+00:07:25.280 --> 00:07:28.010
+And the Container quarkus-solver
+
+00:07:28.010 --> 00:07:30.740
+failed liveness probe and
+it will be restarted.
+
+00:07:30.740 --> 00:07:37.320
+And that is a normal behavior for the
+OpenShift liveness probe to perform.
+
+00:07:38.590 --> 00:07:43.280
+Finally, the pod is up
+and running again because
+
+00:07:43.280 --> 00:07:47.915
+the readiness probe is now reporting
+ready status all over again.
+
+00:07:47.915 --> 00:07:50.375
+And that concludes this exercise,
+
+00:07:50.375 --> 00:07:54.125
+which we can clean up with
+lab tolerance-health
+
+00:07:54.125 --> 00:07:58.010
+finish script and move on to
+the last video in this chapter,
+
+00:07:58.010 --> 00:08:02.430
+which is the end of Chapter
+Challenge lab. See you there.
 

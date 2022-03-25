@@ -1,5 +1,535 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:02.010
+In this end of chapter review lab,
 
+00:00:02.010 --> 00:00:07.410
+we will take the Quarkus
+conference application and modify
+
+00:00:07.410 --> 00:00:11.970
+the microservice session
+application to work as a client to
+
+00:00:11.970 --> 00:00:14.700
+the microservice speaker
+application to obtain
+
+00:00:14.700 --> 00:00:18.615
+information about lectures
+for particular sessions.
+
+00:00:18.615 --> 00:00:22.185
+Starting with lab apps-
+review start script,
+
+00:00:22.185 --> 00:00:27.930
+going to the exercise
+directory, that is DO378
+
+00:00:27.930 --> 00:00:30.080
+/lab/apps-reviews
+
+00:00:30.080 --> 00:00:33.690
+quarkus-conference/
+microservice-speaker,
+
+00:00:33.690 --> 00:00:36.060
+let's have a look at the
+speaker application.
+
+00:00:36.060 --> 00:00:43.745
+It's got a DAO object which actually
+uses them back-end to retrieve,
+
+00:00:43.745 --> 00:00:47.075
+well, first, create a
+database and then of course,
+
+00:00:47.075 --> 00:00:50.180
+keep the information about the
+speakers in that database.
+
+00:00:50.180 --> 00:00:55.850
+And as such, it is quite
+a bit more complete in
+
+00:00:55.850 --> 00:00:58.220
+the amount of information 
+that it contains
+
+00:00:58.220 --> 00:01:02.015
+as current implementation
+of the session application.
+
+00:01:02.015 --> 00:01:05.285
+Looking at the speaker 
+model object,
+
+00:01:05.285 --> 00:01:09.005
+we can see that speakers
+are indeed entities.
+
+00:01:09.005 --> 00:01:11.840
+They have a uuid, first name, last name,
+
+00:01:11.840 --> 00:01:15.349
+organization, biography
+picture, and a twitterHandle.
+
+00:01:15.349 --> 00:01:23.410
+Now if we have a look at the
+SpeakerResource around line 30,
+
+00:01:23.410 --> 00:01:27.100
+we have got an endpoint
+method called listAll,
+
+00:01:27.100 --> 00:01:33.565
+which simply returns a listAll
+results from the Speaker entity.
+
+00:01:33.565 --> 00:01:36.760
+That is of course
+
+00:01:36.760 --> 00:01:39.550
+an inherited method from PanacheEntity.
+
+00:01:39.550 --> 00:01:42.160
+But this is actually the method that
+
+00:01:42.160 --> 00:01:46.090
+the session service is going to
+use when working with speakers.
+
+00:01:46.090 --> 00:01:48.520
+Now, having a look at
+
+00:01:48.520 --> 00:01:52.600
+the current model in the
+microservice session application,
+
+00:01:52.600 --> 00:01:56.440
+we can see that indeed 
+it does have an ID.
+
+00:01:56.440 --> 00:01:58.420
+It has a name,
+
+00:01:58.420 --> 00:02:01.300
+just the name and the uuid.
+
+00:02:01.300 --> 00:02:05.900
+So currently, the data modelling in
+the session application is
+
+00:02:05.900 --> 00:02:10.490
+a lot weaker than in the
+actual speaker application.
+
+00:02:10.490 --> 00:02:14.975
+So what we are going to do is move
+over to the microservice-session app.
+
+00:02:14.975 --> 00:02:16.340
+And first of all,
+
+00:02:16.340 --> 00:02:19.610
+create a new representation
+of the speaker.
+
+00:02:19.610 --> 00:02:22.025
+We will call it 
+SpeakerFromService
+
+00:02:22.025 --> 00:02:25.040
+and we are going to make
+sure that it matches
+
+00:02:25.040 --> 00:02:27.740
+at least the 3 fields that we
+
+00:02:27.740 --> 00:02:30.710
+need to display the speaker
+in the sessions application.
+
+00:02:30.710 --> 00:02:32.645
+So the first and the last name, of course,
+
+00:02:32.645 --> 00:02:34.910
+we'll also be matching speakers by
+
+00:02:34.910 --> 00:02:40.530
+uuid because that's how they're
+assigned to the sessions.
+
+00:02:40.720 --> 00:02:47.750
+We have got constructor and we have
+got JsonbCreator constructor,
+
+00:02:47.750 --> 00:02:50.030
+so static method really.
+
+00:02:50.030 --> 00:02:54.050
+So this is how new instances
+of the SpeakerFrom
+
+00:02:54.050 --> 00:03:00.410
+Service class can be created
+when we receive JSON
+
+00:03:00.410 --> 00:03:05.820
+and we need to deserialize it
+into an instance of this class.
+
+00:03:06.040 --> 00:03:11.330
+The rest-client extension is
+already added to the project,
+
+00:03:11.330 --> 00:03:15.590
+so we don't need to use
+quarkus add-extension for it.
+
+00:03:15.590 --> 00:03:20.225
+We will however, refactor
+the SpeakerService now.
+
+00:03:20.225 --> 00:03:23.435
+So looking at the changes,
+
+00:03:23.435 --> 00:03:28.130
+actually we first have to
+create an interface for
+
+00:03:28.130 --> 00:03:30.380
+the SpeakerService because
+we will be using the listAll
+
+00:03:30.380 --> 00:03:33.710
+method to obtain all
+the speakers from it.
+
+00:03:33.710 --> 00:03:38.420
+So this is essentially a
+contract for the client to
+
+00:03:38.420 --> 00:03:44.240
+use when invoking the
+speaker microservice.
+
+00:03:44.240 --> 00:03:48.080
+Note that we didn't add all the endpoints,
+
+00:03:48.080 --> 00:03:51.560
+we just simply added the
+listAll method with
+
+00:03:51.560 --> 00:03:56.435
+the correct annotation and with
+the correct endpoint address.
+
+00:03:56.435 --> 00:04:01.490
+Now what we need to do is configure the
+rest-client in application properties.
+
+00:04:01.490 --> 00:04:04.775
+We will be adding a single line that will
+
+00:04:04.775 --> 00:04:07.130
+configure the interface that we have just
+
+00:04:07.130 --> 00:04:09.755
+created, the speaker service interface.
+
+00:04:09.755 --> 00:04:17.390
+We will be telling it to use the rest
+url on localhost on port 8082.
+
+00:04:17.390 --> 00:04:19.040
+This is where we're going to be running
+
+00:04:19.040 --> 00:04:22.160
+SpeakerService when we start
+testing the application
+
+00:04:22.160 --> 00:04:28.490
+and finally, the SessionStore
+application component
+
+00:04:28.490 --> 00:04:31.400
+needs a couple of modifications
+
+00:04:31.400 --> 00:04:35.645
+namely, we are going to
+add a Feature Toggle.
+
+00:04:35.645 --> 00:04:39.920
+So if we want to enable
+the session-integration,
+
+00:04:39.920 --> 00:04:43.100
+we will turn the Feature Toggle on.
+
+00:04:43.100 --> 00:04:45.515
+Otherwise we will still be
+using the old method,
+
+00:04:45.515 --> 00:04:47.300
+we'll fix the method a little bit later.
+
+00:04:47.300 --> 00:04:49.880
+So let's focus on adding
+the Feature Toggle
+
+00:04:49.880 --> 00:04:53.570
+first simply by adding a @ConfigProperty.
+
+00:04:53.570 --> 00:04:56.015
+Call it sessionIntegration
+
+00:04:56.015 --> 00:04:58.865
+and then of course, making sure
+that initially it's turned
+
+00:04:58.865 --> 00:05:02.150
+off in the application.properties
+by adding features.
+
+00:05:02.150 --> 00:05:06.080
+session-integration equals false
+to the application.properties in
+
+00:05:06.080 --> 00:05:11.555
+the microservice-session application. 
+Going back to the SessionStore,
+
+00:05:11.555 --> 00:05:15.500
+what we will be doing is first of all,
+
+00:05:15.500 --> 00:05:18.605
+we have to inject the rest
+client implementation.
+
+00:05:18.605 --> 00:05:20.900
+So we will inject instance of
+
+00:05:20.900 --> 00:05:26.300
+the SpeakerService interface
+implemented by the RestClient,
+
+00:05:26.300 --> 00:05:27.005
+of course.
+
+00:05:27.005 --> 00:05:33.140
+Then we are going to replace the
+original findById method.
+
+00:05:33.140 --> 00:05:40.940
+We are going to replace a reference
+to the repository DAO object,
+
+00:05:40.940 --> 00:05:44.270
+which is here. We will leave it in,
+
+00:05:44.270 --> 00:05:45.860
+we won't remove it because we want both the
+
+00:05:45.860 --> 00:05:48.485
+old and the new functionality, right?
+
+00:05:48.485 --> 00:05:54.050
+But we will refactor this single
+line where we simply rely on
+
+00:05:54.050 --> 00:05:56.855
+the fact that repository has
+information about speakers
+
+00:05:56.855 --> 00:06:01.415
+into either the search for the
+speaker using the repository,
+
+00:06:01.415 --> 00:06:03.965
+refactoring it into an optional.
+
+00:06:03.965 --> 00:06:07.160
+However, if we have
+
+00:06:07.160 --> 00:06:16.360
+sessionIntegration enabled and we do
+find the speaker in the repository,
+
+00:06:16.360 --> 00:06:22.285
+then we are going to also try to obtain
+the speaker from the speaker service.
+
+00:06:22.285 --> 00:06:26.770
+So we are not going to invoke the
+speaker service unnecessarily,
+
+00:06:26.770 --> 00:06:31.120
+if someone tries to obtain a
+session ID without a speaker or
+
+00:06:31.120 --> 00:06:33.760
+with a non-existent. Non-existent
+speaker reference will
+
+00:06:33.760 --> 00:06:36.505
+only invoke the downstream service,
+
+00:06:36.505 --> 00:06:39.320
+if we actually have a result.
+
+00:06:39.330 --> 00:06:44.515
+Then simply process the stream
+
+00:06:44.515 --> 00:06:50.365
+and making sure that the service
+speaker is found in the stream
+
+00:06:50.365 --> 00:06:54.365
+and of course, replacing
+
+00:06:54.365 --> 00:06:56.825
+the information found in the result with
+
+00:06:56.825 --> 00:06:58.970
+the fully qualified name of the speaker.
+
+00:06:58.970 --> 00:07:05.390
+So the speaker that is returned by the
+repository.find method
+
+00:07:05.390 --> 00:07:12.995
+is going to have their name replaced
+by the data returned by our client
+
+00:07:12.995 --> 00:07:16.190
+invocation of the speaker service.
+
+00:07:16.190 --> 00:07:18.410
+Right!
+
+00:07:18.410 --> 00:07:21.215
+So let's start everything up now.
+
+00:07:21.215 --> 00:07:24.770
+Going to the quarkus-conference/ directory,
+
+00:07:24.770 --> 00:07:28.475
+so that's one level above where
+we were making code changes.
+
+00:07:28.475 --> 00:07:33.965
+There is a start-locally script which
+starts all the application components,
+
+00:07:33.965 --> 00:07:37.955
+so the microservice-schedule,
+the microservice-session,
+
+00:07:37.955 --> 00:07:43.310
+and as we can see,
+
+00:07:43.310 --> 00:07:46.710
+it also download some images,
+
+00:07:46.870 --> 00:07:50.900
+initializes speakers
+service and so on and so on.
+
+00:07:50.900 --> 00:07:55.174
+When you see that the script
+says Press enter to Terminate,
+
+00:07:55.174 --> 00:07:58.400
+this is a sign that the application is up.
+
+00:07:58.400 --> 00:08:06.395
+And we can move on to the web
+browser opening localhost port 8080.
+
+00:08:06.395 --> 00:08:10.580
+It may be that the left menu is
+covering the list of sessions.
+
+00:08:10.580 --> 00:08:12.920
+When you click Sessions in
+the left menu, you may have to
+
+00:08:12.920 --> 00:08:16.260
+close the left menu and then
+select one of the sessions.
+
+00:08:16.260 --> 00:08:21.475
+Without the feature of
+the remote invocation,
+
+00:08:21.475 --> 00:08:25.285
+we will only get the first
+name from the Speaker.
+
+00:08:25.285 --> 00:08:28.465
+This is the old data model.
+
+00:08:28.465 --> 00:08:31.825
+If we go and modify
+
+00:08:31.825 --> 00:08:34.060
+application properties and actually
+
+00:08:34.060 --> 00:08:37.420
+change the features.session-
+integration toggle to true
+
+00:08:37.420 --> 00:08:39.280
+and we reload that page,
+
+00:08:39.280 --> 00:08:42.940
+we will get the full name
+of the speaker as returned
+
+00:08:42.940 --> 00:08:47.230
+by the invoked downstream microservice.
+
+00:08:47.230 --> 00:08:49.930
+So we can now grade
+
+00:08:49.930 --> 00:08:54.970
+our exercise's success by invoking
+lab apps-review grade script
+
+00:08:54.970 --> 00:08:58.635
+and when it returns
+success on both passes,
+
+00:08:58.635 --> 00:09:03.620
+simply clean up everything by invoking
+lab apps-review finish script.
+
+00:09:03.620 --> 00:09:10.355
+And don't forget to terminate your
+application by, actually your applications,
+
+00:09:10.355 --> 00:09:13.565
+by actually pressing
+Enter to terminate them,
+
+00:09:13.565 --> 00:09:19.655
+such that they shut down and the
+working directory is now removed.
+
+00:09:19.655 --> 00:09:22.310
+This concludes the end of Chapter lab,
+
+00:09:22.310 --> 00:09:23.900
+join us in the next video,
+
+00:09:23.900 --> 00:09:25.715
+where we are going to talk about how to implement
+
+00:09:25.715 --> 00:09:30.300
+fault tolerance in your Quarkus
+applications. See you there.
 

@@ -1,5 +1,449 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:02.970
+In this exercise, we are going
+to start all the components for
 
+00:00:02.970 --> 00:00:05.370
+Quarkus Conference application and
+
+00:00:05.370 --> 00:00:07.515
+then familiarize ourselves
+with the front-end
+
+00:00:07.515 --> 00:00:13.005
+and of course, have a look at what
+components we needed to start and how.
+
+00:00:13.005 --> 00:00:14.385
+We'll start with the lab
+
+00:00:14.385 --> 00:00:17.640
+deploy-microservicesapp start script
+
+00:00:17.640 --> 00:00:21.075
+which checks that OpenShift
+is up and running,
+
+00:00:21.075 --> 00:00:22.890
+although it doesn't really need to, we
+
+00:00:22.890 --> 00:00:25.140
+do not use OpenShift
+for it
+
+00:00:25.140 --> 00:00:30.030
+and it downloads some exercise files.
+
+00:00:30.030 --> 00:00:32.850
+Now the first thing we're going to do is start
+
+00:00:32.850 --> 00:00:35.985
+a Postgres container. In
+a new terminal window,
+
+00:00:35.985 --> 00:00:42.055
+we are going to simply run a new
+postgresql-conference container,
+
+00:00:42.055 --> 00:00:44.360
+listening on port 5432,
+
+00:00:44.360 --> 00:00:47.705
+providing it some configuration
+environment variables
+
+00:00:47.705 --> 00:00:51.680
+and using the image from registry.access.
+
+00:00:51.680 --> 00:00:53.480
+redhat.com/rhscl/
+
+00:00:53.480 --> 00:00:57.395
+postgresql-10-rhel7 with a tag of one.
+
+00:00:57.395 --> 00:01:00.035
+Generally you will do
+it in the background.
+
+00:01:00.035 --> 00:01:03.050
+I have included the
+container logs just to show
+
+00:01:03.050 --> 00:01:07.430
+you that the container is
+literally initializing itself
+
+00:01:07.430 --> 00:01:09.860
+and then it comes up.
+
+00:01:09.860 --> 00:01:14.675
+As I said, this is the requirement
+for the session service.
+
+00:01:14.675 --> 00:01:22.115
+Another external database which is used
+by the voting services, the MongoDB.
+
+00:01:22.115 --> 00:01:24.035
+We're going to call it vdb
+
+00:01:24.035 --> 00:01:25.190
+the container that is,
+
+00:01:25.190 --> 00:01:28.955
+we're going to listen on port 27017
+
+00:01:28.955 --> 00:01:30.905
+and the image we are going to use is from
+
+00:01:30.905 --> 00:01:35.645
+quay.io/bitnami/mongodb with
+the tag of 4.0.
+
+00:01:35.645 --> 00:01:37.595
+So when the image is downloaded,
+
+00:01:37.595 --> 00:01:39.740
+the MongoDB container starts up,
+
+00:01:39.740 --> 00:01:46.400
+deploys MongoDB, and restarts
+itself to begin serving.
+
+00:01:46.400 --> 00:01:50.840
+The next one is our very
+first microservice.
+
+00:01:50.840 --> 00:01:52.310
+It's the speaker service.
+
+00:01:52.310 --> 00:01:56.585
+So we're going to go and change
+our directory to DO378/
+
+00:01:56.585 --> 00:02:01.070
+labs/deploy-microservicesapp/quarkus-conference/
+
+00:02:01.070 --> 00:02:04.460
+microservice-speaker and which
+
+00:02:04.460 --> 00:02:08.270
+is simply going to run
+Quarkus in development mode.
+
+00:02:08.270 --> 00:02:12.350
+It will download some additional
+libraries before it starts up
+
+00:02:12.350 --> 00:02:15.845
+and ultimately we are going to see it
+
+00:02:15.845 --> 00:02:25.550
+report that it is listening
+for debug on port 5005,
+
+00:02:25.550 --> 00:02:32.705
+and it can also see it initialize
+the Hibernate backend,
+
+00:02:32.705 --> 00:02:36.440
+that is the H2 database,
+
+00:02:36.440 --> 00:02:38.750
+and load some initial data from
+
+00:02:38.750 --> 00:02:41.810
+the import sql file. Feel free
+to browse the source code,
+
+00:02:41.810 --> 00:02:44.780
+open these applications in VSCodium,
+
+00:02:44.780 --> 00:02:47.810
+have a look around to
+see how they're configured.
+
+00:02:47.810 --> 00:02:51.185
+They especially pay attention to
+application properties files,
+
+00:02:51.185 --> 00:02:53.810
+because you will have seen
+that we didn't really
+
+00:02:53.810 --> 00:02:57.500
+provide any additional parameters
+to our Quarkus containers,
+
+00:02:57.500 --> 00:02:59.405
+Quarkus engines.
+
+00:02:59.405 --> 00:03:02.450
+We simply told them to start
+in development mode
+
+00:03:02.450 --> 00:03:05.210
+yet there are no port
+conflicts or any of the sort.
+
+00:03:05.210 --> 00:03:10.670
+So this one is configured out of the box
+to listen on localhost port 8082.
+
+00:03:10.670 --> 00:03:14.990
+And when it starts up,
+
+00:03:14.990 --> 00:03:17.600
+we can move on to the next component,
+
+00:03:17.600 --> 00:03:20.165
+which is the schedule application.
+
+00:03:20.165 --> 00:03:24.770
+Again telling it to simply run
+as quarkus:dev, so in dev mode,
+
+00:03:24.770 --> 00:03:28.730
+what you may see, when this
+particular instance starts
+
+00:03:28.730 --> 00:03:33.830
+up is that it complains about
+the debug port being in use.
+
+00:03:33.830 --> 00:03:35.600
+This is not a fatal error,
+
+00:03:35.600 --> 00:03:38.390
+it's simply a warning, telling
+
+00:03:38.390 --> 00:03:42.810
+that the bugging of this
+application will not be possible.
+
+00:03:42.880 --> 00:03:46.310
+But it still works without a problem,
+
+00:03:46.310 --> 00:03:48.200
+still loads the application.
+
+00:03:48.200 --> 00:03:49.835
+And as you can see here,
+
+00:03:49.835 --> 00:03:52.565
+it's listening on port 8083.
+
+00:03:52.565 --> 00:03:57.334
+In the next step, we're going to
+also start the microservice-session
+
+00:03:57.334 --> 00:04:01.790
+application, this time avoiding port
+conflicts by telling it to listen for
+
+00:04:01.790 --> 00:04:07.205
+incoming debug connections on
+port 5007, right?
+
+00:04:07.205 --> 00:04:10.520
+It too downloads a number
+of Maven dependencies
+
+00:04:10.520 --> 00:04:12.380
+and then starts itself.
+
+00:04:12.380 --> 00:04:16.775
+This time not complaining about
+a port conflict for debugging.
+
+00:04:16.775 --> 00:04:22.970
+It is configured to
+listen on port 8081
+
+00:04:22.970 --> 00:04:27.215
+and if you recall, the session application
+
+00:04:27.215 --> 00:04:30.740
+is one of those that
+use a backend database.
+
+00:04:30.740 --> 00:04:33.275
+That is
+
+00:04:33.275 --> 00:04:37.295
+why you can see these SQL exception
+
+00:04:37.295 --> 00:04:43.070
+helpers warning about the fact that
+certain tables do not exist and so on.
+
+00:04:43.070 --> 00:04:47.630
+The fourth component is
+the voting application.
+
+00:04:47.630 --> 00:04:52.595
+It's going to be using
+the debug port 5008.
+
+00:04:52.595 --> 00:04:55.055
+And again, as it starts up,
+
+00:04:55.055 --> 00:04:58.910
+it connects to the MongoDB container
+
+00:04:58.910 --> 00:05:07.160
+and again here you can see some
+reports about Mongo clusters having
+
+00:05:07.160 --> 00:05:10.940
+being created and it listens on port 8084.
+
+00:05:10.940 --> 00:05:15.020
+Lastly, what we will do is we are going
+
+00:05:15.020 --> 00:05:20.165
+to start up our pre-built
+front end container.
+
+00:05:20.165 --> 00:05:23.750
+It's available from quay.io/redhat
+
+00:05:23.750 --> 00:05:28.040
+training/quarkus-onference-frontend with the tag of latest.
+
+00:05:28.040 --> 00:05:30.695
+We will expose it on port 8080
+
+00:05:30.695 --> 00:05:32.990
+and once it starts up,
+
+00:05:32.990 --> 00:05:37.475
+it reports that it is up,
+
+00:05:37.475 --> 00:05:39.245
+and accepting connections.
+
+00:05:39.245 --> 00:05:41.675
+We can open it in the browser.
+
+00:05:41.675 --> 00:05:43.670
+So if we look at the Schedules,
+
+00:05:43.670 --> 00:05:46.070
+for example, just click
+an example Schedule.
+
+00:05:46.070 --> 00:05:50.210
+We can see the Date it is
+being held on, the Venue
+
+00:05:50.210 --> 00:05:52.220
+it is at and the sessions
+
+00:05:52.220 --> 00:05:54.020
+and the speakers that are available.
+
+00:05:54.020 --> 00:05:58.070
+These are all links to
+the respective microservices,
+
+00:05:58.070 --> 00:06:01.745
+the Sessions microservice,
+the Speaker microservice,
+
+00:06:01.745 --> 00:06:04.535
+which you can see in the
+bottom left-hand corner,
+
+00:06:04.535 --> 00:06:07.850
+if you look at the URL or
+if you click on it and
+
+00:06:07.850 --> 00:06:12.330
+observe the URL in the browser's URL tab.
+
+00:06:12.370 --> 00:06:15.905
+We can have a look at the Speakers that are here.
+
+00:06:15.905 --> 00:06:21.050
+If we click one, we can see their
+Organization, Twitter handle, Biography
+
+00:06:21.050 --> 00:06:25.895
+and the link to Sessions gives us
+access to session information,
+
+00:06:25.895 --> 00:06:28.940
+which by the way is also
+
+00:06:28.940 --> 00:06:34.755
+an entry point to the vote application. It doesn't have a separate user interface.
+
+00:06:34.755 --> 00:06:37.510
+The assumption is whoever
+had attended a Session,
+
+00:06:37.510 --> 00:06:40.990
+will be able to return
+to that Sessions page and
+
+00:06:40.990 --> 00:06:44.995
+click on one of the stars
+next to the Session.
+
+00:06:44.995 --> 00:06:47.365
+Because this requires authentication,
+
+00:06:47.365 --> 00:06:50.260
+so it's not going to work
+
+00:06:50.260 --> 00:06:54.250
+until we have an authorization
+application running.
+
+00:06:54.250 --> 00:06:55.720
+Right!
+
+00:06:55.720 --> 00:06:58.255
+That's it for our quick overview.
+
+00:06:58.255 --> 00:07:02.785
+Returning back to the terminal windows,
+
+00:07:02.785 --> 00:07:05.920
+we can actually do a podman stop
+
+00:07:05.920 --> 00:07:09.865
+-a to terminate all
+the running containers.
+
+00:07:09.865 --> 00:07:17.540
+Followed by podman rm -a
+to remove all the containers remains.
+
+00:07:20.650 --> 00:07:26.240
+There we go. And then run lab deploy-
+
+00:07:26.240 --> 00:07:30.470
+microservicesapp finish script,
+
+00:07:30.470 --> 00:07:32.495
+which will clean everything up.
+
+00:07:32.495 --> 00:07:38.135
+And of course, you can also shut
+down the running Quarkus instances.
+
+00:07:38.135 --> 00:07:40.940
+This concludes the initial
+exercise of this chapter.
+
+00:07:40.940 --> 00:07:44.210
+Join us in the next video, where we're
+going to have a look at how to deploy
+
+00:07:44.210 --> 00:07:49.380
+microservices in Red Hat OpenShift
+Container Platform. See you there.
 

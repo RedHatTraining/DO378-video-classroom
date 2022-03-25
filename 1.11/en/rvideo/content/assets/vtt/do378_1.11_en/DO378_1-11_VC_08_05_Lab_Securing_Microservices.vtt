@@ -1,5 +1,429 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:01.650
+In this end of Chapter lab,
 
+00:00:01.650 --> 00:00:07.470
+we will secure microservice session and a
+microservice speaker, microservices of
+
+00:00:07.470 --> 00:00:11.805
+our quarkus-conference
+application using mutual TLS
+
+00:00:11.805 --> 00:00:18.330
+and using authorization with OpenID
+Connect and JSON Web Tokens.
+
+00:00:18.330 --> 00:00:23.550
+For that, we are first going to start
+with the lab secure-review start script,
+
+00:00:23.550 --> 00:00:27.765
+which populates the
+exercise files and starts
+
+00:00:27.765 --> 00:00:34.005
+both the backend database and the Keycloak container, the OpenID server.
+
+00:00:34.005 --> 00:00:37.040
+Then while these are starting,
+
+00:00:37.040 --> 00:00:39.410
+you can already go and have a look at
+
+00:00:39.410 --> 00:00:45.110
+the DO378/labs/secure-review/ directory
+which contains a number of scripts.
+
+00:00:45.110 --> 00:00:47.869
+One of which is the script that prepares
+
+00:00:47.869 --> 00:00:51.230
+all the certificates
+for the microservices.
+
+00:00:51.230 --> 00:00:57.260
+And it literally generates a keystore
+file for the microservice-session.
+
+00:00:57.260 --> 00:01:00.950
+A keystore file from microservice-speaker 
+so that each of them has
+
+00:01:00.950 --> 00:01:05.630
+their own private and public key
+or certificate as it's known.
+
+00:01:05.630 --> 00:01:08.030
+Then it exports the certificate of
+
+00:01:08.030 --> 00:01:11.705
+each and puts it into the
+trust store of the other.
+
+00:01:11.705 --> 00:01:13.100
+So that's what it does
+
+00:01:13.100 --> 00:01:14.480
+in the next 2 steps.
+
+00:01:14.480 --> 00:01:20.405
+It exports the certificate and
+creates a trust store for mutual TLS.
+
+00:01:20.405 --> 00:01:25.280
+So simply run the /prepare-certificates script
+
+00:01:25.280 --> 00:01:27.845
+and then we can return back
+
+00:01:27.845 --> 00:01:30.410
+to the previous terminal window.
+
+00:01:30.410 --> 00:01:33.755
+By now, the script had finished already.
+
+00:01:33.755 --> 00:01:37.220
+So if we go to the quarkus-conference directory,
+
+00:01:37.220 --> 00:01:40.115
+we see here there are both applications.
+
+00:01:40.115 --> 00:01:42.110
+Now just having a look at
+
+00:01:42.110 --> 00:01:45.695
+the application.properties of
+the session microservice,
+
+00:01:45.695 --> 00:01:53.615
+we simply have to remove the
+SpeakerService's old configuration
+
+00:01:53.615 --> 00:01:58.070
+because it's no longer going to
+be listening on port 8080 to once
+
+00:01:58.070 --> 00:02:04.910
+we reconfigure everything to its TLS. It's
+is going to be listening on port 8444.
+
+00:02:04.910 --> 00:02:08.630
+And then we configure the
+trustStore for the client to
+
+00:02:08.630 --> 00:02:12.170
+the SpeakerService and the
+keyStore for that client as well,
+
+00:02:12.170 --> 00:02:15.635
+because it's going to have
+to authenticate against it.
+
+00:02:15.635 --> 00:02:17.450
+And of course, we are going to configure
+
+00:02:17.450 --> 00:02:20.510
+the session microservice
+to use TLS as well.
+
+00:02:20.510 --> 00:02:24.695
+So we are going to put it
+on port 8445 and again,
+
+00:02:24.695 --> 00:02:27.830
+configure the Keystore
+and the trust store.
+
+00:02:27.830 --> 00:02:32.450
+We are going to do something
+similar to the speaker microservice,
+
+00:02:32.450 --> 00:02:36.935
+except that the speaker microservice
+does not connect to the session,
+
+00:02:36.935 --> 00:02:40.760
+it's the session service that
+connects to the speaker microservice
+
+00:02:40.760 --> 00:02:44.975
+because it wants to enrich the
+information about speakers in a session.
+
+00:02:44.975 --> 00:02:47.810
+So there is no client configuration in
+
+00:02:47.810 --> 00:02:51.650
+the application.properties
+of the speaker service, it's
+
+00:02:51.650 --> 00:02:53.660
+just the server configuration.
+
+00:02:53.660 --> 00:02:56.810
+So remapping to port 8444
+
+00:02:56.810 --> 00:03:02.015
+and making sure the key-store and
+the trust-store are configured.
+
+00:03:02.015 --> 00:03:03.800
+In addition to that,
+
+00:03:03.800 --> 00:03:08.750
+we now have the speaker
+microservice requiring mutual TLS
+
+00:03:08.750 --> 00:03:14.270
+from any clients and just rejecting
+any plain text requests.
+
+00:03:14.270 --> 00:03:15.815
+Right!
+
+00:03:15.815 --> 00:03:20.840
+Now, let us secure the session
+microservice's endpoints as well.
+
+00:03:20.840 --> 00:03:22.370
+So we are going to go to
+
+00:03:22.370 --> 00:03:25.160
+the session microservice's
+source code directory
+
+00:03:25.160 --> 00:03:28.625
+at the quarkus-oidc extension
+
+00:03:28.625 --> 00:03:31.520
+and then have a look at
+application.properties.
+
+00:03:31.520 --> 00:03:36.185
+We need to add the authentication
+authorization service URL.
+
+00:03:36.185 --> 00:03:39.620
+We need to tell the client what its ID
+
+00:03:39.620 --> 00:03:43.280
+to use against the quarkus realm should be.
+
+00:03:43.280 --> 00:03:48.440
+And of course, the authentication
+secret for the authorization client.
+
+00:03:48.440 --> 00:03:52.010
+Then we go and have a look
+at the SessionResource.
+
+00:03:52.010 --> 00:03:53.690
+Right now it's unprotected.
+
+00:03:53.690 --> 00:03:57.800
+We are going to require any use of
+the session microservice to be
+
+00:03:57.800 --> 00:04:03.659
+authenticated by adding the
+@Authenticated annotation on the class.
+
+00:04:04.060 --> 00:04:09.380
+Then we are also going to add role-based
+access control to all the endpoints.
+
+00:04:09.380 --> 00:04:13.445
+So the list of all sessions
+requires read, role.
+
+00:04:13.445 --> 00:04:16.220
+The creation of the
+session requires modify role,
+
+00:04:16.220 --> 00:04:20.330
+retrieval of individual
+session requires read access
+
+00:04:20.330 --> 00:04:22.880
+again, updating, modify,
+
+00:04:22.880 --> 00:04:25.520
+deleting requires the delete role
+
+00:04:25.520 --> 00:04:30.470
+The obtaining of sessionSpeakers
+requires a read role as well.
+
+00:04:30.470 --> 00:04:34.609
+The adding a speaker to the
+session modify role and removing
+
+00:04:34.609 --> 00:04:38.960
+the session speaker requires
+the delete role as well.
+
+00:04:38.960 --> 00:04:43.010
+So we fixed the endpoint, secured them.
+
+00:04:43.010 --> 00:04:45.830
+Now, what we can do is simply use
+
+00:04:45.830 --> 00:04:51.170
+the start-services script that is
+2 levels above the source code,
+
+00:04:51.170 --> 00:04:54.125
+just above the quarkus-conference directory.
+
+00:04:54.125 --> 00:04:57.290
+So this will start our application,
+
+00:04:57.290 --> 00:05:00.590
+which allows us to start testing it.
+
+00:05:00.590 --> 00:05:05.435
+But to do so, we need
+to have JSON Web Token.
+
+00:05:05.435 --> 00:05:09.530
+So we will obtain that using
+the keycloak-token script,
+
+00:05:09.530 --> 00:05:13.260
+which is also located in the
+secure-review subdirectory.
+
+00:05:13.330 --> 00:05:21.005
+We will simply generate the tokens
+using user1 service account
+
+00:05:21.005 --> 00:05:23.840
+and here we go. User1 has the modify,
+
+00:05:23.840 --> 00:05:26.660
+read and delete roles.
+
+00:05:26.660 --> 00:05:29.690
+Then we are going to
+generate the token for user2
+
+00:05:29.690 --> 00:05:33.050
+as well and user2 just has a read role
+
+00:05:33.050 --> 00:05:34.895
+So let's test it.
+
+00:05:34.895 --> 00:05:43.490
+The curl request sent to the session
+microservices on port 8445,
+
+00:05:43.490 --> 00:05:49.085
+asking to retrieve details of
+session s-1-1 using user1_token,
+
+00:05:49.085 --> 00:05:51.230
+does successfully retrieve the session,
+
+00:05:51.230 --> 00:05:54.860
+but note that the name of
+the speaker is not enriched.
+
+00:05:54.860 --> 00:05:59.435
+This might point to a mutual TLS issue,
+
+00:05:59.435 --> 00:06:03.965
+or it might simply be that the
+microservice has not started up yet.
+
+00:06:03.965 --> 00:06:08.990
+So trying the user2_token as well.
+
+00:06:08.990 --> 00:06:14.225
+In the meantime, it seems to be
+accepted because it only needs read role.
+
+00:06:14.225 --> 00:06:16.340
+Now waiting a little bit,
+
+00:06:16.340 --> 00:06:19.220
+and trying again, we can see that by
+
+00:06:19.220 --> 00:06:21.860
+now the speaker service has
+actually started up.
+
+00:06:21.860 --> 00:06:24.695
+So everything is working correctly.
+
+00:06:24.695 --> 00:06:28.055
+I'm trying to delete session
+
+00:06:28.055 --> 00:06:30.305
+as the user2  user.
+
+00:06:30.305 --> 00:06:37.145
+We see that the response is 403. Trying
+to delete that same session as user 1,
+
+00:06:37.145 --> 00:06:40.805
+we get a 204 response, which is great.
+
+00:06:40.805 --> 00:06:45.050
+Now before we go and grade
+the outcome of the lab,
+
+00:06:45.050 --> 00:06:47.660
+we need to restart the service.
+
+00:06:47.660 --> 00:06:51.860
+So we are going to have to go to
+the initial screen, press ENTER
+
+00:06:51.860 --> 00:06:57.795
+and wait for the services to shut
+down and then restart them again
+
+00:06:57.795 --> 00:07:03.370
+because we need to reinitialize the
+database for the grading scripts to work.
+
+00:07:03.370 --> 00:07:07.450
+Otherwise, you will get some
+failures towards the end and do not
+
+00:07:07.450 --> 00:07:11.380
+be too eager to repeat the grade,
+wait for both services to start.
+
+00:07:11.380 --> 00:07:14.335
+It can take up to half
+a minute or a minute.
+
+00:07:14.335 --> 00:07:16.630
+Otherwise you will get failures like this.
+
+00:07:16.630 --> 00:07:18.820
+once both services are started
+
+00:07:18.820 --> 00:07:22.105
+just rerun lab secure-review grade script.
+
+00:07:22.105 --> 00:07:25.990
+If you have all the passing
+scores, that's excellent.
+
+00:07:25.990 --> 00:07:28.030
+Just run the lab secure-review
+
+00:07:28.030 --> 00:07:30.850
+finish script to clean everything up,
+
+00:07:30.850 --> 00:07:33.310
+and join us in the next
+chapter where we are going to
+
+00:07:33.310 --> 00:07:36.650
+talk about monitoring. See you there.
 
