@@ -1,5 +1,903 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:03.270
+Let's develop a simple
+RESTful microservice
 
+00:00:03.270 --> 00:00:06.420
+in this exercise. We are going to work with
+
+00:00:06.420 --> 00:00:10.050
+the expense-restful-service project to
+
+00:00:10.050 --> 00:00:14.460
+implement a JAX-RS web service
+using dependency injection,
+
+00:00:14.460 --> 00:00:21.435
+using JAX-RS annotations and also
+JSON-B marshaling and unmarshaling.
+
+00:00:21.435 --> 00:00:28.230
+This first exercise is going to
+be performed step-by-step in
+
+00:00:28.230 --> 00:00:35.190
+the interactive mode as you would have
+performed it in your own workstation.
+
+00:00:35.190 --> 00:00:36.689
+In the future exercises,
+
+00:00:36.689 --> 00:00:40.230
+I'm going to be using a little bit
+more efficient mode of presentation.
+
+00:00:40.230 --> 00:00:43.955
+So I will not be using Visual Studio Code,
+
+00:00:43.955 --> 00:00:48.380
+focusing more on the
+changes to the source code
+
+00:00:48.380 --> 00:00:54.185
+and the way we can execute Quarkus
+applications from the command line as well.
+
+00:00:54.185 --> 00:00:56.780
+Let's start by running the lab
+
+00:00:56.780 --> 00:01:00.240
+implement-rest start script,
+
+00:01:00.910 --> 00:01:06.695
+which simply downloads
+some files into our labs/
+
+00:01:06.695 --> 00:01:12.230
+implement-rest/expense-restful-service directory.
+
+00:01:12.230 --> 00:01:18.125
+So if we have a look at the
+source code file structure,
+
+00:01:18.125 --> 00:01:21.770
+we can see this is a
+typical Maven project with
+
+00:01:21.770 --> 00:01:26.060
+src/main/java the source
+code located underneath
+
+00:01:26.060 --> 00:01:28.175
+and then of course, src/main/
+
+00:01:28.175 --> 00:01:33.440
+resources and the application
+properties file located next to it.
+
+00:01:33.440 --> 00:01:36.560
+If you open this in VSCodium,
+
+00:01:36.560 --> 00:01:39.950
+clicking on File, Open Folder or simply
+
+00:01:39.950 --> 00:01:43.715
+clicking Open Folder in
+the Get Started tab,
+
+00:01:43.715 --> 00:01:46.895
+pointing to the labs, implement-rest,
+
+00:01:46.895 --> 00:01:50.165
+expense-restful-service and click OK,
+
+00:01:50.165 --> 00:01:54.470
+it's going to be a short amount
+of time during which you can
+
+00:01:54.470 --> 00:01:58.790
+see the little circle turning
+around in the bottom right corner,
+
+00:01:58.790 --> 00:02:04.550
+progress report telling you how much
+of the project has been imported.
+
+00:02:04.550 --> 00:02:07.040
+And then finally, a pop-up bubble
+
+00:02:07.040 --> 00:02:11.810
+notification saying that the Projects
+are imported into the workspace.
+
+00:02:11.810 --> 00:02:16.730
+You can close this. You can view the
+project by clicking on view projects,
+
+00:02:16.730 --> 00:02:19.820
+which will open the project outline.
+
+00:02:19.820 --> 00:02:23.000
+And that means we can also close
+
+00:02:23.000 --> 00:02:25.520
+the File Explorer and focus on
+
+00:02:25.520 --> 00:02:29.105
+the Java project structure
+here on the left-hand side.
+
+00:02:29.105 --> 00:02:30.080
+There we go.
+
+00:02:30.080 --> 00:02:33.950
+There's a package org.acme.rest.json
+
+00:02:33.950 --> 00:02:39.170
+or what we will add first
+is the Expense class,
+
+00:02:39.170 --> 00:02:45.560
+which is a simple data object
+model type of class.
+
+00:02:45.560 --> 00:02:52.115
+We're going to add a method to allow
+creating Expense objects from JSON data.
+
+00:02:52.115 --> 00:02:56.960
+Note that this class does not have
+a parameter, this constructor.
+
+00:02:56.960 --> 00:03:03.335
+It just has 2 constructors which
+take varying numbers of parameters.
+
+00:03:03.335 --> 00:03:06.530
+Which means that according
+to JSON-B specification,
+
+00:03:06.530 --> 00:03:09.680
+we need to annotate 1 of the 2 with
+
+00:03:09.680 --> 00:03:13.415
+the @JsonbCreator annotation and annotate
+
+00:03:13.415 --> 00:03:16.985
+also the parameters of
+that constructor with
+
+00:03:16.985 --> 00:03:22.115
+any potential changes between
+the JSON data structure,
+
+00:03:22.115 --> 00:03:24.800
+attribute names, and the parameter names.
+
+00:03:24.800 --> 00:03:26.465
+Luckily, in our case,
+
+00:03:26.465 --> 00:03:29.045
+we do not have any changes
+in parameter names that
+
+00:03:29.045 --> 00:03:34.070
+the JSON data structure is actually
+matching the names of these parameters.
+
+00:03:34.070 --> 00:03:38.900
+So the @JsonbCreator implementation
+can actually automatically
+
+00:03:38.900 --> 00:03:44.765
+use the corresponding JSON data
+structure to inject these fields.
+
+00:03:44.765 --> 00:03:53.060
+So what we're going to do is simply
+add a @JsonbCreator annotation here.
+
+00:03:53.060 --> 00:03:57.020
+This will also automatically resolve
+
+00:03:57.020 --> 00:04:01.595
+the type it will add it to the
+list of imports at the top
+
+00:04:01.595 --> 00:04:07.744
+and we're annotating a method.
+
+00:04:07.744 --> 00:04:11.060
+So the constructor method that is,
+
+00:04:11.060 --> 00:04:13.910
+which means that the JSON-B implementation
+
+00:04:13.910 --> 00:04:16.400
+will actually immediately
+know which constructor to use
+
+00:04:16.400 --> 00:04:22.445
+when it'ss deserializing JSON string
+into an instance of this class.
+
+00:04:22.445 --> 00:04:25.100
+Now the next thing we can save this file.
+
+00:04:25.100 --> 00:04:27.080
+The next thing we're going
+to do is we're going to
+
+00:04:27.080 --> 00:04:31.580
+annotate the ExpenseService class,
+
+00:04:31.580 --> 00:04:33.080
+making it a CDI bean,
+
+00:04:33.080 --> 00:04:37.265
+it's going to be an ApplicationScoped
+bean so at the class level,
+
+00:04:37.265 --> 00:04:41.270
+simply have to add an
+@ApplicationScoped annotation,
+
+00:04:41.270 --> 00:04:47.615
+making sure that it is a javax.enterprise.context.ApplicationScoped
+
+00:04:47.615 --> 00:04:48.740
+bean.
+
+00:04:48.740 --> 00:04:53.900
+Finally in the ExpenseResource we will
+be implementing the rest endpoints.
+
+00:04:53.900 --> 00:05:03.510
+So we need to annotate the class
+with the route path. Like this.
+
+00:05:04.930 --> 00:05:10.250
+We need to also express that this class
+will both consume and produce JSON.
+
+00:05:10.250 --> 00:05:17.105
+So we'll use a @Produces annotation
+from javax.ws.rs.core.Response
+
+00:05:17.105 --> 00:05:19.820
+not the enterprise Produces.
+
+00:05:19.820 --> 00:05:24.180
+We're going to use the MediaType
+
+00:05:24.400 --> 00:05:29.960
+again from javax.ws.rs.core
+
+00:05:29.960 --> 00:05:36.110
+and we're going to select
+APPLICATION_JSON, like this.
+
+00:05:36.110 --> 00:05:39.410
+First we're going to do the same
+for the @Consumes annotations.
+
+00:05:39.410 --> 00:05:47.525
+I'm just going to copy this parameter
+and use it with the @Consumes annotation.
+
+00:05:47.525 --> 00:05:52.100
+Note that the imports are managed
+automatically by VSCodium,
+
+00:05:52.100 --> 00:05:53.960
+so there's no need to add 
+them manually, you
+
+00:05:53.960 --> 00:05:58.070
+would only have to add them manually
+if you're using something other than
+
+00:05:58.070 --> 00:06:02.675
+an IDE such as Vim or other plane editors.
+
+00:06:02.675 --> 00:06:05.480
+In the next steps, we're going
+to annotate the methods,
+
+00:06:05.480 --> 00:06:08.000
+making them endpoints for this service.
+
+00:06:08.000 --> 00:06:10.475
+Let's start with the list method.
+
+00:06:10.475 --> 00:06:13.180
+The list method, according
+to our specifications,
+
+00:06:13.180 --> 00:06:17.465
+should be a simple parameter, list
+GET operation.
+
+00:06:17.465 --> 00:06:21.245
+So if someone sends a GET
+request to the expenses path,
+
+00:06:21.245 --> 00:06:23.750
+they should be able to
+retrieve the list of
+
+00:06:23.750 --> 00:06:27.140
+expenses. In the create we will express
+
+00:06:27.140 --> 00:06:32.900
+that this is a @POST operation because
+there's only a single parameter,
+
+00:06:32.900 --> 00:06:39.170
+we do not have to annotate this as a
+post parameter or any of that sort.
+
+00:06:39.170 --> 00:06:42.755
+Any @POST method bodies automatically used
+
+00:06:42.755 --> 00:06:47.330
+and deserialize into the
+expense parameter instance.
+
+00:06:47.330 --> 00:06:51.920
+The create method has a @POST
+method associated with it,
+
+00:06:51.920 --> 00:07:01.205
+whereas the @DELETE method will be
+associated with the delete HTTP method.
+
+00:07:01.205 --> 00:07:03.710
+Now, the UUID though,
+
+00:07:03.710 --> 00:07:06.590
+because the @DELETE method does
+not necessarily have to have
+
+00:07:06.590 --> 00:07:10.670
+a method body, will be expressed
+in the @PATH parameter.
+
+00:07:10.670 --> 00:07:17.990
+So we're going to actually use the uuid
+as the name of this path parameter.
+
+00:07:17.990 --> 00:07:24.170
+And we'll just annotate the field
+here with the @PathParam annotation,
+
+00:07:24.170 --> 00:07:28.100
+telling the JAX-RS framework to inject
+
+00:07:28.100 --> 00:07:34.650
+uuid parameter from the
+@PATH into this method field.
+
+00:07:36.390 --> 00:07:42.144
+Of course, I accidentally overwrote the type.
+
+00:07:42.144 --> 00:07:44.485
+There it is, it's now back.
+
+00:07:44.485 --> 00:07:46.945
+Lastly, the update method,
+
+00:07:46.945 --> 00:07:51.280
+where it's going to be associated with
+the @PUT HTTP method invocation.
+
+00:07:51.280 --> 00:07:54.400
+Again, @PUT method body
+will automatically be
+
+00:07:54.400 --> 00:07:59.395
+deserialized into the
+expense object instance.
+
+00:07:59.395 --> 00:08:06.070
+Right? If we save all these
+files that we've modified,
+
+00:08:06.070 --> 00:08:12.460
+we can have a look at the Swagger
+UI associated with this project.
+
+00:08:12.460 --> 00:08:13.975
+But first we have to run it.
+
+00:08:13.975 --> 00:08:19.600
+So either Ctrl Shift and P
+or view Command Palette
+
+00:08:19.600 --> 00:08:24.685
+will give us the ability to
+Debug current Quarkus project.
+
+00:08:24.685 --> 00:08:27.850
+Note that VSCodium is learning about
+
+00:08:27.850 --> 00:08:31.345
+which commands from the
+Palette we use most
+
+00:08:31.345 --> 00:08:35.320
+and also which commands make
+sense in the current context.
+
+00:08:35.320 --> 00:08:38.035
+So after the first use,
+
+00:08:38.035 --> 00:08:40.690
+when you still may have to search for
+
+00:08:40.690 --> 00:08:43.360
+the Debug current Quarkus
+project command by simply
+
+00:08:43.360 --> 00:08:49.210
+typing debug quarkus
+into the search field.
+
+00:08:49.210 --> 00:08:51.250
+After the first time you've used it,
+
+00:08:51.250 --> 00:08:55.285
+it shall appear closer to the top
+
+00:08:55.285 --> 00:09:02.090
+and while we're waiting for the
+Quarkus runtime to start up,
+
+00:09:02.280 --> 00:09:07.720
+we can open up a browser
+and open http://localhost
+
+00:09:07.720 --> 00:09:13.090
+on port 8080 and point to swagger-ui.
+
+00:09:13.090 --> 00:09:16.360
+What we see is the automatically
+
+00:09:16.360 --> 00:09:20.140
+generated open API description
+of our RESTful web service.
+
+00:09:20.140 --> 00:09:22.990
+If we click on Get expenses method,
+
+00:09:22.990 --> 00:09:27.010
+select, Try it out and click on Execute,
+
+00:09:27.010 --> 00:09:31.720
+what we're going to see
+is not what I expected.
+
+00:09:31.720 --> 00:09:34.060
+There is an Internal Server Error.
+
+00:09:34.060 --> 00:09:37.615
+We can see it's associated
+with a NullPointerException,
+
+00:09:37.615 --> 00:09:42.505
+know how nicely the error information
+is actually serialized in JSON,
+
+00:09:42.505 --> 00:09:49.460
+because we had told JAX-RS
+that this method produces JSON,
+
+00:09:49.460 --> 00:09:52.490
+so even the exception messages in JSON.
+
+00:09:52.490 --> 00:09:55.580
+Now the NullPointerException indicates
+
+00:09:55.580 --> 00:10:00.635
+that field that we're trying to use in
+the GET method is not initialized.
+
+00:10:00.635 --> 00:10:02.420
+Let's have a look and see why that is
+
+00:10:02.420 --> 00:10:07.940
+so? We have a look at the
+Expense list method,
+
+00:10:07.940 --> 00:10:12.215
+which is the one that is activated
+by the @GET HTTP request.
+
+00:10:12.215 --> 00:10:16.025
+We can see that it's using
+expenseService.list method.
+
+00:10:16.025 --> 00:10:18.425
+But the ExpenseResource here,
+
+00:10:18.425 --> 00:10:23.120
+while it declares the
+ExpenseService field,
+
+00:10:23.120 --> 00:10:24.815
+it does not initialize it.
+
+00:10:24.815 --> 00:10:28.130
+That's because it is an injection point,
+
+00:10:28.130 --> 00:10:29.270
+the CDI injection point,
+
+00:10:29.270 --> 00:10:35.690
+and I forgot to add the @Inject annotation
+here while I was editing the class.
+
+00:10:35.690 --> 00:10:37.685
+So upon saving it,
+
+00:10:37.685 --> 00:10:39.530
+I don't have to do anything
+really because it's
+
+00:10:39.530 --> 00:10:41.705
+going to be automatically reloaded.
+
+00:10:41.705 --> 00:10:44.885
+I just have to retry the method like
+
+00:10:44.885 --> 00:10:49.325
+clicking on Execute again. And here we go.
+
+00:10:49.325 --> 00:10:53.584
+The Response body is an
+empty JSON list because
+
+00:10:53.584 --> 00:10:58.850
+the service is currently
+not initialized, right?
+
+00:10:58.850 --> 00:11:06.650
+What we will use now is a @PostConstruct
+annotation on the service class.
+
+00:11:06.650 --> 00:11:11.460
+So going back to the application,
+
+00:11:11.620 --> 00:11:20.180
+going back to VSCodium and
+selecting Stop Debugging,
+
+00:11:20.180 --> 00:11:23.330
+I'm going to switch
+back to ExpenseService,
+
+00:11:23.330 --> 00:11:26.030
+close the terminal window at the bottom
+
+00:11:26.030 --> 00:11:31.010
+and Post construct method
+that we're about to add
+
+00:11:31.080 --> 00:11:38.230
+is going to initialize the
+ExpenseService with some data.
+
+00:11:38.230 --> 00:11:41.875
+We're simply going to add method,
+
+00:11:41.875 --> 00:11:44.635
+let's say at the top.
+
+00:11:44.635 --> 00:11:50.365
+Like this, we're going to
+market as a public void method
+
+00:11:50.365 --> 00:11:52.150
+initData.
+
+00:11:52.150 --> 00:11:54.160
+We don't really have to make it public.
+
+00:11:54.160 --> 00:11:55.900
+We can just keep it
+
+00:11:55.900 --> 00:11:57.835
+package protected or
+
+00:11:57.835 --> 00:12:01.255
+package private as it's also known as.
+
+00:12:01.255 --> 00:12:04.735
+We're going to add 2 sample expenses here.
+
+00:12:04.735 --> 00:12:08.140
+So we're going to be adding
+to this collection over here,
+
+00:12:08.140 --> 00:12:12.440
+expenses.add is
+what we're going to use.
+
+00:12:12.440 --> 00:12:17.510
+new_Expense, let's say Groceries.
+
+00:12:17.510 --> 00:12:20.960
+We're going to make it
+a cash payment method.
+
+00:12:20.960 --> 00:12:28.280
+PaymentMethod is a class that is provided
+by one of our bundled dependencies.
+
+00:12:28.280 --> 00:12:35.990
+And the amount of this expense
+is going to be say $150.50.
+
+00:12:35.990 --> 00:12:38.405
+That's the first expense
+we're going to add.
+
+00:12:38.405 --> 00:12:46.385
+The second expense is
+going to be for a game,
+
+00:12:46.385 --> 00:12:50.105
+Civilization 6,
+
+00:12:50.105 --> 00:12:56.090
+where the payment method is obviously
+going to be either credit or debit card.
+
+00:12:56.090 --> 00:13:01.205
+Let's say it's a debit card
+and it's costing us 25 bucks.
+
+00:13:01.205 --> 00:13:07.475
+Now, for this method to actually be
+invoked at the class creation time,
+
+00:13:07.475 --> 00:13:12.094
+we need to use CDI's
+@PostConstruct annotation.
+
+00:13:12.094 --> 00:13:17.840
+Here we go, save the file.
+
+00:13:17.840 --> 00:13:23.360
+And since I stopped the Quarkus runtime,
+
+00:13:23.360 --> 00:13:25.955
+I didn't have to, but I chose to.
+
+00:13:25.955 --> 00:13:29.340
+I'm just going to restart it again.
+
+00:13:31.870 --> 00:13:36.815
+Note that I didn't have to restart
+it again because of hot to replace.
+
+00:13:36.815 --> 00:13:39.245
+So any code changes would have been
+
+00:13:39.245 --> 00:13:43.295
+immediately activated and
+reloaded in the Quarkus runtime.
+
+00:13:43.295 --> 00:13:52.220
+Now if I go back to the browser
+window and click Execute again,
+
+00:13:52.220 --> 00:13:55.010
+I see 2 expenses,
+
+00:13:55.010 --> 00:13:59.720
+there they are, as I've defined
+in the initData method.
+
+00:13:59.720 --> 00:14:01.610
+Let's create a new expense.
+
+00:14:01.610 --> 00:14:03.890
+So we're going to go to the Post method,
+
+00:14:03.890 --> 00:14:06.860
+I'm going to close the GET
+method and I'm going to select
+
+00:14:06.860 --> 00:14:12.725
+the POST expenses rest method,
+
+00:14:12.725 --> 00:14:15.155
+select, Try it out
+
+00:14:15.155 --> 00:14:21.049
+and in the request body which is already
+populated by an example content,
+
+00:14:21.049 --> 00:14:25.070
+I'm going to create a new expense for $10,
+
+00:14:25.070 --> 00:14:28.775
+creationDate is something
+that I'm going to remove,
+
+00:14:28.775 --> 00:14:33.905
+going to give it a name of Foo Bar.
+
+00:14:33.905 --> 00:14:38.015
+This is a very special
+excellent chocolate bar
+
+00:14:38.015 --> 00:14:43.350
+and I'm going to leave the
+paymentMethod, at CASH.
+
+00:14:43.510 --> 00:14:51.180
+There we go. If I click the Execute
+button at the bottom,
+
+00:14:54.580 --> 00:14:57.755
+I get a Bad Request
+
+00:14:57.755 --> 00:15:04.625
+because the Creator parameter
+uuid is missing in json document.
+
+00:15:04.625 --> 00:15:07.430
+So that would mean that
+something is wrong with
+
+00:15:07.430 --> 00:15:13.805
+my JsonbCreator method
+in the expense class.
+
+00:15:13.805 --> 00:15:15.260
+Let's move back to
+
+00:15:15.260 --> 00:15:22.460
+the expense code and have a look
+at what I did to JsonbCreator.
+
+00:15:22.460 --> 00:15:26.930
+Actually, my positioning of this
+annotation is completely wrong.
+
+00:15:26.930 --> 00:15:30.200
+I should have actually
+created a static method.
+
+00:15:30.200 --> 00:15:35.225
+I'm just going to put them
+after the both constructors.
+
+00:15:35.225 --> 00:15:38.105
+So the JsonbCreator is going to be for a
+
+00:15:38.105 --> 00:15:45.035
+public static void and not
+a void, public static Expense of
+
+00:15:45.035 --> 00:15:48.065
+and then specify all the parameters that
+
+00:15:48.065 --> 00:15:51.710
+the JsonbCreator needs in
+order to invoke the constructor.
+
+00:15:51.710 --> 00:15:58.580
+So String name one, PaymentMethod
+is going to be the other one.
+
+00:15:58.580 --> 00:16:02.150
+We have to make sure that the
+names of the parameters are the
+
+00:16:02.150 --> 00:16:08.790
+same as the rest structure,
+that JSON structure.
+
+00:16:09.640 --> 00:16:11.135
+There they are.
+
+00:16:11.135 --> 00:16:13.805
+So these are the only 3 parameters we're going to need
+
+00:16:13.805 --> 00:16:18.005
+necessarily to create the new expense.
+
+00:16:18.005 --> 00:16:26.420
+And it's just got to return a new Expense
+containing the name, paymentMethod.
+
+00:16:26.420 --> 00:16:31.355
+and amount like this.
+
+00:16:31.355 --> 00:16:35.840
+Again, we have to simply
+
+00:16:35.840 --> 00:16:37.970
+resubmit the request because
+
+00:16:37.970 --> 00:16:40.940
+the code change is going to
+be automatically reloaded.
+
+00:16:40.940 --> 00:16:43.520
+Note how the JSON attributes are
+
+00:16:43.520 --> 00:16:46.490
+the same as the names of
+the method parameters.
+
+00:16:46.490 --> 00:16:50.060
+So if I do an Execute action again,
+
+00:16:50.060 --> 00:16:56.345
+here we have the Response body which
+contains our fully qualified resource and
+
+00:16:56.345 --> 00:17:02.929
+along with the creationDate and the uuid that was assigned to this new expense.
+
+00:17:02.929 --> 00:17:06.500
+Let's review the current list of expenses.
+
+00:17:06.500 --> 00:17:11.975
+So moving back to the GET
+method and executing it again,
+
+00:17:11.975 --> 00:17:17.510
+we can see that now there is
+the new expense also listed.
+
+00:17:17.510 --> 00:17:21.080
+And that means we can return back to
+
+00:17:21.080 --> 00:17:28.915
+VSCodium and select Run,
+
+00:17:28.915 --> 00:17:30.595
+Stop Debugging.
+
+00:17:30.595 --> 00:17:35.830
+If a prompt asks you whether you want
+to terminate the quarkus dev task,
+
+00:17:35.830 --> 00:17:40.450
+simply say yes or even as I did,
+
+00:17:40.450 --> 00:17:41.770
+that's why I wasn't asked.
+
+00:17:41.770 --> 00:17:44.690
+Again, remember my choice.
+
+00:17:44.850 --> 00:17:48.070
+This brings us to the end of the exercise,
+
+00:17:48.070 --> 00:17:50.410
+which means that we can actually close
+
+00:17:50.410 --> 00:17:55.510
+VSCodium or just leave it
+running and run the lab
+
+00:17:55.510 --> 00:17:58.390
+implement-rest finish script,
+
+00:17:58.390 --> 00:18:01.990
+which will clean up after our exercise.
+
+00:18:01.990 --> 00:18:04.030
+Join us in the next video,
+
+00:18:04.030 --> 00:18:08.310
+we're going to persist
+some data using panache.
 

@@ -1,5 +1,759 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:01.125
+Welcome back!
 
+00:00:01.125 --> 00:00:03.195
+Let's have a look at how to deploy
+
+00:00:03.195 --> 00:00:06.390
+applications in OpenShift
+Container Platform in this video.
+
+00:00:06.390 --> 00:00:08.985
+But first, let's have a brief review of
+
+00:00:08.985 --> 00:00:12.525
+what the OpenShift Container
+Platform is and what it offers us?
+
+00:00:12.525 --> 00:00:21.165
+It is a containerized application platform
+and it is a self-service one at that.
+
+00:00:21.165 --> 00:00:23.550
+Which means that users can,
+
+00:00:23.550 --> 00:00:25.275
+if they have access to it,
+
+00:00:25.275 --> 00:00:27.690
+login, create their own projects,
+
+00:00:27.690 --> 00:00:29.355
+deploy their own applications,
+
+00:00:29.355 --> 00:00:32.700
+and orchestrate them in terms of scaling,
+
+00:00:32.700 --> 00:00:38.210
+in terms of
+mutual relationships and so on.
+
+00:00:38.210 --> 00:00:41.630
+There are many different
+deployment scenarios for
+
+00:00:41.630 --> 00:00:45.500
+OpenShift applications to be deployed.
+
+00:00:45.500 --> 00:00:50.765
+Typically, very commonly
+actually is that we,
+
+00:00:50.765 --> 00:00:54.425
+as a developer, we simply login to
+the OpenShift Container Platform,
+
+00:00:54.425 --> 00:00:58.280
+select that we want to create
+a new application and provide
+
+00:00:58.280 --> 00:01:02.480
+a Git URL to where our source code
+is and then everything else,
+
+00:01:02.480 --> 00:01:04.445
+the building of a new container image,
+
+00:01:04.445 --> 00:01:07.715
+the selection of the base
+image for our application,
+
+00:01:07.715 --> 00:01:10.670
+and the deployment of the application
+itself once it's built,
+
+00:01:10.670 --> 00:01:16.110
+is performed completely autonomously
+by the OpenShift Container Platform.
+
+00:01:16.150 --> 00:01:19.190
+By automating these things,
+
+00:01:19.190 --> 00:01:23.120
+OCP allows developers
+to focus on working on
+
+00:01:23.120 --> 00:01:27.170
+the application rather
+than bother themselves
+
+00:01:27.170 --> 00:01:31.040
+with the details in the
+technicalities of creating
+
+00:01:31.040 --> 00:01:36.270
+pods and containers in
+orchestration environment.
+
+00:01:36.490 --> 00:01:44.960
+And OpenShift has been since the
+very beginning, very flexible
+
+00:01:44.960 --> 00:01:46.895
+versatile platform when it comes to
+
+00:01:46.895 --> 00:01:51.200
+running your applications
+to choice of language,
+
+00:01:51.200 --> 00:01:52.685
+to choice of platform.
+
+00:01:52.685 --> 00:01:54.380
+And even to this day,
+
+00:01:54.380 --> 00:01:57.260
+it supports environments
+out of the box for
+
+00:01:57.260 --> 00:02:00.215
+the most popular programming
+languages such as Java,
+
+00:02:00.215 --> 00:02:03.799
+Ruby, Python, PHP, Node.js,
+
+00:02:03.799 --> 00:02:05.795
+.NET and many more.
+
+00:02:05.795 --> 00:02:08.660
+As the traffic and load to your
+application increase when
+
+00:02:08.660 --> 00:02:11.555
+users start using the
+applications deployed,
+
+00:02:11.555 --> 00:02:17.870
+more and more, OpenShift can
+actually scale your application out.
+
+00:02:17.870 --> 00:02:22.850
+So provision new instances as needed
+based on the metrics that it monitors.
+
+00:02:22.850 --> 00:02:26.900
+And of course, when the load seizes,
+
+00:02:26.900 --> 00:02:28.880
+it can also scale down.
+
+00:02:28.880 --> 00:02:32.360
+And it provides additional tools
+
+00:02:32.360 --> 00:02:35.420
+like logging and monitoring
+for operations teams as well.
+
+00:02:35.420 --> 00:02:38.239
+Typical architecture of an application
+
+00:02:38.239 --> 00:02:42.200
+deployed in OpenShift is
+that of a containerized one,
+
+00:02:42.200 --> 00:02:45.695
+which means that the runtime environment,
+
+00:02:45.695 --> 00:02:49.130
+all the dependencies
+for the application and
+
+00:02:49.130 --> 00:02:53.270
+the compiled code itself are
+built into a container image,
+
+00:02:53.270 --> 00:02:55.670
+which is then used to start a container,
+
+00:02:55.670 --> 00:03:00.665
+but that container is actually
+encapsulated additionally within a pod,
+
+00:03:00.665 --> 00:03:03.710
+which allows us for some
+interesting deployment
+
+00:03:03.710 --> 00:03:07.310
+use cases and scenarios
+such as sidecar containers,
+
+00:03:07.310 --> 00:03:10.265
+which perform non-functional requirements,
+
+00:03:10.265 --> 00:03:12.740
+which means that our
+application can be even more
+
+00:03:12.740 --> 00:03:16.290
+specialized, clean, and small.
+
+00:03:16.300 --> 00:03:20.180
+So a pod is obviously an important term.
+
+00:03:20.180 --> 00:03:23.165
+We're going to define
+it a little bit later.
+
+00:03:23.165 --> 00:03:29.825
+Now when it comes to developers
+typical interaction with the platform,
+
+00:03:29.825 --> 00:03:34.460
+the developer will publish
+their code in Git repository.
+
+00:03:34.460 --> 00:03:37.340
+They will login to the
+OpenShift web console or
+
+00:03:37.340 --> 00:03:40.355
+use the API or the command line utilities
+
+00:03:40.355 --> 00:03:44.420
+and they will create
+definitions that build
+
+00:03:44.420 --> 00:03:45.710
+that source code in
+
+00:03:45.710 --> 00:03:49.610
+the OpenShift Container Platform
+and deploy it as an application.
+
+00:03:49.610 --> 00:03:52.685
+They can create as many
+applications as they want.
+
+00:03:52.685 --> 00:03:56.105
+They can scale them up to as
+many instances as they need,
+
+00:03:56.105 --> 00:03:57.590
+provided, of course, that
+
+00:03:57.590 --> 00:04:03.815
+the platform administrators have given
+them sufficient resources to do so.
+
+00:04:03.815 --> 00:04:06.470
+There's a variety of different ways to
+
+00:04:06.470 --> 00:04:09.335
+deploy an application in
+OpenShift Container Platform,
+
+00:04:09.335 --> 00:04:14.105
+among which one of the most
+commonly used ones in development are
+
+00:04:14.105 --> 00:04:16.835
+the Source-to-Image approach,
+
+00:04:16.835 --> 00:04:20.119
+where you commit your
+work to Git repository.
+
+00:04:20.119 --> 00:04:22.160
+When you're ready to
+deploy the application,
+
+00:04:22.160 --> 00:04:27.400
+you login to the web console of the
+OpenShift Container Platform and
+
+00:04:27.400 --> 00:04:33.730
+pass the URL to the Git repository to
+a new application creation wizard.
+
+00:04:33.730 --> 00:04:36.580
+You could optionally even choose
+
+00:04:36.580 --> 00:04:41.140
+a specific container image that you want
+to build your application on top of
+
+00:04:41.140 --> 00:04:44.965
+or even choose a template
+which you want to use,
+
+00:04:44.965 --> 00:04:49.405
+which provides you with additional
+components such as databases.
+
+00:04:49.405 --> 00:04:52.870
+The OpenShift Container Platform
+then retrieves the code from
+
+00:04:52.870 --> 00:04:56.065
+a Git repository and builds
+a new application image,
+
+00:04:56.065 --> 00:05:00.400
+and then subsequently deploys
+the application in a pod.
+
+00:05:00.400 --> 00:05:05.605
+Couple of commonly used resource types
+that you will encounter in OpenShift
+
+00:05:05.605 --> 00:05:08.489
+are a pod, which is basically a
+
+00:05:08.489 --> 00:05:12.185
+collection of one or more
+containers that belong together,
+
+00:05:12.185 --> 00:05:15.950
+scale together, perform
+their services together.
+
+00:05:15.950 --> 00:05:20.585
+This is the atomic unit of
+deployment in OpenShift.
+
+00:05:20.585 --> 00:05:27.050
+Typically those pods are managed by
+deployments or deployment configurations,
+
+00:05:27.050 --> 00:05:32.000
+which are actually factories for
+generations of an application.
+
+00:05:32.000 --> 00:05:34.190
+So deployments and deployment configs have
+
+00:05:34.190 --> 00:05:37.070
+the ability because they contain a recipe,
+
+00:05:37.070 --> 00:05:39.395
+a description of what a
+pod should look like.
+
+00:05:39.395 --> 00:05:42.710
+They have the ability to
+deploy a new generation
+
+00:05:42.710 --> 00:05:45.890
+of the application when a
+new version is available and
+
+00:05:45.890 --> 00:05:49.040
+seamlessly transition from
+old one to the new one
+
+00:05:49.040 --> 00:05:53.220
+using what we call roll-out strategy.
+
+00:05:53.860 --> 00:06:00.695
+We can additionally connect external
+resources such as ConfigMaps
+
+00:06:00.695 --> 00:06:03.620
+and secrets to our pod template
+
+00:06:03.620 --> 00:06:06.979
+in the description of that pod
+template in the deployment or
+
+00:06:06.979 --> 00:06:11.250
+deployment config, ConfigMaps and secrets.
+
+00:06:12.130 --> 00:06:17.540
+They are basically key-value
+store resources which can
+
+00:06:17.540 --> 00:06:22.130
+contain simple scaler key-value pairs,
+
+00:06:22.130 --> 00:06:24.935
+or can even contain entire files,
+
+00:06:24.935 --> 00:06:28.580
+which we can then attach in the
+file system of a container,
+
+00:06:28.580 --> 00:06:32.795
+or just simply use them to
+initialize environment variables.
+
+00:06:32.795 --> 00:06:36.950
+Routes are very useful resource because
+
+00:06:36.950 --> 00:06:40.820
+they give us access to the application
+from outside of OpenShift.
+
+00:06:40.820 --> 00:06:41.900
+So in other words,
+
+00:06:41.900 --> 00:06:45.005
+they expose the application
+to external consumers.
+
+00:06:45.005 --> 00:06:47.840
+Routes are typically
+associated with a host name,
+
+00:06:47.840 --> 00:06:50.360
+which we can use then to
+access the application,
+
+00:06:50.360 --> 00:06:54.650
+but generally, they do
+allow sub units such
+
+00:06:54.650 --> 00:07:01.160
+as URLs in a host name to point to
+different applications as well. As such
+
+00:07:01.160 --> 00:07:08.435
+Routes can be used as a terrifically
+primitive applications API gateway,
+
+00:07:08.435 --> 00:07:10.730
+if we bind, for example,
+
+00:07:10.730 --> 00:07:12.830
+a number of applications
+to the same host name,
+
+00:07:12.830 --> 00:07:15.380
+but we use different URL prefixes.
+
+00:07:15.380 --> 00:07:18.620
+When you open the OpenShift web console,
+
+00:07:18.620 --> 00:07:21.410
+you will be expected to
+login to your account.
+
+00:07:21.410 --> 00:07:26.255
+For that, you will have the credentials
+provided at the lab creation time.
+
+00:07:26.255 --> 00:07:28.100
+And then once you login,
+
+00:07:28.100 --> 00:07:31.055
+there are 2 perspectives that
+you can choose from.
+
+00:07:31.055 --> 00:07:33.020
+One is the administrative perspective,
+
+00:07:33.020 --> 00:07:37.370
+which is meant primarily in a developer
+
+00:07:37.370 --> 00:07:42.110
+grade account as an application
+administrator perspective.
+
+00:07:42.110 --> 00:07:44.540
+So in the administrative perspective,
+
+00:07:44.540 --> 00:07:48.350
+we can see how many resources
+our applications are using.
+
+00:07:48.350 --> 00:07:51.545
+We can change their existing
+configuration and so on.
+
+00:07:51.545 --> 00:07:53.975
+Whereas the Developer perspective,
+
+00:07:53.975 --> 00:07:55.310
+which is the second one,
+
+00:07:55.310 --> 00:07:58.400
+can be used to create new applications.
+
+00:07:58.400 --> 00:07:59.945
+But before we can do that,
+
+00:07:59.945 --> 00:08:06.335
+we have to Create a Project
+which is like an encompassing,
+
+00:08:06.335 --> 00:08:11.809
+an enclosure for all the resources that
+are related to a single application.
+
+00:08:11.809 --> 00:08:15.845
+There are many ways to organize
+application components.
+
+00:08:15.845 --> 00:08:19.825
+Having the related microservices place
+
+00:08:19.825 --> 00:08:22.685
+together in the same project
+is just one of them.
+
+00:08:22.685 --> 00:08:27.950
+Creating a project allows us to
+select it from a drop-down box in
+
+00:08:27.950 --> 00:08:34.385
+the top left corner and then have
+a look at the topology view.
+
+00:08:34.385 --> 00:08:38.570
+Now, before we can look at the
+topology of applications, of course,
+
+00:08:38.570 --> 00:08:42.545
+we must first add the new
+application to our project.
+
+00:08:42.545 --> 00:08:45.245
+So that is in the developer perspective.
+
+00:08:45.245 --> 00:08:47.120
+Once we've selected a project,
+
+00:08:47.120 --> 00:08:49.610
+we simply click on the Add button
+
+00:08:49.610 --> 00:08:52.055
+on the left hand side in the left menu.
+
+00:08:52.055 --> 00:08:55.415
+We can then choose from a
+number of different options
+
+00:08:55.415 --> 00:08:59.540
+either deploy quick
+starts or choose images,
+
+00:08:59.540 --> 00:09:02.960
+or browse the Developer Catalog where
+
+00:09:02.960 --> 00:09:06.860
+we can choose from various
+language environments.
+
+00:09:06.860 --> 00:09:10.940
+So for a source-to-image
+builds or choose to
+
+00:09:10.940 --> 00:09:15.740
+deploy individual database
+components or other utility images.
+
+00:09:15.740 --> 00:09:20.150
+Once we select our choice of
+language, let's say Java
+
+00:09:20.150 --> 00:09:26.375
+in our case, we simply fill out the
+parameters that are requested in the form.
+
+00:09:26.375 --> 00:09:29.090
+Usually that will be the version of Java,
+
+00:09:29.090 --> 00:09:30.920
+the URL to our source code,
+
+00:09:30.920 --> 00:09:34.880
+any potential branch that
+we want to deploy from,
+
+00:09:34.880 --> 00:09:37.250
+and any potential subdirectory,
+
+00:09:37.250 --> 00:09:40.565
+which is called context directory
+within our source code.
+
+00:09:40.565 --> 00:09:42.920
+And once we confirm,
+
+00:09:42.920 --> 00:09:47.720
+it is up to the OpenShift
+Container Platform to
+
+00:09:47.720 --> 00:09:53.075
+build our application into a
+new image and run it as a pod.
+
+00:09:53.075 --> 00:10:01.340
+Once that happens, it appears in our
+topology view where we can see its state,
+
+00:10:01.340 --> 00:10:05.450
+where we can see it's
+controlling resource
+
+00:10:05.450 --> 00:10:09.440
+and where we can actually establish links
+
+00:10:09.440 --> 00:10:13.729
+between applications which do not
+actually do anything functionally,
+
+00:10:13.729 --> 00:10:21.755
+but can be nice reminders about
+which applications depend on others,
+
+00:10:21.755 --> 00:10:26.285
+whenever we open the topology
+view and review the diagram.
+
+00:10:26.285 --> 00:10:28.625
+If we click on the application icon,
+
+00:10:28.625 --> 00:10:31.625
+the details of that
+application will appear.
+
+00:10:31.625 --> 00:10:34.040
+We will have seen it's
+controlling resource,
+
+00:10:34.040 --> 00:10:35.614
+in this case the deployment.
+
+00:10:35.614 --> 00:10:39.110
+We will see which pods it consists of.
+
+00:10:39.110 --> 00:10:40.940
+We will see what build produce
+
+00:10:40.940 --> 00:10:43.180
+this particular application,
+
+00:10:43.180 --> 00:10:46.760
+we will see all other service
+related information such
+
+00:10:46.760 --> 00:10:51.065
+as routes, services and similar.
+
+00:10:51.065 --> 00:10:56.390
+When there is a route for an
+application, generally it's optional.
+
+00:10:56.390 --> 00:11:00.050
+Not all applications have to be
+exposed to the outside world,
+
+00:11:00.050 --> 00:11:02.735
+which is, for example,
+
+00:11:02.735 --> 00:11:07.310
+also the case with our some
+
+00:11:07.310 --> 00:11:10.355
+of the components for our
+microservices application.
+
+00:11:10.355 --> 00:11:14.360
+Because the web frontend is
+a Node.js Frontend.
+
+00:11:14.360 --> 00:11:18.545
+It obviously needs direct access
+to all the microservices.
+
+00:11:18.545 --> 00:11:20.465
+In this case,
+
+00:11:20.465 --> 00:11:23.015
+if you remember in the previous exercise,
+
+00:11:23.015 --> 00:11:25.145
+we didn't have an API gateway.
+
+00:11:25.145 --> 00:11:27.470
+Now, it would have been
+completely different if
+
+00:11:27.470 --> 00:11:31.370
+the API gateway was a
+part of our ensemble.
+
+00:11:31.370 --> 00:11:35.660
+Because the API gateway would
+be contacted by the frontend
+
+00:11:35.660 --> 00:11:39.890
+and that would have been the only
+application of the lot that we needed
+
+00:11:39.890 --> 00:11:44.195
+to expose for the web frontend
+to be able to access.
+
+00:11:44.195 --> 00:11:46.910
+Of course in addition to
+the web frontend itself,
+
+00:11:46.910 --> 00:11:50.420
+all the other microservices
+could be protected by
+
+00:11:50.420 --> 00:11:54.215
+the secure Container Platform perimeter
+
+00:11:54.215 --> 00:11:57.710
+because it would have been the API
+gateway that would contact them
+
+00:11:57.710 --> 00:12:02.240
+internally to OpenShift and then simply
+return the response back to the user.
+
+00:12:02.240 --> 00:12:07.850
+So that's one use case where routes are
+not necessary for all the applications.
+
+00:12:07.850 --> 00:12:09.650
+Now whenever there is a route,
+
+00:12:09.650 --> 00:12:12.950
+we can click on it and we can see
+
+00:12:12.950 --> 00:12:18.695
+the host name associated with that
+route and its current status.
+
+00:12:18.695 --> 00:12:22.760
+If you need to change something
+about OpenShift resources,
+
+00:12:22.760 --> 00:12:24.770
+there's always an Actions menu in
+
+00:12:24.770 --> 00:12:28.250
+the top right corner of
+the resource detail view.
+
+00:12:28.250 --> 00:12:32.150
+Generally, labels, annotations
+can always be changed
+
+00:12:32.150 --> 00:12:33.875
+and for the most part,
+
+00:12:33.875 --> 00:12:39.770
+the resource itself can also be edited
+or deleted if that is necessary.
+
+00:12:39.770 --> 00:12:45.030
+Join us in the next video where we have
+a look at how to do this in practice.
 

@@ -1,5 +1,365 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:03.000
+In this exercise, we are
+going to trace a couple of
 
+00:00:03.000 --> 00:00:05.970
+requests over 3 microservices,
+
+00:00:05.970 --> 00:00:10.905
+the familiar solver, adder
+and multiplier constellation.
+
+00:00:10.905 --> 00:00:14.700
+So we are going to first run the
+lab monitor-trace start script,
+
+00:00:14.700 --> 00:00:19.875
+which downloads the exercise
+files and subscripts.
+
+00:00:19.875 --> 00:00:23.640
+If we go to DO378/labs/monitor-
+
+00:00:23.640 --> 00:00:28.500
+trace/ directory, we can see that
+there are already some scripts here
+
+00:00:28.500 --> 00:00:34.425
+and the 3 projects that we will be
+using to trace. The ad-tracing script is
+
+00:00:34.425 --> 00:00:38.220
+friendly utility script that
+actually adds the quarkus-smallrye-
+
+00:00:38.220 --> 00:00:42.394
+opentracing extension
+to all of our projects.
+
+00:00:42.394 --> 00:00:43.985
+If we just run it,
+
+00:00:43.985 --> 00:00:50.135
+it's going to actually modify every
+one of the project's pom.xml
+
+00:00:50.135 --> 00:00:53.449
+and then if we look at the jaeger script,
+
+00:00:53.449 --> 00:00:57.860
+we can see that it really just runs
+the jaegertracing/all-in-
+
+00:00:57.860 --> 00:01:03.590
+one container in podman and exposes
+all the ports needed for communication.
+
+00:01:03.590 --> 00:01:05.660
+So, if we run the jaeger script,
+
+00:01:05.660 --> 00:01:10.595
+it's going to start up the jaeger instance.
+While we are waiting for it to start,
+
+00:01:10.595 --> 00:01:15.745
+let's just move over to another terminal
+window and go to the labs/monitor-
+
+00:01:15.745 --> 00:01:22.025
+trace directory. We will be editing all 3
+of the applications.property files.
+
+00:01:22.025 --> 00:01:25.805
+We will be adding pretty much the
+same content to all 3 of them.
+
+00:01:25.805 --> 00:01:31.910
+So we are going to name the service using
+quarkus.jaeger.service-name property.
+
+00:01:31.910 --> 00:01:34.940
+We are going to use the const
+sampler type in all of
+
+00:01:34.940 --> 00:01:38.150
+them collecting a 100
+percent of all the samples.
+
+00:01:38.150 --> 00:01:41.960
+And we are going to tell
+that the console log
+
+00:01:41.960 --> 00:01:45.995
+for traces should actually
+contain traceId,
+
+00:01:45.995 --> 00:01:48.710
+the spanId and so on.
+
+00:01:48.710 --> 00:01:53.105
+We are also going to log the spans to
+the console using this format.
+
+00:01:53.105 --> 00:01:56.165
+And for Jaeger to report
+
+00:01:56.165 --> 00:01:59.375
+the span and the trace information
+back to the collector
+
+00:01:59.375 --> 00:02:04.355
+we are going to point it to 14268 port.
+
+00:02:04.355 --> 00:02:09.485
+The endpoint /api/traces
+telling it to propagate b3 level headers
+
+00:02:09.485 --> 00:02:14.765
+which means we will be able to correlate
+spans and put them into our trace.
+
+00:02:14.765 --> 00:02:17.285
+The only thing that's
+going to be different from
+
+00:02:17.285 --> 00:02:20.000
+this block that was added to the, as
+
+00:02:20.000 --> 00:02:22.490
+you can see here adders
+application.properties,
+
+00:02:22.490 --> 00:02:24.800
+we are going to be adding the same block
+
+00:02:24.800 --> 00:02:27.440
+to the multiplier, the solver services,
+
+00:02:27.440 --> 00:02:29.300
+well. The only thing we have to be
+
+00:02:29.300 --> 00:02:31.880
+careful about is that
+we will name the service
+
+00:02:31.880 --> 00:02:39.440
+differently because that's what
+identifies the origin of the traces.
+
+00:02:39.440 --> 00:02:41.780
+So we are going to name it multiplier for
+
+00:02:41.780 --> 00:02:48.020
+the multiplier service and
+solver for the solver service.
+
+00:02:48.020 --> 00:02:49.895
+Right!
+
+00:02:49.895 --> 00:02:53.570
+Now we can start the
+applications, that now that we have
+
+00:02:53.570 --> 00:02:57.650
+configured the tracing properties
+in each application as well.
+
+00:02:57.650 --> 00:03:00.530
+And as they are starting up,
+
+00:03:00.530 --> 00:03:07.940
+we can move over to the next tab and
+send request to the adder service first,
+
+00:03:07.940 --> 00:03:10.310
+telling it to add 5 and 3 together,
+
+00:03:10.310 --> 00:03:11.810
+as we get a response.
+
+00:03:11.810 --> 00:03:18.350
+We can go and open the
+Jaeger web console. We will
+
+00:03:18.350 --> 00:03:21.140
+be entering the adder service on
+
+00:03:21.140 --> 00:03:25.295
+the left-hand side because if you have
+opened it before, just reload it
+
+00:03:25.295 --> 00:03:30.485
+because initially there was no
+trace data found so just reload it
+
+00:03:30.485 --> 00:03:33.590
+and select adder on
+
+00:03:33.590 --> 00:03:36.905
+the left-hand side as the service
+name and click Find Traces.
+
+00:03:36.905 --> 00:03:41.345
+You will be able to see the 1 trace
+that has so far being collected.
+
+00:03:41.345 --> 00:03:42.920
+And clicking on it,
+
+00:03:42.920 --> 00:03:46.310
+you will be able to see the
+details of the trace.
+
+00:03:46.310 --> 00:03:49.715
+So you can see that it
+took a fairly long time,
+
+00:03:49.715 --> 00:03:55.550
+280 milliseconds to resolve this
+full request of which a quarter of
+
+00:03:55.550 --> 00:04:01.385
+a second was spent in the adders GET
+method doing something of initialization.
+
+00:04:01.385 --> 00:04:05.765
+That was the first request
+to the Quarkus instance here,
+
+00:04:05.765 --> 00:04:10.010
+so that's why it probably
+took a little bit longer.
+
+00:04:10.010 --> 00:04:12.260
+It had to initialize all the data structures
+
+00:04:12.260 --> 00:04:16.325
+then. It submitted a request to solver,
+
+00:04:16.325 --> 00:04:18.590
+that's for 1 operand.
+
+00:04:18.590 --> 00:04:19.190
+Got it
+
+00:04:19.190 --> 00:04:22.580
+returned, submitted another
+request to solver for
+
+00:04:22.580 --> 00:04:28.080
+the other operand and producer response.
+
+00:04:28.420 --> 00:04:32.195
+Doing the same thing to the multiplier,
+
+00:04:32.195 --> 00:04:35.270
+paying attention to the port,
+
+00:04:35.270 --> 00:04:38.360
+we tell to multiply 5 and 4,
+
+00:04:38.360 --> 00:04:40.415
+we get a response of 20.
+
+00:04:40.415 --> 00:04:44.780
+Doing another search for the multiplier
+service and clicking Find Traces
+
+00:04:44.780 --> 00:04:48.770
+we will be able to see that 1
+single trace was produced so far.
+
+00:04:48.770 --> 00:04:51.395
+Clicking on it, we see a very similar,
+
+00:04:51.395 --> 00:04:53.435
+structure of spans.
+
+00:04:53.435 --> 00:04:58.190
+A lot quicker though,
+just 54.7 milliseconds,
+
+00:04:58.190 --> 00:05:04.970
+lot less time spent in the
+multipliers initial GET span.
+
+00:05:04.970 --> 00:05:06.140
+Right!
+
+00:05:06.140 --> 00:05:09.590
+Let's then combine all of them together.
+
+00:05:09.590 --> 00:05:12.965
+Let's ask solver to solve
+a more complex equation,
+
+00:05:12.965 --> 00:05:14.690
+5 times 4 plus 3.
+
+00:05:14.690 --> 00:05:16.670
+We do get the correct result.
+
+00:05:16.670 --> 00:05:19.100
+And looking at the trace data,
+
+00:05:19.100 --> 00:05:23.780
+it's looking for the solvers
+traces and clicking Find Traces.
+
+00:05:23.780 --> 00:05:28.400
+We will be able to see the last one is
+the most recent one, the topmost one.
+
+00:05:28.400 --> 00:05:32.120
+Clicking on it, we can see how
+the requests have actually
+
+00:05:32.120 --> 00:05:36.140
+been traversing various microservices.
+
+00:05:36.140 --> 00:05:40.625
+So first, the adder was
+invoking the multiplier,
+
+00:05:40.625 --> 00:05:44.600
+and then finally, the adder
+was invoking the solver.
+
+00:05:44.600 --> 00:05:49.865
+We can see a nice graph of how
+these requests have been processed.
+
+00:05:49.865 --> 00:05:56.240
+So the recursive flow of this
+application's calculation, right!
+
+00:05:56.240 --> 00:05:57.800
+So now that's done.
+
+00:05:57.800 --> 00:06:01.220
+We can press Control C to
+stop the applications.
+
+00:06:01.220 --> 00:06:05.045
+Actually that would be enter in
+this application terminal window.
+
+00:06:05.045 --> 00:06:07.265
+We can press Control C to stop
+
+00:06:07.265 --> 00:06:10.655
+Jaeger and run the lab monitor-trace finish script,
+
+00:06:10.655 --> 00:06:12.290
+which will clean everything up.
+
+00:06:12.290 --> 00:06:15.695
+What remains is for you to
+join us in the next video,
+
+00:06:15.695 --> 00:06:19.440
+which is the end of chapter
+review lab. See you there.
 

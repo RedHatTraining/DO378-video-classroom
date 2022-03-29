@@ -1,5 +1,490 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:04.620
+Let's review this testing chapter
+by doing an end of Chapter lab.
 
+00:00:04.620 --> 00:00:07.785
+Starting with the lab test-review start script,
+
+00:00:07.785 --> 00:00:14.115
+we get our usual Quarkus conference
+collection of microservices.
+
+00:00:14.115 --> 00:00:18.165
+We will first going to work on
+the schedule microservice.
+
+00:00:18.165 --> 00:00:19.530
+If we look at the tests,
+
+00:00:19.530 --> 00:00:23.715
+we do have a single Java test.
+
+00:00:23.715 --> 00:00:25.545
+The other one is a native one.
+
+00:00:25.545 --> 00:00:27.855
+Now if we have a look at this test,
+
+00:00:27.855 --> 00:00:31.380
+we can see that it's got a testRetrieve
+
+00:00:31.380 --> 00:00:35.090
+and a testAdd,
+
+00:00:35.090 --> 00:00:37.910
+and a testAllSchedules method
+
+00:00:37.910 --> 00:00:41.460
+and then finally testRetrieveByVenue.
+
+00:00:41.920 --> 00:00:52.340
+These all basically exercise
+the microservice somehow,
+
+00:00:52.340 --> 00:00:57.440
+but we are missing set a of annotations
+to even access the microservice.
+
+00:00:57.440 --> 00:01:00.050
+So if we try to run the test,
+
+00:01:00.050 --> 00:01:02.030
+they will fail because first of all,
+
+00:01:02.030 --> 00:01:05.690
+they won't even start Quarkus,
+you just get a Connection
+
+00:01:05.690 --> 00:01:10.505
+refused errors and all fails.
+
+00:01:10.505 --> 00:01:12.755
+So what do we need to do?
+
+00:01:12.755 --> 00:01:17.120
+Well, we need to edit that
+ScheduleResourceTest.java file
+
+00:01:17.120 --> 00:01:19.115
+of course. We need to import
+
+00:01:19.115 --> 00:01:22.565
+the annotations and add them
+to the top of the class,
+
+00:01:22.565 --> 00:01:26.570
+so QuarkusTest and the TestHTTPEndpoint injecting
+
+00:01:26.570 --> 00:01:31.100
+the ScheduleResource endpoint
+into the test class. Let's,
+
+00:01:31.100 --> 00:01:33.125
+if we run the test again,
+
+00:01:33.125 --> 00:01:35.645
+the situation is a little bit better.
+
+00:01:35.645 --> 00:01:39.050
+But we now have some issues with
+
+00:01:39.050 --> 00:01:43.280
+the Datasource complaining about an
+unknown host exception and of course,
+
+00:01:43.280 --> 00:01:48.320
+failing the tests as well because the
+Quarkus container fails to start.
+
+00:01:48.320 --> 00:01:52.550
+So what we need to do is, we need to add
+
+00:01:52.550 --> 00:02:01.460
+the derby test extension to manage the
+database lifecycle during testing.
+
+00:02:01.460 --> 00:02:07.430
+And we need to edit the 
+ScheduleResourceTest file again,
+
+00:02:07.430 --> 00:02:10.429
+adding the QuarkusTestResource annotation,
+
+00:02:10.429 --> 00:02:13.430
+pointing to the 
+DerbyDatabaseTestResource,
+
+00:02:13.430 --> 00:02:16.685
+of course, adding both
+imports, the class as well.
+
+00:02:16.685 --> 00:02:22.234
+And what we also need to do is
+to edit application.properties
+
+00:02:22.234 --> 00:02:25.385
+adding the quarkus.datasource.
+
+00:02:25.385 --> 00:02:30.080
+jdbc.url for the test profile
+only because we are going
+
+00:02:30.080 --> 00:02:32.950
+to actually use a local database
+
+00:02:32.950 --> 00:02:36.205
+and we are going to create
+it upon startup as well.
+
+00:02:36.205 --> 00:02:40.000
+Now there we go and start the test.
+
+00:02:40.000 --> 00:02:42.730
+My problem was that by adding
+
+00:02:42.730 --> 00:02:45.520
+the test extension, I've actually
+
+00:02:45.520 --> 00:02:49.015
+accidentally gotten the version
+test instead of a scope test,
+
+00:02:49.015 --> 00:02:50.485
+that's why the previous failure.
+
+00:02:50.485 --> 00:02:54.805
+So I had to fix this, io.quarkus, quarkus-test-
+
+00:02:54.805 --> 00:02:58.105
+derby must be in scope test.
+
+00:02:58.105 --> 00:03:00.800
+Now if I rerun the tests,
+
+00:03:00.960 --> 00:03:04.615
+there we go, startup is correct.
+
+00:03:04.615 --> 00:03:07.300
+Tests all execute successfully.
+
+00:03:07.300 --> 00:03:11.500
+So we can now move on to
+our speaker microservice.
+
+00:03:11.500 --> 00:03:17.285
+Speaker microservice has a 
+SpeakerResourceTest as well.
+
+00:03:17.285 --> 00:03:19.340
+If we have a look at it,
+
+00:03:19.340 --> 00:03:21.485
+it's just got 2 test methods.
+
+00:03:21.485 --> 00:03:23.300
+One is the testNewSpeaker,
+
+00:03:23.300 --> 00:03:24.770
+the other one is the testListAll
+
+00:03:24.770 --> 00:03:28.220
+The testNewSpeaker creates
+
+00:03:28.220 --> 00:03:36.394
+a new UUID and then sends a JSON
+block to the speaker endpoint.
+
+00:03:36.394 --> 00:03:41.840
+And expect the uuid that
+is returned
+
+00:03:41.840 --> 00:03:44.630
+from the endpoint to be
+
+00:03:44.630 --> 00:03:48.920
+actually equal to this generated UUID now. Unfortunately,
+
+00:03:48.920 --> 00:03:51.380
+that is not the case because
+
+00:03:51.380 --> 00:03:58.100
+the method that creates a new speaker
+in turn invokes a speakerDAO.
+
+00:03:58.100 --> 00:04:03.920
+SpeakerDAO actually invokes the
+generator.generate method
+
+00:04:03.920 --> 00:04:06.245
+and if we have a look at
+what the generator is,
+
+00:04:06.245 --> 00:04:11.435
+it is an IdGenerator instance
+injected into that class.
+
+00:04:11.435 --> 00:04:15.185
+If we look at just
+what a class it implements,
+
+00:04:15.185 --> 00:04:20.105
+it implements the idgenerator.IdGenerator interface, that's this one.
+
+00:04:20.105 --> 00:04:21.650
+And this is the implementation.
+
+00:04:21.650 --> 00:04:23.870
+So if we look at the interface, it's
+
+00:04:23.870 --> 00:04:27.635
+just got a generate String method.
+
+00:04:27.635 --> 00:04:32.690
+And the implementation itself actually
+uses the randomUUID generation,
+
+00:04:32.690 --> 00:04:37.160
+which means that our UUID is actually
+never going to match whatever
+
+00:04:37.160 --> 00:04:42.080
+we get from the invocation in the test.
+
+00:04:42.080 --> 00:04:45.980
+What we need to do then is we need to
+
+00:04:45.980 --> 00:04:51.424
+override the randomUUID generator
+with the DeterministicIdGenerator.
+
+00:04:51.424 --> 00:04:55.849
+So for that purpose, we are going to
+open the DeterministicIdGenerator,
+
+00:04:55.849 --> 00:04:59.930
+we are going to annotate it as
+a Mock and as a Singleton, such
+
+00:04:59.930 --> 00:05:04.895
+that there is only ever going to
+be 1 instance of it in the JVM.
+
+00:05:04.895 --> 00:05:11.674
+So both the web service and our tests
+are going to use this generator.
+
+00:05:11.674 --> 00:05:16.220
+We are going to also change the
+SpeakerResourceTest class in order
+
+00:05:16.220 --> 00:05:20.525
+to inject the DeterministicIdGenerator and
+
+00:05:20.525 --> 00:05:25.640
+actually simply overriding
+the generated uuid
+
+00:05:25.640 --> 00:05:29.480
+by asking the idGenerator
+to actually override it.
+
+00:05:29.480 --> 00:05:31.370
+By the way, I made a typo here,
+
+00:05:31.370 --> 00:05:34.610
+there's small g, it should
+have been a capital G.
+
+00:05:34.610 --> 00:05:37.445
+So I am just going to fix it.
+
+00:05:37.445 --> 00:05:42.630
+There we go. Running the test.
+
+00:05:42.910 --> 00:05:47.525
+We see that one test
+has actually succeeded.
+
+00:05:47.525 --> 00:05:50.075
+But the second test,
+
+00:05:50.075 --> 00:05:54.270
+the testListAll is still
+failing. What do we do?
+
+00:05:54.270 --> 00:05:56.080
+It's getting 0 results,
+
+00:05:56.080 --> 00:05:58.420
+but it expects, sorry!
+
+00:05:58.420 --> 00:05:59.920
+it expects 0 results,
+
+00:05:59.920 --> 00:06:01.390
+but it gets 5.
+
+00:06:01.390 --> 00:06:05.440
+This is because of the
+initialization during the startup.
+
+00:06:05.440 --> 00:06:08.860
+So what we need to do is we need to
+
+00:06:08.860 --> 00:06:13.975
+mock the record that we are
+manipulating in that method.
+
+00:06:13.975 --> 00:06:16.135
+So we will add quarkus-panache-
+
+00:06:16.135 --> 00:06:19.720
+mock extension to the project.
+
+00:06:19.720 --> 00:06:24.100
+And we are going to further modify the
+SpeakerResourceTest a little bit.
+
+00:06:24.100 --> 00:06:32.185
+Just importing panache.mock and Mockito
+and the Collections utility class,
+
+00:06:32.185 --> 00:06:36.750
+now, instead of using the
+actual speaker resource,
+
+00:06:36.750 --> 00:06:40.445
+the speakerDAO, sorry, the object,
+
+00:06:40.445 --> 00:06:45.995
+we are going to use PanacheMock
+to mock it to get an instance,
+
+00:06:45.995 --> 00:06:47.390
+a mock instance of it.
+
+00:06:47.390 --> 00:06:48.815
+And we are going to simply say,
+
+00:06:48.815 --> 00:06:53.150
+whenever someone invokes the listAll
+static method on the Speaker,
+
+00:06:53.150 --> 00:06:55.385
+just return an empty Collection.
+
+00:06:55.385 --> 00:06:58.640
+That should fix the
+expectation on the test.
+
+00:06:58.640 --> 00:07:03.470
+And it does, we get 2
+successful test executions.
+
+00:07:03.470 --> 00:07:07.910
+Now for the last one, we move
+over to microservice-vote.
+
+00:07:07.910 --> 00:07:15.485
+We are simply going to add the quarkus-junit5-mockito extension to pom.xml.
+
+00:07:15.485 --> 00:07:17.585
+And then looking at the tests,
+
+00:07:17.585 --> 00:07:22.010
+we have RatingStatsResourceTest here.
+
+00:07:22.010 --> 00:07:25.055
+If we have a look at what each problem is,
+
+00:07:25.055 --> 00:07:35.450
+is that it's only test
+method is unimplemented.
+
+00:07:35.450 --> 00:07:37.595
+So what it's going to
+
+00:07:37.595 --> 00:07:41.870
+do is basically it's
+just simply going to create a vote and
+
+00:07:41.870 --> 00:07:47.735
+then try to extract the 3 consecutive 
+ratings that were submitted.
+
+00:07:47.735 --> 00:07:51.560
+What we are going to use is, we are
+going to mock this Session
+
+00:07:51.560 --> 00:07:54.860
+RatingDAO in this class.
+
+00:07:54.860 --> 00:07:57.080
+So we need Mockito.
+
+00:07:57.080 --> 00:08:00.710
+We need the static import
+for ArgumentMatchers
+
+00:08:00.710 --> 00:08:04.040
+and we need to use the
+InjectMock annotation,
+
+00:08:04.040 --> 00:08:05.390
+so there it is.
+
+00:08:05.390 --> 00:08:08.450
+Least amount of work just
+asking Mockito, look,
+
+00:08:08.450 --> 00:08:12.695
+dream one up and inject it into this field.
+
+00:08:12.695 --> 00:08:16.130
+Then we configure the desired behavior,
+
+00:08:16.130 --> 00:08:20.540
+saying that whenever someone
+invokes getRatingsBySession,
+
+00:08:20.540 --> 00:08:25.400
+looking for rating stats per session,
+
+00:08:25.400 --> 00:08:28.040
+we simply return threeConsecutiveRatings which
+
+00:08:28.040 --> 00:08:30.995
+are configured actually
+a couple of lines above.
+
+00:08:30.995 --> 00:08:32.585
+There they are.
+
+00:08:32.585 --> 00:08:43.130
+And by running the tests as a MongoDB
+that starts up an embedded MongoDB.
+
+00:08:43.130 --> 00:08:48.515
+By running the tests, we can see
+that we have a full success.
+
+00:08:48.515 --> 00:08:52.955
+So now let's just grade
+the review exercises.
+
+00:08:52.955 --> 00:08:55.340
+When getting all the passing scores,
+
+00:08:55.340 --> 00:08:58.535
+we can clean up using lab
+test-review finish.
+
+00:08:58.535 --> 00:09:00.410
+That's it for the testing chapter,
+
+00:09:00.410 --> 00:09:04.980
+so join us in the next one where
+we discuss secure communications.
 

@@ -1,5 +1,1150 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:02.010
+Welcome to the end of 
+chapter lab, where we are
 
+00:00:02.010 --> 00:00:05.580
+going to review the contents
+of the fault tolerance chapter.
+
+00:00:05.580 --> 00:00:09.270
+We are going to start with lab
+tolerance-review start script,
+
+00:00:09.270 --> 00:00:10.980
+which sets everything up.
+
+00:00:10.980 --> 00:00:15.450
+It basically places the 4 microservices from
+
+00:00:15.450 --> 00:00:21.165
+the quarkus conference application
+into DO378/labs/tolerance-review/.
+
+00:00:21.165 --> 00:00:24.120
+What we will be doing is
+we will be working with
+
+00:00:24.120 --> 00:00:28.920
+the microservice-session
+application mostly.
+
+00:00:28.920 --> 00:00:32.730
+But we need to add the smallrye
+
+00:00:32.730 --> 00:00:39.755
+health extension to both the session
+and the schedule applications
+
+00:00:39.755 --> 00:00:41.930
+first, because that's where
+we are going to start.
+
+00:00:41.930 --> 00:00:45.740
+We are going to start by looking
+at how to implement health.
+
+00:00:45.740 --> 00:00:52.370
+So we use from the top level directory
+just above the 4 web services,
+
+00:00:52.370 --> 00:00:55.940
+we just use quarkus:add-extension,
+
+00:00:55.940 --> 00:00:58.115
+go with maven.
+
+00:00:58.115 --> 00:01:00.665
+We select Dextension
+to be smallrye-
+
+00:01:00.665 --> 00:01:04.820
+health, and we use the
+-pl option to point
+
+00:01:04.820 --> 00:01:09.545
+maven at Reactor projects of
+microservice-schedule and microservice-session.
+
+00:01:09.545 --> 00:01:13.205
+So it will go into the subdirectories and
+
+00:01:13.205 --> 00:01:18.420
+fix the configuration of
+the projects in there.
+
+00:01:19.000 --> 00:01:24.790
+Next, we are going to have the
+LivenessCheck to both applications,
+
+00:01:24.790 --> 00:01:28.205
+starting with the schedule
+application. There it is.
+
+00:01:28.205 --> 00:01:32.045
+It simply returns Service is alive
+
+00:01:32.045 --> 00:01:34.130
+and it's the same check for
+
+00:01:34.130 --> 00:01:38.615
+the session microservice except
+that the package is different.
+
+00:01:38.615 --> 00:01:40.760
+So we are going to do the same.
+
+00:01:40.760 --> 00:01:43.100
+You can just copy the file
+and change the package,
+
+00:01:43.100 --> 00:01:44.495
+that's it.
+
+00:01:44.495 --> 00:01:46.430
+They are literally the same.
+
+00:01:46.430 --> 00:01:52.280
+The next thing we are going to do is create
+a ReadinessCheck for both of them.
+
+00:01:52.280 --> 00:01:55.220
+So starting with the, again,
+
+00:01:55.220 --> 00:02:01.190
+scheduled application, the ReadinessChecks
+simply says Service is ready.
+
+00:02:01.190 --> 00:02:03.920
+If it's reachable then it's ready.
+
+00:02:03.920 --> 00:02:07.700
+And we are going to do again the same
+thing for the session application.
+
+00:02:07.700 --> 00:02:10.835
+Again, the same file, no difference,
+
+00:02:10.835 --> 00:02:13.775
+so we can just copy it and
+change the package name.
+
+00:02:13.775 --> 00:02:17.420
+And then we are going to start
+the applications and test them.
+
+00:02:17.420 --> 00:02:18.950
+So for that purpose,
+
+00:02:18.950 --> 00:02:21.515
+we have a service-toggle script,
+
+00:02:21.515 --> 00:02:23.405
+which if we started,
+
+00:02:23.405 --> 00:02:28.130
+shows us a list of modules and
+allows us to start or stop
+
+00:02:28.130 --> 00:02:31.760
+the modules, display the Status or Exit.
+
+00:02:31.760 --> 00:02:36.170
+We are going to start the
+postgresql database first.
+
+00:02:36.170 --> 00:02:40.520
+Then we are going to start
+the session microservice.
+
+00:02:40.520 --> 00:02:44.075
+You see the logs and when it starts up,
+
+00:02:44.075 --> 00:02:47.480
+we are going to also start
+the schedule microservice.
+
+00:02:47.480 --> 00:02:49.430
+You can ignore the port 5005
+
+00:02:49.430 --> 00:02:51.080
+in use.
+
+00:02:51.080 --> 00:02:53.240
+We are not going to debug anything.
+
+00:02:53.240 --> 00:02:56.000
+So once both of them start,
+
+00:02:56.000 --> 00:02:58.670
+we will also start the speaker microservice,
+
+00:02:58.670 --> 00:03:01.130
+we are going to see why a little bit later.
+
+00:03:01.130 --> 00:03:05.195
+So when they are all started up,
+
+00:03:05.195 --> 00:03:07.490
+we can go on and test them.
+
+00:03:07.490 --> 00:03:12.290
+Sending a q/health request to
+port 8081 on localhost,
+
+00:03:12.290 --> 00:03:14.765
+we get the UP status.
+
+00:03:14.765 --> 00:03:18.500
+Doing the same to port 8083,
+
+00:03:18.500 --> 00:03:21.710
+we also get the same response
+because we have literally
+
+00:03:21.710 --> 00:03:25.490
+implemented the same health
+and liveness checks.
+
+00:03:25.490 --> 00:03:31.520
+Note, how both applications report the
+Database connection health as well,
+
+00:03:31.520 --> 00:03:34.160
+even though we didn't
+really implement that,
+
+00:03:34.160 --> 00:03:36.650
+that's the automatic health endpoints,
+
+00:03:36.650 --> 00:03:39.665
+that some modules, some extensions register.
+
+00:03:39.665 --> 00:03:42.320
+Note that we can also use
+
+00:03:42.320 --> 00:03:47.195
+the more specific endpoint instead
+of just generic /q/health.
+
+00:03:47.195 --> 00:03:51.080
+We can ask about liveness and
+get the liveness response or
+
+00:03:51.080 --> 00:03:56.434
+specifically ask for readiness
+and get the readiness response.
+
+00:03:56.434 --> 00:03:58.280
+Right!
+
+00:03:58.280 --> 00:04:02.345
+So now we are going to move on
+to the session application.
+
+00:04:02.345 --> 00:04:04.880
+Session application communicates with
+
+00:04:04.880 --> 00:04:09.125
+the schedule and the speaker
+microservices in certain points.
+
+00:04:09.125 --> 00:04:13.655
+In that it has some issues, we are going to fix them.
+
+00:04:13.655 --> 00:04:15.920
+So first, we are going to add the smallrye
+
+00:04:15.920 --> 00:04:19.820
+fault tolerance extension to the
+microservice-session Reactor project.
+
+00:04:19.820 --> 00:04:22.550
+We could just as well have entered
+
+00:04:22.550 --> 00:04:24.830
+the microservice-session/ subdirectory and
+
+00:04:24.830 --> 00:04:28.355
+added it there without
+the -pl option.
+
+00:04:28.355 --> 00:04:31.685
+Well, nevertheless, here we are.
+
+00:04:31.685 --> 00:04:39.170
+There is an endpoint called allsessions
+in the SessionResource.java file.
+
+00:04:39.170 --> 00:04:42.620
+It simply invokes sessionStores.
+
+00:04:42.620 --> 00:04:46.625
+findAll method to return
+all the registered sessions
+
+00:04:46.625 --> 00:04:49.715
+and if we have a look at the
+SessionStores implementation,
+
+00:04:49.715 --> 00:04:53.720
+findAll actually has a
+Feature toggle implemented.
+
+00:04:53.720 --> 00:04:57.095
+So if, sessionIntegration is turned on,
+
+00:04:57.095 --> 00:05:00.545
+it uses the findAllWithEnrichment method.
+
+00:05:00.545 --> 00:05:02.915
+If sessionIntegration is turned off,
+
+00:05:02.915 --> 00:05:06.410
+it uses the findAllWithoutEnrichment method.
+
+00:05:06.410 --> 00:05:09.845
+If we have a look at the
+sessionIntegration
+
+00:05:09.845 --> 00:05:12.469
+boolean, which is using this conditional,
+
+00:05:12.469 --> 00:05:17.570
+we can see that it is actually
+annotated as a @ConfigProperty using
+
+00:05:17.570 --> 00:05:20.150
+the features.session-integration setting
+
+00:05:20.150 --> 00:05:22.970
+from application.properties and
+the defaultValue of false.
+
+00:05:22.970 --> 00:05:24.950
+So let's have a look at
+application.properties to
+
+00:05:24.950 --> 00:05:28.025
+see the state of this toggle.
+
+00:05:28.025 --> 00:05:30.890
+We can see that it's currently turned on,
+
+00:05:30.890 --> 00:05:35.810
+which means that the findAll method will use the enrichment method.
+
+00:05:35.810 --> 00:05:37.610
+If we have a look at that,
+
+00:05:37.610 --> 00:05:43.160
+so the findAllWithEnrichment
+implementation in the SessionStore uses
+
+00:05:43.160 --> 00:05:46.460
+the speakerService.listAll method
+
+00:05:46.460 --> 00:05:50.720
+to obtain a stream and map it to
+the speakers and so on and so on.
+
+00:05:50.720 --> 00:05:53.870
+If we have a look at
+what Speaker service is,
+
+00:05:53.870 --> 00:05:56.120
+again, in the SessionStore,
+
+00:05:56.120 --> 00:05:59.480
+we can see that it is indeed a RestClient
+
+00:05:59.480 --> 00:06:03.755
+injected into the SessionStore class,
+
+00:06:03.755 --> 00:06:05.180
+which basically means we are
+
+00:06:05.180 --> 00:06:11.360
+using RestClient for enrichment
+of the speaker result.
+
+00:06:11.360 --> 00:06:15.605
+If we have a look at the
+configuration of this RestClient,
+
+00:06:15.605 --> 00:06:18.229
+just looking for the SpeakerService,
+
+00:06:18.229 --> 00:06:21.650
+any mention of SpeakerService
+in application.properties,
+
+00:06:21.650 --> 00:06:25.415
+we can see that by default,
+
+00:06:25.415 --> 00:06:31.205
+the SpeakerService is using
+port 8082 on localhost.
+
+00:06:31.205 --> 00:06:34.025
+Just remembering these little details,
+
+00:06:34.025 --> 00:06:40.280
+now what we are going to do is we are
+going to open SessionResource file,
+
+00:06:40.280 --> 00:06:43.430
+and we are going to create
+a Fallback method in
+
+00:06:43.430 --> 00:06:47.195
+case that the speaker
+service is not available.
+
+00:06:47.195 --> 00:06:49.700
+So if that happens,
+
+00:06:49.700 --> 00:06:55.505
+we are marking the allSessions
+method with the @Fallback annotation
+
+00:06:55.505 --> 00:06:58.340
+and telling it to use
+allSessionsFallback
+
+00:06:58.340 --> 00:07:01.070
+method which we had to
+add as well, of course.
+
+00:07:01.070 --> 00:07:03.350
+And the allSessionsFallback method doesn't
+
+00:07:03.350 --> 00:07:05.960
+really guess about any feature
+integrations or anything.
+
+00:07:05.960 --> 00:07:08.405
+It just directly uses sessionStore.
+
+00:07:08.405 --> 00:07:11.255
+findAllWithoutEnrichment method,
+
+00:07:11.255 --> 00:07:15.080
+which doesn't use any
+external services at all.
+
+00:07:15.080 --> 00:07:22.595
+Let us stop the speaker service
+before we go and test it.
+
+00:07:22.595 --> 00:07:26.525
+If we ask for sessions, there we go.
+
+00:07:26.525 --> 00:07:30.290
+We get a response without
+first name, last name, we
+
+00:07:30.290 --> 00:07:34.310
+just get the first name of
+the speaker for each service.
+
+00:07:34.310 --> 00:07:36.920
+And if you recall,
+
+00:07:36.920 --> 00:07:40.130
+we actually added a log record
+
+00:07:40.130 --> 00:07:44.630
+here, in case the allSessionsFallback
+method is invoked.
+
+00:07:44.630 --> 00:07:50.870
+So we cannot expect a warning after
+stopping the speaker service.
+
+00:07:50.870 --> 00:07:56.720
+And this is the reload of
+the session resource
+
+00:07:56.720 --> 00:07:59.000
+and we can see that there actually is
+
+00:07:59.000 --> 00:08:01.955
+a warning about Fallback
+method being invoked for
+
+00:08:01.955 --> 00:08:04.220
+sessions because the speaker service is
+
+00:08:04.220 --> 00:08:07.775
+down at the point when
+we invoke this endpoint.
+
+00:08:07.775 --> 00:08:09.350
+And we do get the short names,
+
+00:08:09.350 --> 00:08:14.510
+which just proves that the speaker
+enrichment was not actually used.
+
+00:08:14.510 --> 00:08:18.270
+Starting the speaker service backup,
+
+00:08:19.320 --> 00:08:23.680
+we can check that the
+session enrichment now works
+
+00:08:23.680 --> 00:08:29.140
+again by invoking the
+specific session retrieval
+
+00:08:29.140 --> 00:08:33.895
+and here is Emmanuel. All right!
+
+00:08:33.895 --> 00:08:36.145
+Next problem.
+
+00:08:36.145 --> 00:08:43.360
+The session resource has a
+method called retrieveSession;
+
+00:08:43.360 --> 00:08:52.615
+retrieveSession, uses sessionStore.
+findById method and essentially
+
+00:08:52.615 --> 00:08:56.920
+could use a Fallback as well in
+case the sessionStore.findById
+
+00:08:56.920 --> 00:09:02.220
+cannot contact an external
+service, the speaker service.
+
+00:09:02.220 --> 00:09:08.825
+So what we'll do again is add a
+fallbackMethod for it, which is here.
+
+00:09:08.825 --> 00:09:10.445
+It just basically invokes,
+
+00:09:10.445 --> 00:09:11.900
+like in the previous case,
+
+00:09:11.900 --> 00:09:14.960
+findByIdWithoutEnrichment,
+
+00:09:14.960 --> 00:09:17.540
+we've annotated the fallbackMethod.
+
+00:09:17.540 --> 00:09:21.605
+But the requirement was that,
+should a failure happen,
+
+00:09:21.605 --> 00:09:24.620
+this method should not invoke any sort of
+
+00:09:24.620 --> 00:09:27.980
+external service for the
+subsequent 30 seconds, right?
+
+00:09:27.980 --> 00:09:31.115
+So that's why we also added
+a CircuitBreaker here,
+
+00:09:31.115 --> 00:09:37.459
+configure it that if 2 out of 2
+subsequent requests fail, we stop.
+
+00:09:37.459 --> 00:09:39.710
+We open the circuit for 30 seconds.
+
+00:09:39.710 --> 00:09:41.780
+So let's try that.
+
+00:09:41.780 --> 00:09:47.510
+Stopping the speaker application again,
+
+00:09:47.510 --> 00:09:49.980
+there we go.
+
+00:09:51.760 --> 00:09:58.790
+Sending a request to the
+session retrieval service,
+
+00:09:58.790 --> 00:10:01.820
+we see that we get a Emmanuel,
+
+00:10:01.820 --> 00:10:04.820
+not the full name Emanuel Bernard.
+
+00:10:04.820 --> 00:10:07.055
+Using a timer here,
+
+00:10:07.055 --> 00:10:09.530
+we can see that it takes 1 second,
+
+00:10:09.530 --> 00:10:14.645
+so it's still actually trying to
+reach the external service failing
+
+00:10:14.645 --> 00:10:18.450
+and then going for the fallback method.
+
+00:10:18.550 --> 00:10:21.455
+If we do that the third time,
+
+00:10:21.455 --> 00:10:24.425
+we can see that the circuit has opened.
+
+00:10:24.425 --> 00:10:26.510
+Now there's an opportunity
+
+00:10:26.510 --> 00:10:30.590
+to see that it's really staying
+open for 30 seconds, if we quickly
+
+00:10:30.590 --> 00:10:33.920
+restart and we have to do this quickly
+
+00:10:33.920 --> 00:10:37.280
+because I was too slow
+the first time around.
+
+00:10:37.280 --> 00:10:40.055
+So I had to stop the service again,
+
+00:10:40.055 --> 00:10:47.585
+trip the circuit open by submitting
+2 requests that failed,
+
+00:10:47.585 --> 00:10:50.270
+seeing that the circuit
+is now open and then
+
+00:10:50.270 --> 00:10:55.530
+quickly starting the
+speaker service again.
+
+00:10:57.280 --> 00:11:00.035
+There it is.
+
+00:11:00.035 --> 00:11:03.560
+So making sure the
+speaker is up, quickly going
+
+00:11:03.560 --> 00:11:07.984
+back to the terminal and submitting
+another couple of requests.
+
+00:11:07.984 --> 00:11:11.915
+You can see that even though
+the speaker service is UP,
+
+00:11:11.915 --> 00:11:14.300
+the request still return really
+
+00:11:14.300 --> 00:11:18.680
+quickly and do not enrich
+the speaker information.
+
+00:11:18.680 --> 00:11:22.415
+Waiting for another couple of seconds,
+
+00:11:22.415 --> 00:11:27.515
+we now eventually get the enrich data
+
+00:11:27.515 --> 00:11:31.970
+because the circuit has stopped,
+being open, it has closed
+
+00:11:31.970 --> 00:11:34.295
+and because the backend service,
+
+00:11:34.295 --> 00:11:35.780
+speaker service is up again,
+
+00:11:35.780 --> 00:11:39.030
+we do get the enrichment back.
+
+00:11:39.760 --> 00:11:41.555
+Right!
+
+00:11:41.555 --> 00:11:51.575
+So the next issue is that there
+is a sessionSpeakers method,
+
+00:11:51.575 --> 00:11:55.490
+which again invokes the speakers resource
+
+00:11:55.490 --> 00:11:58.730
+but since the speakers,
+
+00:11:58.730 --> 00:12:04.295
+there is an artificial delay
+basically built into the client,
+
+00:12:04.295 --> 00:12:08.120
+into the backend method that
+this client is invoking.
+
+00:12:08.120 --> 00:12:13.175
+So we have to implement a timeout
+in order to make sure that
+
+00:12:13.175 --> 00:12:18.395
+this particular sessionSpeakers
+method always returns within 1 second.
+
+00:12:18.395 --> 00:12:21.410
+Adding a Timeout annotation on it.
+
+00:12:21.410 --> 00:12:25.185
+That's quite an explicit request.
+
+00:12:25.185 --> 00:12:31.480
+If we invoke the speakers
+list for a particular session,
+
+00:12:31.480 --> 00:12:34.780
+it's going to take more
+than 1 second to return.
+
+00:12:34.780 --> 00:12:38.575
+And you can see after 1.75 seconds,
+
+00:12:38.575 --> 00:12:42.580
+we do get an Internal error saying that
+
+00:12:42.580 --> 00:12:47.260
+there was an error handling
+requests because it timed out.
+
+00:12:47.260 --> 00:12:51.145
+Turning off the session-integration
+
+00:12:51.145 --> 00:12:54.625
+is going to turn off obviously any sort of
+
+00:12:54.625 --> 00:12:58.630
+external requests and also make
+
+00:12:58.630 --> 00:13:03.235
+it possible for this method to
+complete sooner than in 1 second.
+
+00:13:03.235 --> 00:13:08.445
+So if we turn the session-integration
+off and repeat the request,
+
+00:13:08.445 --> 00:13:11.660
+we can see that the first time
+around it takes a little bit longer
+
+00:13:11.660 --> 00:13:14.375
+because the application has to reload,
+
+00:13:14.375 --> 00:13:17.360
+relaunch because of the changed
+application.properties
+
+00:13:17.360 --> 00:13:19.025
+but then the second time around,
+
+00:13:19.025 --> 00:13:22.760
+it takes 17 milliseconds to
+return without enrichment,
+
+00:13:22.760 --> 00:13:26.249
+of course, but also without a timeout.
+
+00:13:26.350 --> 00:13:29.795
+Now, before we continue,
+
+00:13:29.795 --> 00:13:32.525
+we are going to turn the
+session integration back on
+
+00:13:32.525 --> 00:13:36.605
+and go on to our next problem.
+
+00:13:36.605 --> 00:13:41.360
+The next problem is that the
+
+00:13:41.360 --> 00:13:48.365
+adding and the removing of
+session speakers are 2 very
+
+00:13:48.365 --> 00:13:53.330
+important methods in order to
+preserve integrity of data
+
+00:13:53.330 --> 00:13:58.235
+between the session and
+the speaker applications.
+
+00:13:58.235 --> 00:14:03.485
+So, we under no conditions want
+those 2 methods to fail.
+
+00:14:03.485 --> 00:14:07.190
+The amount of time that
+it takes to complete this
+
+00:14:07.190 --> 00:14:11.255
+is not so important as it is important
+that they do actually complete.
+
+00:14:11.255 --> 00:14:13.145
+So we have gotten a request to,
+
+00:14:13.145 --> 00:14:16.040
+in the event of a failure,
+to just simply retry
+
+00:14:16.040 --> 00:14:21.965
+up to 60 times with the delay of
+1 second between retry attempts.
+
+00:14:21.965 --> 00:14:24.260
+That's easy enough to
+implement, just adding
+
+00:14:24.260 --> 00:14:26.900
+a @Retry annotation on top of both methods.
+
+00:14:26.900 --> 00:14:30.500
+Of course not forgetting the new
+import which is usually handled
+
+00:14:30.500 --> 00:14:35.285
+by the IDE that you're using.
+
+00:14:35.285 --> 00:14:38.555
+So once you've added those 2 annotations,
+
+00:14:38.555 --> 00:14:42.410
+to addSessionSpeaker and
+removeSessionSpeaker methods.
+
+00:14:42.410 --> 00:14:49.560
+We are going to stop the
+speaker application again.
+
+00:14:51.790 --> 00:14:57.170
+Just going to skip all those timeouts
+here in the logs. There we go.
+
+00:14:57.170 --> 00:15:00.710
+We're going to be stopping
+the speaker once more
+
+00:15:00.710 --> 00:15:02.690
+and there we go.
+
+00:15:02.690 --> 00:15:07.340
+If we tried to send a PUT
+request to session 1-
+
+00:15:07.340 --> 00:15:11.295
+1, adding speaker/Alex, to that session,
+
+00:15:11.295 --> 00:15:13.870
+we see that we eventually get
+
+00:15:13.870 --> 00:15:17.140
+an Internal Server Error in
+the handling of this request,
+
+00:15:17.140 --> 00:15:19.030
+going to skip the error message
+
+00:15:19.030 --> 00:15:22.040
+because I want to show
+you how long it took.
+
+00:15:23.940 --> 00:15:28.880
+We can see that in
+the exception message,
+
+00:15:30.210 --> 00:15:33.625
+the exception was Connection refused.
+
+00:15:33.625 --> 00:15:37.150
+So then the method actually tried to
+
+00:15:37.150 --> 00:15:41.305
+contact the speaker application to
+verify that Alex is an existing speaker.
+
+00:15:41.305 --> 00:15:45.970
+However, it wasn't able to
+do so for over a minute.
+
+00:15:45.970 --> 00:15:48.850
+So it tried and tried and tried again,
+
+00:15:48.850 --> 00:15:50.605
+of course, because it couldn't.
+
+00:15:50.605 --> 00:15:53.805
+Within a minute, it finally gave up.
+
+00:15:53.805 --> 00:15:57.365
+Let's retry this same request,
+
+00:15:57.365 --> 00:16:02.180
+but start the speaker application while
+waiting for this request to complete.
+
+00:16:02.180 --> 00:16:04.205
+So sending the request,
+
+00:16:04.205 --> 00:16:10.235
+going back to the logs and starting
+the speaker application again.
+
+00:16:10.235 --> 00:16:12.665
+There we go.
+
+00:16:12.665 --> 00:16:16.880
+I waited deliberately for
+about 10 seconds before going
+
+00:16:16.880 --> 00:16:20.900
+back to the menu and
+starting the speaker.
+
+00:16:20.900 --> 00:16:24.650
+We can see that it literally
+did complete within
+
+00:16:24.650 --> 00:16:28.625
+13 seconds and returned
+the modified schedule,
+
+00:16:28.625 --> 00:16:34.250
+the modified session, which now
+includes Alex Soto as a speaker.
+
+00:16:34.250 --> 00:16:36.020
+So this is the enriched
+
+00:16:36.020 --> 00:16:39.390
+information that we are looking for.
+
+00:16:40.300 --> 00:16:42.425
+Right!
+
+00:16:42.425 --> 00:16:49.865
+Next problem is that the updateSession
+is sensitive to concurrent requests.
+
+00:16:49.865 --> 00:16:54.080
+We do not want the 2
+concurrent requests to
+
+00:16:54.080 --> 00:16:59.780
+this method, to cause the data about
+session to become inconsistent.
+
+00:16:59.780 --> 00:17:01.940
+So what we are going to do
+is we are only going to
+
+00:17:01.940 --> 00:17:04.130
+allow 1 concurrent invocation.
+
+00:17:04.130 --> 00:17:07.910
+So for as long as there is an
+updateSession operation going on,
+
+00:17:07.910 --> 00:17:13.445
+we will be refusing any other
+requests to update any session.
+
+00:17:13.445 --> 00:17:15.830
+For that purpose, we will simply add
+
+00:17:15.830 --> 00:17:20.510
+a @Bulkhead annotation on top
+of the method signature.
+
+00:17:20.510 --> 00:17:25.385
+This literally, with the value of
+1 does exactly what we wanted it to.
+
+00:17:25.385 --> 00:17:30.905
+So if we go back to the test tab,
+
+00:17:30.905 --> 00:17:34.580
+we can see that if we start
+
+00:17:34.580 --> 00:17:39.995
+10 parallel requests using
+the parallel.sh script,
+
+00:17:39.995 --> 00:17:43.970
+telling them to basically
+
+00:17:43.970 --> 00:17:48.485
+send a PUT request with the head
+of Content-Type application/
+
+00:17:48.485 --> 00:17:56.570
+json and the data of the
+id of session being s-1-1,
+
+00:17:56.570 --> 00:18:00.740
+the schedule it should use
+should be schedule number 1
+
+00:18:00.740 --> 00:18:07.070
+and that's obviously a PUT operation
+to /session/s-1-1.
+
+00:18:07.070 --> 00:18:10.205
+Looking again at the
+signature of this method,
+
+00:18:10.205 --> 00:18:17.495
+it is the sessionId in the URL
+of the sessions top level path.
+
+00:18:17.495 --> 00:18:21.035
+So that is exactly the
+method we are targeting.
+
+00:18:21.035 --> 00:18:23.780
+If we send 10 concurrent requests using
+
+00:18:23.780 --> 00:18:26.810
+the parallel script and
+print out the response code,
+
+00:18:26.810 --> 00:18:33.020
+we see that every single request
+actually fails until the very first one,
+
+00:18:33.020 --> 00:18:34.760
+which took a while to complete,
+
+00:18:34.760 --> 00:18:39.150
+returns a successful operation.
+
+00:18:39.490 --> 00:18:46.115
+Right! So what we are going to do
+first is restart the session application,
+
+00:18:46.115 --> 00:18:47.780
+there we go.
+
+00:18:47.780 --> 00:18:52.040
+So we are going to stop the session
+application and start it again to
+
+00:18:52.040 --> 00:18:58.715
+reset any data that we may have modified
+during this end of Chapter lab.
+
+00:18:58.715 --> 00:19:04.655
+What I forgot was a tiny little
+bit of texts just above that step,
+
+00:19:04.655 --> 00:19:09.200
+which says that the speaker application
+actually also has to be stopped.
+
+00:19:09.200 --> 00:19:13.100
+If you forget that, your grading
+script will be failing,
+
+00:19:13.100 --> 00:19:16.040
+see the Speaker Service must be down.
+
+00:19:16.040 --> 00:19:19.115
+If it's not down, you will
+get the number of failures.
+
+00:19:19.115 --> 00:19:22.655
+I just stopped waiting
+eventually and went back.
+
+00:19:22.655 --> 00:19:31.265
+And what I did was I restarted
+the session service again.
+
+00:19:31.265 --> 00:19:34.130
+So I stopped it, started it just to get
+
+00:19:34.130 --> 00:19:37.415
+rid of any side effects that the
+grading script may have caused.
+
+00:19:37.415 --> 00:19:43.490
+And additionally, I made sure that
+the speaker application was stopped.
+
+00:19:43.490 --> 00:19:46.970
+So the Status, which is
+a command number 9,
+
+00:19:46.970 --> 00:19:50.105
+now shows PostgreSQL is
+running, Session is running,
+
+00:19:50.105 --> 00:19:53.690
+Schedule is running, but no
+other application is up.
+
+00:19:53.690 --> 00:19:58.730
+Going back to the command
+line, lab tolerance-review
+
+00:19:58.730 --> 00:20:01.580
+grade should report all passing scores
+
+00:20:01.580 --> 00:20:04.955
+on all counts and an
+Overall passing grade,
+
+00:20:04.955 --> 00:20:10.070
+which means that we can
+actually go back to
+
+00:20:10.070 --> 00:20:16.835
+the menu and start shutting things down.
+
+00:20:16.835 --> 00:20:17.570
+There
+
+00:20:17.570 --> 00:20:19.520
+they are, just stopping postgresql,
+
+00:20:19.520 --> 00:20:21.650
+stopping this session application,
+
+00:20:21.650 --> 00:20:23.690
+stopping the schedule application,
+
+00:20:23.690 --> 00:20:26.255
+and then choosing exit,
+
+00:20:26.255 --> 00:20:28.879
+running lab tolerance-review finish.
+
+00:20:28.879 --> 00:20:31.295
+We will have to clean everything up.
+
+00:20:31.295 --> 00:20:35.270
+And that brings us to the end of
+the chapter and into the next one,
+
+00:20:35.270 --> 00:20:38.060
+where we are going to discuss a
+very exciting topic which is
+
+00:20:38.060 --> 00:20:42.480
+building native applications
+using Quarkus. See you there.
 

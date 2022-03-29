@@ -1,5 +1,539 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:04.260
+In this section we are going to talk
+about monitoring application health
 
+00:00:04.260 --> 00:00:06.810
+and of course, since we are monitoring it,
+
+00:00:06.810 --> 00:00:08.760
+we need to be able to implement
+
+00:00:08.760 --> 00:00:11.580
+a health check in the
+application itself as well.
+
+00:00:11.580 --> 00:00:14.550
+Now, even in traditional environments,
+
+00:00:14.550 --> 00:00:16.500
+it's important to get some sort of
+
+00:00:16.500 --> 00:00:20.220
+indication about whether an
+application is working correctly or
+
+00:00:20.220 --> 00:00:23.310
+considers itself to be healthy or not in
+
+00:00:23.310 --> 00:00:26.849
+order to be able to automate reactions.
+
+00:00:26.849 --> 00:00:32.355
+But in container orchestration environments
+such as Kubernetes and OpenShift,
+
+00:00:32.355 --> 00:00:37.500
+that is even more important because
+both of them have functionality that
+
+00:00:37.500 --> 00:00:39.750
+allows us to automatically restart
+
+00:00:39.750 --> 00:00:44.105
+the application if it starts
+reporting unhealthy state.
+
+00:00:44.105 --> 00:00:49.010
+That includes decommissioning the
+application when it's no longer
+
+00:00:49.010 --> 00:00:53.810
+healthy and not putting it in
+service until it reports it's ready.
+
+00:00:53.810 --> 00:00:57.214
+So we have 2 states, 2 phases.
+
+00:00:57.214 --> 00:00:59.780
+One before we put
+application into service,
+
+00:00:59.780 --> 00:01:01.460
+waiting for it to become ready.
+
+00:01:01.460 --> 00:01:05.765
+And one, hopefully, never
+or as late as possible,
+
+00:01:05.765 --> 00:01:10.130
+where the application no longer
+reports that it's alive,
+
+00:01:10.130 --> 00:01:14.630
+so we have to decommission it and
+replace it with a new instance.
+
+00:01:14.630 --> 00:01:19.520
+The MicroProfile Health specification
+allows services to actually
+
+00:01:19.520 --> 00:01:27.665
+notify of their current health status
+or report it, if they are invoked,
+
+00:01:27.665 --> 00:01:29.900
+which allows the systems that are
+
+00:01:29.900 --> 00:01:32.839
+orchestrating those applications
+to react accordingly.
+
+00:01:32.839 --> 00:01:36.950
+We have 2 dedicated endpoints called
+
+00:01:36.950 --> 00:01:42.770
+/q/health/ready and
+/q/health/live.
+
+00:01:42.770 --> 00:01:46.130
+Now, it's important to
+note that if you've seen
+
+00:01:46.130 --> 00:01:51.409
+an older version of Quarkus or
+MicroProfile health tutorials,
+
+00:01:51.409 --> 00:01:54.200
+in the older versions,
+
+00:01:54.200 --> 00:01:57.290
+they use the /health endpoint,
+
+00:01:57.290 --> 00:01:59.570
+for both liveness and readiness.
+
+00:01:59.570 --> 00:02:03.800
+But the health endpoint is now optional
+
+00:02:03.800 --> 00:02:06.530
+and exposes the combination of the 2.
+
+00:02:06.530 --> 00:02:08.120
+If you want to see
+
+00:02:08.120 --> 00:02:12.545
+just readiness state or just liveness
+state of the application,
+
+00:02:12.545 --> 00:02:15.755
+then you can use the 2 individual ones.
+
+00:02:15.755 --> 00:02:20.855
+Additionally, it's now changed to
+the prefix of /q/health.
+
+00:02:20.855 --> 00:02:22.925
+It's no longer at the top level.
+
+00:02:22.925 --> 00:02:27.515
+Now how do you add health
+checks to your source code?
+
+00:02:27.515 --> 00:02:31.355
+We have a functional interface
+called HealthCheck,
+
+00:02:31.355 --> 00:02:34.565
+which just has a single method call,
+
+00:02:34.565 --> 00:02:37.820
+which is convenient because we
+can use Lambda invocations,
+
+00:02:37.820 --> 00:02:41.405
+Lambda definitions to
+define health checks.
+
+00:02:41.405 --> 00:02:48.635
+Now, there are 2 ways
+to define a health check.
+
+00:02:48.635 --> 00:02:51.695
+One is using a Liveness annotation
+
+00:02:51.695 --> 00:02:55.550
+and the other one is using
+a Readiness annotation.
+
+00:02:55.550 --> 00:02:57.529
+For the @Liveness annotation,
+
+00:02:57.529 --> 00:03:00.140
+we simply annotate an implementation of
+
+00:03:00.140 --> 00:03:03.065
+the health check with
+the Liveness annotation
+
+00:03:03.065 --> 00:03:05.630
+and construct the health response into
+
+00:03:05.630 --> 00:03:09.125
+the call method. For Readiness is the same,
+
+00:03:09.125 --> 00:03:13.220
+except that we annotate it with the
+Readiness annotation and implement
+
+00:03:13.220 --> 00:03:17.435
+the call with something that checks
+whether the application is ready or not.
+
+00:03:17.435 --> 00:03:21.080
+Now, how do we construct the
+response though, in both cases,
+
+00:03:21.080 --> 00:03:25.474
+we are expected to return
+a HealthCheckResponse.
+
+00:03:25.474 --> 00:03:27.680
+We can use the builder pattern,
+
+00:03:27.680 --> 00:03:31.325
+so obviously this will involve
+some internal testing.
+
+00:03:31.325 --> 00:03:35.795
+The application needs to be able
+to probe its internal state.
+
+00:03:35.795 --> 00:03:38.285
+That is something that
+cannot be prescribed.
+
+00:03:38.285 --> 00:03:41.810
+It depends on actual application at hand.
+
+00:03:41.810 --> 00:03:45.150
+But once you've got the result,
+
+00:03:45.340 --> 00:03:49.250
+you will just simply use
+
+00:03:49.250 --> 00:03:54.065
+the HealthCheckResponses builder
+methods such as for example,
+
+00:03:54.065 --> 00:03:58.010
+named, which gives the health check a name,
+
+00:03:58.010 --> 00:04:02.420
+and then a state indication
+which is either .up or .down
+
+00:04:02.420 --> 00:04:05.810
+and conclude with the
+build method invocation.
+
+00:04:05.810 --> 00:04:11.435
+So it's just chaining as in any
+other builder pattern approach.
+
+00:04:11.435 --> 00:04:15.305
+And this final build
+invocation would return
+
+00:04:15.305 --> 00:04:20.165
+a HealthCheckResponse with the name of
+my-health-check and the status of up.
+
+00:04:20.165 --> 00:04:23.810
+You can alternatively use a
+down method instead of up,
+
+00:04:23.810 --> 00:04:26.900
+if the state is up or it's not up.
+
+00:04:26.900 --> 00:04:31.190
+Or you simply use the state method and use
+
+00:04:31.190 --> 00:04:34.220
+a Boolean variable as a parameter and that
+
+00:04:34.220 --> 00:04:37.265
+will decide what state the method is in.
+
+00:04:37.265 --> 00:04:42.199
+There's an abbreviation for
+up and down which conjoins,
+
+00:04:42.199 --> 00:04:48.800
+or it joins the conjoined named and up or named
+and down method invocations
+
+00:04:48.800 --> 00:04:51.740
+you can just simply, if that
+is all you want to set,
+
+00:04:51.740 --> 00:04:54.665
+you can just simply invoke up and the name
+
+00:04:54.665 --> 00:04:58.115
+of the health check or down and
+the name of the health check,
+
+00:04:58.115 --> 00:05:02.285
+not having to invoke a final
+build at the end as well.
+
+00:05:02.285 --> 00:05:06.725
+There are many other methods
+in the builder pattern.
+
+00:05:06.725 --> 00:05:13.890
+Feel free to examine and explore them as
+you are working on the next exercise.
+
+00:05:13.930 --> 00:05:19.730
+It is possible to provide additional
+data in the HealthCheckResponse.
+
+00:05:19.730 --> 00:05:27.665
+For example, if we have a HealthCheckResponse method call, that,
+
+00:05:27.665 --> 00:05:30.380
+let's say returns load average.
+
+00:05:30.380 --> 00:05:36.740
+Load average has or is a
+specific number, right?
+
+00:05:36.740 --> 00:05:41.255
+So just up or down doesn't
+tell us anything useful.
+
+00:05:41.255 --> 00:05:43.865
+We would need to provide an actual number
+
+00:05:43.865 --> 00:05:48.365
+and we can do that by using the withData
+method in the builder sequence,
+
+00:05:48.365 --> 00:05:51.440
+specifying what the parameter is and
+
+00:05:51.440 --> 00:05:54.965
+specifying what the value
+of this parameter would be.
+
+00:05:54.965 --> 00:06:01.490
+This is very useful if you want to
+provide also the causes for the error or
+
+00:06:01.490 --> 00:06:05.360
+whatever indicators you need
+to provide alongside with
+
+00:06:05.360 --> 00:06:09.395
+just a black and white up and down status.
+
+00:06:09.395 --> 00:06:13.010
+So you can provide, for example, metrics,
+
+00:06:13.010 --> 00:06:15.110
+you can provide causes of errors such
+
+00:06:15.110 --> 00:06:17.705
+as exception, types, messages and similar.
+
+00:06:17.705 --> 00:06:20.975
+And even in case of an error,
+
+00:06:20.975 --> 00:06:24.605
+estimated time to recovery.
+
+00:06:24.605 --> 00:06:28.775
+And once you've defined the health
+checks in your application,
+
+00:06:28.775 --> 00:06:34.160
+be it Readiness or Liveness, you can
+also instruct OpenShift to use
+
+00:06:34.160 --> 00:06:37.490
+those endpoints in making sure
+your application is ready to
+
+00:06:37.490 --> 00:06:41.375
+be used and making sure that your
+application is still alive.
+
+00:06:41.375 --> 00:06:45.200
+You can simply add a
+couple of attributes to
+
+00:06:45.200 --> 00:06:50.000
+the application.properties file that
+are called quarkus.openshift.
+
+00:06:50.000 --> 00:06:55.550
+liveness-probe, or quarkus.openshift.readiness-probe.
+
+00:06:55.550 --> 00:07:01.205
+Now, there are 2 main parameters
+that you want to use here.
+
+00:07:01.205 --> 00:07:03.410
+First one is the initial delay,
+
+00:07:03.410 --> 00:07:05.494
+which is the delay,
+
+00:07:05.494 --> 00:07:10.775
+well, you simply do not want
+to perform that check
+
+00:07:10.775 --> 00:07:12.605
+for the readiness probe.
+
+00:07:12.605 --> 00:07:14.870
+That means, you know,
+
+00:07:14.870 --> 00:07:19.895
+this application is not going to be
+ready sooner than in 5 seconds.
+
+00:07:19.895 --> 00:07:22.865
+So in the readiness-probe.initial-delay,
+
+00:07:22.865 --> 00:07:25.055
+you would set the value to
+
+00:07:25.055 --> 00:07:28.970
+5 seconds, if you know that's
+how long it usually takes.
+
+00:07:28.970 --> 00:07:32.990
+In liveness probe, it doesn't make sense to
+
+00:07:32.990 --> 00:07:36.470
+use a liveness probe before
+the application report says ready.
+
+00:07:36.470 --> 00:07:38.840
+But unfortunately the implementation in
+
+00:07:38.840 --> 00:07:43.055
+OpenShift starts probing both liveness
+and readiness at the same time.
+
+00:07:43.055 --> 00:07:48.980
+So again, if you know that your application
+always takes a certain amount of
+
+00:07:48.980 --> 00:07:51.170
+time to start and then always
+
+00:07:51.170 --> 00:07:55.085
+works fine for at least the
+next couple of seconds,
+
+00:07:55.085 --> 00:07:59.300
+that's how long you would set the
+liveness-probe.initial-delay 2.
+
+00:07:59.300 --> 00:08:05.090
+Don't set it too long obviously
+in case the service suddenly flaps.
+
+00:08:05.090 --> 00:08:08.750
+Those checks are performed periodically,
+
+00:08:08.750 --> 00:08:12.140
+so if the first check fails,
+
+00:08:12.140 --> 00:08:15.635
+another one is performed
+subsequently ends on.
+
+00:08:15.635 --> 00:08:17.600
+That is for readiness probes,
+
+00:08:17.600 --> 00:08:20.465
+of course, readiness probes,
+
+00:08:20.465 --> 00:08:26.000
+period of repetition of those
+checks should not be too long.
+
+00:08:26.000 --> 00:08:28.790
+Because if it fails for the first time,
+
+00:08:28.790 --> 00:08:33.155
+then it's going to take that amount
+of time before we try again.
+
+00:08:33.155 --> 00:08:34.760
+And for that amount of time,
+
+00:08:34.760 --> 00:08:37.640
+the application is not
+going to be seen as ready
+
+00:08:37.640 --> 00:08:41.270
+even if it was because we are just
+not testing and we cannot detect it.
+
+00:08:41.270 --> 00:08:47.960
+So do not set the readiness
+probes period to too much.
+
+00:08:47.960 --> 00:08:50.555
+For liveness probes period,
+
+00:08:50.555 --> 00:08:54.440
+the period is the maximum amount of
+
+00:08:54.440 --> 00:08:58.430
+time that a liveness failure
+can go unnoticed basically.
+
+00:08:58.430 --> 00:09:01.370
+So again, set the
+liveness probes period,
+
+00:09:01.370 --> 00:09:05.465
+to something sensible and
+acceptable for your clients.
+
+00:09:05.465 --> 00:09:08.330
+Some Quarkus extensions actually add
+
+00:09:08.330 --> 00:09:12.020
+health checks automatically by
+adding them to your applications,
+
+00:09:12.020 --> 00:09:14.060
+such as the agroal extension,
+
+00:09:14.060 --> 00:09:18.020
+which handles datasource connections,
+
+00:09:18.020 --> 00:09:20.330
+can automatically report whether
+
+00:09:20.330 --> 00:09:23.510
+the database connection that
+it's in charge of is up or
+
+00:09:23.510 --> 00:09:30.200
+down. Then there are some other extensions that
+add the health checks as well.
+
+00:09:30.200 --> 00:09:35.700
+Let's move on to the next video, where
+we have a health check exercise.
 

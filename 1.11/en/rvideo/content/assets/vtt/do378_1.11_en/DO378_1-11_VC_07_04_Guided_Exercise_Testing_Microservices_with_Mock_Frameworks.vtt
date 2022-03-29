@@ -1,5 +1,253 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:02.910
+Let's Mock some dependencies 
+in this exercise,
 
+00:00:02.910 --> 00:00:05.670
+starting with lab test-mock start,
+
+00:00:05.670 --> 00:00:10.620
+we get a project our
+familiar /expense-service/
+
+00:00:10.620 --> 00:00:14.430
+which has 3 files.
+
+00:00:14.430 --> 00:00:16.500
+So the one is Expense,
+
+00:00:16.500 --> 00:00:18.420
+which is a data object model.
+
+00:00:18.420 --> 00:00:21.870
+The ExpenseResource is the rest web
+service and the ExpenseService is
+
+00:00:21.870 --> 00:00:24.360
+the data access class.
+
+00:00:24.360 --> 00:00:27.325
+We also have 2 test classes already.
+
+00:00:27.325 --> 00:00:31.790
+But we still need a mock to
+replace the external dependency,
+
+00:00:31.790 --> 00:00:32.810
+which is the database.
+
+00:00:32.810 --> 00:00:39.065
+So we are going to create a very
+simple mock by editing the src/test/
+
+00:00:39.065 --> 00:00:41.105
+java/org/acme/rest/
+
+00:00:41.105 --> 00:00:43.895
+json/ExpenseServiceMock.
+
+00:00:43.895 --> 00:00:50.525
+We are going to annotate it with @Mock and
+make it extend the ExpenseService.
+
+00:00:50.525 --> 00:00:55.895
+And we are just going to override
+the creating an empty update method
+
+00:00:55.895 --> 00:01:01.550
+and creating an exists method implementation
+
+00:01:01.550 --> 00:01:04.759
+which always checks for the same uuid
+
+00:01:04.759 --> 00:01:07.490
+and if it is the uuid that we are getting,
+
+00:01:07.490 --> 00:01:11.280
+it just returns a true.
+
+00:01:11.470 --> 00:01:15.530
+Trying to run the test,
+of course will fail because
+
+00:01:15.530 --> 00:01:19.160
+we are not really using any mocks yet.
+
+00:01:19.160 --> 00:01:23.540
+So we have got a failure
+in the Postgres code.
+
+00:01:23.540 --> 00:01:30.950
+We've got a failure in a NullPointerException
+in the ExpenseServiceTest.
+
+00:01:30.950 --> 00:01:34.565
+So 2 tests, 2 failures,
+really bad situation.
+
+00:01:34.565 --> 00:01:40.400
+Now, let's fix the ExpenseResourceTest.
+
+00:01:40.400 --> 00:01:44.135
+First of all, we are
+going to import Mockito.
+
+00:01:44.135 --> 00:01:50.220
+And we are going to add a
+mock for ExpenseService.
+
+00:01:50.950 --> 00:01:55.790
+We are going to specify that whenever
+
+00:01:55.790 --> 00:02:00.125
+the expenseService's mock is invoked with
+
+00:02:00.125 --> 00:02:06.215
+exists method and a
+Uuid that is notFound,
+
+00:02:06.215 --> 00:02:08.330
+then we return false.
+
+00:02:08.330 --> 00:02:11.675
+So this is in a prescribed
+behavior for the mock.
+
+00:02:11.675 --> 00:02:19.220
+Then adding to the existing
+expenseResourceNotFound field,
+
+00:02:19.220 --> 00:02:23.060
+which is initialized with
+a new ExpenseResource,
+
+00:02:23.060 --> 00:02:28.460
+we will simply reset the
+expenseService to be the Mock.
+
+00:02:28.460 --> 00:02:30.440
+So to start using the mock,
+
+00:02:30.440 --> 00:02:35.105
+we have created a couple of
+lines before. Running the test,
+
+00:02:35.105 --> 00:02:38.220
+we will now see that
+
+00:02:38.740 --> 00:02:44.750
+the failure is due to not having
+added Mockito to our pom.xml.
+
+00:02:44.750 --> 00:02:47.450
+So that's something we will have to do,
+
+00:02:47.450 --> 00:02:50.210
+prior to the test working.
+
+00:02:50.210 --> 00:02:55.205
+Just adding a quarkus-junit5-mockito
+dependency in the test scope,
+
+00:02:55.205 --> 00:03:00.229
+we are running the test, actually
+does bring some great results.
+
+00:03:00.229 --> 00:03:04.115
+This time around the ExpenseResourceTest succeeds.
+
+00:03:04.115 --> 00:03:07.730
+Of course, the ExpenseServiceTest still fails because
+
+00:03:07.730 --> 00:03:12.035
+still depends on the
+database which is not found.
+
+00:03:12.035 --> 00:03:17.135
+So what we are going to 
+do is edit that one too.
+
+00:03:17.135 --> 00:03:20.150
+We are going to import Mockito as well,
+
+00:03:20.150 --> 00:03:23.450
+but additionally, we are going
+to add the PanacheMock,
+
+00:03:23.450 --> 00:03:26.059
+which is capable of mocking
+
+00:03:26.059 --> 00:03:34.205
+the DAO, so data access objects
+code or functionality actually.
+
+00:03:34.205 --> 00:03:39.560
+And we are going to configure
+PanacheMock with behavior
+
+00:03:39.560 --> 00:03:46.970
+which whenever someone deletes
+the uuid within existing match,
+
+00:03:46.970 --> 00:03:49.385
+so with the pre-configured match,
+
+00:03:49.385 --> 00:03:52.175
+this is the UUID that
+we are matching against.
+
+00:03:52.175 --> 00:03:54.980
+Then we return 1 deleted record.
+
+00:03:54.980 --> 00:03:59.945
+If they try to delete the
+UUID that does not match,
+
+00:03:59.945 --> 00:04:03.120
+then we will just not return anything.
+
+00:04:03.130 --> 00:04:06.770
+That is the mocked desired behavior,
+
+00:04:06.770 --> 00:04:10.835
+now, the second desired behavior
+
+00:04:10.835 --> 00:04:15.995
+obviously is when we try to
+delete a uuid that does not exist,
+
+00:04:15.995 --> 00:04:18.710
+we will return a 0.
+
+00:04:18.710 --> 00:04:22.385
+Right? So these 2 bits
+of mock prescription,
+
+00:04:22.385 --> 00:04:26.645
+prescribed behaviors were added
+to the ExpenseServiceTest.
+
+00:04:26.645 --> 00:04:28.850
+Now if we try to test again,
+
+00:04:28.850 --> 00:04:32.330
+you see that both tests have succeeded.
+
+00:04:32.330 --> 00:04:35.060
+Also in the ExpenseServiceTest,
+
+00:04:35.060 --> 00:04:37.430
+we have a set of succeeding tests,
+
+00:04:37.430 --> 00:04:42.050
+after all. Now we just need to clean up
+after ourselves using lab test-
+
+00:04:42.050 --> 00:04:44.660
+mock finish script, and move on to
+
+00:04:44.660 --> 00:04:48.510
+the end of Chapter Challenge
+lab. See you there.
 

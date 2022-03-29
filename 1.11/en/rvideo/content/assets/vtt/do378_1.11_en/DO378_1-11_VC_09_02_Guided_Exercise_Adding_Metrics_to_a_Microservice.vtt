@@ -1,5 +1,647 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:03.705
+Let's add some metrics to
+our expense microservice,
 
+00:00:03.705 --> 00:00:07.020
+starting with the lab monitor-metrics start script,
+
+00:00:07.020 --> 00:00:09.840
+which download the exercise files and
+
+00:00:09.840 --> 00:00:12.840
+starts the database for
+the expense application,
+
+00:00:12.840 --> 00:00:16.080
+but also starts the Prometheus
+and a Grafana server
+
+00:00:16.080 --> 00:00:17.520
+which we will use later.
+
+00:00:17.520 --> 00:00:18.840
+It will take a little bit
+
+00:00:18.840 --> 00:00:23.190
+so while you are waiting for it to start,
+
+00:00:23.190 --> 00:00:26.460
+just switch to another terminal window and
+
+00:00:26.460 --> 00:00:30.285
+go to DO378/labs/monitor-metrics/ directory.
+
+00:00:30.285 --> 00:00:32.940
+Listing the contents of that directory,
+
+00:00:32.940 --> 00:00:35.129
+you can see a number of files.
+
+00:00:35.129 --> 00:00:40.990
+Now prometheus.yml is the file that
+configures the Prometheus server.
+
+00:00:40.990 --> 00:00:46.100
+You can see it's configured to scrape
+the metrics every 3 seconds
+
+00:00:46.100 --> 00:00:54.125
+from /q/metrics endpoint
+at localhost port 8080.
+
+00:00:54.125 --> 00:00:57.695
+So this is where we are going to
+be starting our application.
+
+00:00:57.695 --> 00:01:03.080
+The datasource for
+Grafana is then or the
+
+00:01:03.080 --> 00:01:07.685
+Prometheus server is then
+available on localhost port 9090.
+
+00:01:07.685 --> 00:01:11.210
+Now going back to the original window,
+
+00:01:11.210 --> 00:01:14.690
+the services have by now already started.
+
+00:01:14.690 --> 00:01:18.500
+So we can go to our 
+expense-service/ directory and
+
+00:01:18.500 --> 00:01:23.285
+add the micrometer-registry
+prometheus extension.
+
+00:01:23.285 --> 00:01:27.335
+So we can see it was added
+successfully to pom.xml.
+
+00:01:27.335 --> 00:01:31.370
+And then have a look at
+the expenses resource,
+
+00:01:31.370 --> 00:01:34.505
+ExpenseResource and just
+start adding metrics.
+
+00:01:34.505 --> 00:01:37.535
+So the first thing we are
+going to need to do is
+
+00:01:37.535 --> 00:01:40.775
+inject a MeterRegistry into the class,
+
+00:01:40.775 --> 00:01:44.480
+and here it is being injected.
+
+00:01:44.480 --> 00:01:52.985
+We are also going to create a
+Counter and a timer supplier.
+
+00:01:52.985 --> 00:01:57.740
+So we are going to be basically counting
+the number of lists invocations
+
+00:01:57.740 --> 00:02:00.500
+and timing the amount of time that the
+
+00:02:00.500 --> 00:02:03.605
+lists expenses method takes to complete.
+
+00:02:03.605 --> 00:02:07.325
+What we are also going
+to do is we are going to
+
+00:02:07.325 --> 00:02:12.170
+measure the amount of time
+it took from the last time
+
+00:02:12.170 --> 00:02:15.350
+somebody invoked the expense list.
+
+00:02:15.350 --> 00:02:18.260
+Just as a point of interest,
+
+00:02:18.260 --> 00:02:21.515
+we can use a StopWatch to do this for us.
+
+00:02:21.515 --> 00:02:25.100
+StopWatch is a utility class from org.
+
+00:02:25.100 --> 00:02:30.410
+apache.commons, that just keeps
+measuring time from the last reset.
+
+00:02:30.410 --> 00:02:34.730
+And it's actually quite a
+useful implementation to do
+
+00:02:34.730 --> 00:02:39.050
+such things as we wanted here, right!
+
+00:02:39.050 --> 00:02:43.400
+We will initialize the
+counter and the timer.
+
+00:02:43.400 --> 00:02:50.390
+And of course, we will also
+use this StopWatch in a gauge.
+
+00:02:50.390 --> 00:02:53.360
+It's perfect for gauge because it really
+
+00:02:53.360 --> 00:02:56.510
+does count the time from last invocation.
+
+00:02:56.510 --> 00:02:59.810
+And then when someone invokes
+the list method again,
+
+00:02:59.810 --> 00:03:02.480
+it resets to 0, so it's
+not really a counter,
+
+00:03:02.480 --> 00:03:04.985
+it will both rise and fall.
+
+00:03:04.985 --> 00:03:09.080
+So we will initialize all of these 3 in
+
+00:03:09.080 --> 00:03:13.280
+a PostConstruct lifecycle
+method called initMeters.
+
+00:03:13.280 --> 00:03:16.730
+As you can see here, we
+asked the meter registry
+
+00:03:16.730 --> 00:03:20.330
+to give us a counter called
+callsToExpenseList.
+
+00:03:20.330 --> 00:03:24.440
+We ask it to give us a timer
+called expenseListTimer.
+
+00:03:24.440 --> 00:03:28.025
+And of course, because this
+is a timer for a method,
+
+00:03:28.025 --> 00:03:35.990
+we need to wrap that method
+in a supplier functional interface.
+
+00:03:35.990 --> 00:03:39.800
+And what the list method actually
+
+00:03:39.800 --> 00:03:43.220
+does is, it invokes the
+expenseService list method.
+
+00:03:43.220 --> 00:03:45.200
+And that's what we will be wrapping here.
+
+00:03:45.200 --> 00:03:48.350
+And then we will be replacing the
+actual invocation further down
+
+00:03:48.350 --> 00:03:52.820
+in the list method with
+this, timer's get invocation.
+
+00:03:52.820 --> 00:03:55.160
+The timer's get invocation in turn,
+
+00:03:55.160 --> 00:04:00.740
+will invoke the expenseService's
+list method and return the result,
+
+00:04:00.740 --> 00:04:02.240
+as we can see here,
+
+00:04:02.240 --> 00:04:04.890
+by the generic type specified.
+
+00:04:05.260 --> 00:04:12.950
+We also initialize registry to give us
+a gauge called timeToLastExpenseList.
+
+00:04:12.950 --> 00:04:16.430
+Here you can see
+an interesting detail.
+
+00:04:16.430 --> 00:04:22.850
+You do not have to store the instance
+of a metric because the registry
+
+00:04:22.850 --> 00:04:29.359
+actually saves or remembers that a
+metric has been initialized.
+
+00:04:29.359 --> 00:04:32.210
+And if you want to access this gauge,
+
+00:04:32.210 --> 00:04:35.585
+all you need to know is the exact
+name you gave it and you can
+
+00:04:35.585 --> 00:04:37.730
+access it directly
+through the registry and
+
+00:04:37.730 --> 00:04:40.175
+perform any sort of
+operations you want to.
+
+00:04:40.175 --> 00:04:43.130
+Now, what we are going to do with
+
+00:04:43.130 --> 00:04:46.760
+this gauge is we are going
+to give it a description
+
+00:04:46.760 --> 00:04:50.750
+and then we are going to
+tell it that the value of
+
+00:04:50.750 --> 00:04:55.910
+the gauge is actually the instance
+variable called stopWatch,
+
+00:04:55.910 --> 00:04:57.740
+which we have initialized here.
+
+00:04:57.740 --> 00:05:00.005
+And the
+
+00:05:00.005 --> 00:05:03.620
+actual method to obtain the current value
+
+00:05:03.620 --> 00:05:07.550
+of the gauge is StopWatch's
+getTime method.
+
+00:05:07.550 --> 00:05:09.125
+Right!
+
+00:05:09.125 --> 00:05:13.895
+So let's modify the list method
+to include our counters.
+
+00:05:13.895 --> 00:05:17.060
+First thing we are going to
+do is we are going to replace
+
+00:05:17.060 --> 00:05:20.314
+the expenseService.list method invocation
+
+00:05:20.314 --> 00:05:24.515
+with the invocation of the
+listTimer.get method.
+
+00:05:24.515 --> 00:05:31.520
+As we said, because this GET
+method is wrapping a Supplier that
+
+00:05:31.520 --> 00:05:34.640
+returns a list of expenses and points
+
+00:05:34.640 --> 00:05:39.845
+to the expense services list
+method via lambda reference,
+
+00:05:39.845 --> 00:05:47.000
+the invocation of this timer's get method
+actually invokes what we want to.
+
+00:05:47.000 --> 00:05:48.995
+This is the expenseService.list method,
+
+00:05:48.995 --> 00:05:51.950
+but also times it, encapsulate it in
+
+00:05:51.950 --> 00:05:55.910
+a timer and remembers how much
+time it took to complete.
+
+00:05:55.910 --> 00:05:57.350
+But before we return this,
+
+00:05:57.350 --> 00:05:58.880
+we have to first of all,
+
+00:05:58.880 --> 00:06:02.855
+increment the number of
+invocations to expense list.
+
+00:06:02.855 --> 00:06:07.775
+And because we want to measure the
+time since the last list invocation,
+
+00:06:07.775 --> 00:06:10.835
+you want to reset and
+start the stopwatch again.
+
+00:06:10.835 --> 00:06:14.030
+Also, what we are going
+to do is we are going to
+
+00:06:14.030 --> 00:06:19.715
+add a counter and a timer
+also to the creation method.
+
+00:06:19.715 --> 00:06:23.360
+Here we use the direct
+approach so we simply ask
+
+00:06:23.360 --> 00:06:27.620
+the registry to create a counter
+if it hasn't been created yet,
+
+00:06:27.620 --> 00:06:32.795
+callsToExpenseCreate
+and then increment it.
+
+00:06:32.795 --> 00:06:34.835
+So if it's already being created,
+
+00:06:34.835 --> 00:06:36.229
+it will just be incremented.
+
+00:06:36.229 --> 00:06:38.645
+If this is the first time
+we are invoking the method,
+
+00:06:38.645 --> 00:06:43.130
+it will be created and
+incremented at the same time.
+
+00:06:43.130 --> 00:06:47.570
+What we will also do is we will replace
+
+00:06:47.570 --> 00:06:50.690
+the return statement, where
+
+00:06:50.690 --> 00:06:54.350
+the expenseService.create
+method has been invoked.
+
+00:06:54.350 --> 00:06:58.865
+We will replace it with the
+timer's get invocation.
+
+00:06:58.865 --> 00:07:01.250
+But again, we are going
+to use a lambda here.
+
+00:07:01.250 --> 00:07:06.500
+We are going to wrap the Supplier
+with the type of Expense
+
+00:07:06.500 --> 00:07:13.640
+in a reference to expenseService.create(expense) method.
+
+00:07:13.640 --> 00:07:19.025
+So this does basically the same
+as the old return statement did,
+
+00:07:19.025 --> 00:07:25.370
+except it wraps the invocation of the
+method in yet an additional timer.
+
+00:07:25.370 --> 00:07:27.860
+We are done with the code modifications.
+
+00:07:27.860 --> 00:07:31.429
+Now, let's start the Quarkus instance.
+
+00:07:31.429 --> 00:07:34.355
+It's going to download
+a number of extensions that
+
+00:07:34.355 --> 00:07:39.110
+belong to JAR files
+that belong to the quarkus.
+
+00:07:39.110 --> 00:07:42.815
+micrometer prometheus registry extension.
+
+00:07:42.815 --> 00:07:47.165
+And here it is starting up, there we go.
+
+00:07:47.165 --> 00:07:53.990
+So I can switch to another terminal window
+and invoke the get expenses method.
+
+00:07:53.990 --> 00:07:57.560
+We can see if we ask for the metrics,
+
+00:07:57.560 --> 00:08:01.280
+then we can see that, for example,
+
+00:08:01.280 --> 00:08:05.450
+the expenseListTimer
+has been initialized.
+
+00:08:05.450 --> 00:08:07.399
+It took 83 milliseconds,
+
+00:08:07.399 --> 00:08:11.240
+almost 84 milliseconds to
+return the above result.
+
+00:08:11.240 --> 00:08:15.560
+It's been invoked only once
+
+00:08:15.560 --> 00:08:18.500
+and there's an 
+average of all the 
+
+00:08:18.500 --> 00:08:23.105
+invocation, it's actually a total
+of all the invocation times.
+
+00:08:23.105 --> 00:08:27.410
+But this is not the counter
+that we have registered, right?
+
+00:08:27.410 --> 00:08:28.895
+This is the timer.
+
+00:08:28.895 --> 00:08:31.835
+Note that the timer also has a counter,
+
+00:08:31.835 --> 00:08:35.705
+but our explicit counter is a little
+bit further down, there is,
+
+00:08:35.705 --> 00:08:38.375
+it's callsToExpenseList_total.
+
+00:08:38.375 --> 00:08:39.875
+There we go.
+
+00:08:39.875 --> 00:08:42.890
+And there is also timeToLastExpenseList,
+
+00:08:42.890 --> 00:08:46.880
+which at this moment in time
+is 10, almost 11 seconds.
+
+00:08:46.880 --> 00:08:52.805
+Note that the other metrics which we
+haven't yet used do not appear here.
+
+00:08:52.805 --> 00:08:54.920
+They will only appear when we
+
+00:08:54.920 --> 00:08:57.590
+create an expense for the
+first time, for example.
+
+00:08:57.590 --> 00:09:04.010
+But we do have a number of system metrics
+such as cpu_usage of the process,
+
+00:09:04.010 --> 00:09:07.775
+the http_server_connections_seconds,
+
+00:09:07.775 --> 00:09:09.380
+and so on and so on.
+
+00:09:09.380 --> 00:09:11.000
+Let's go to Grafana.
+
+00:09:11.000 --> 00:09:13.895
+Grafana is running on port 3000
+
+00:09:13.895 --> 00:09:18.860
+and you can login using your
+username of admin, the password of admin
+
+00:09:18.860 --> 00:09:22.100
+and then your Grafana will prompt
+you to change the admin password,
+
+00:09:22.100 --> 00:09:27.620
+just click skip, and you will
+get to the starting page.
+
+00:09:27.620 --> 00:09:33.755
+You can open the Dashboards
+section by going to
+
+00:09:33.755 --> 00:09:36.485
+dashboards menu and clicking
+Home or just simply
+
+00:09:36.485 --> 00:09:40.160
+entering /dashboards in the URL here.
+
+00:09:40.160 --> 00:09:42.800
+And then you will see 
+the expenses folder
+
+00:09:42.800 --> 00:09:45.260
+which contains the Demo 
+Expenses Dashboard.
+
+00:09:45.260 --> 00:09:49.100
+So clicking on that Demo 
+Expenses Dashboard will show
+
+00:09:49.100 --> 00:09:53.195
+you 4 different diagrams.
+
+00:09:53.195 --> 00:09:56.570
+So the expense lists total requests,
+
+00:09:56.570 --> 00:10:02.570
+the number of calls to
+expense is create, time to
+
+00:10:02.570 --> 00:10:07.625
+response and time from last
+call to list expenses.
+
+00:10:07.625 --> 00:10:11.510
+Now, while we are monitoring these metrics,
+
+00:10:11.510 --> 00:10:15.695
+we can also start a script
+called /generate data,
+
+00:10:15.695 --> 00:10:18.260
+which will generate some additional data
+
+00:10:18.260 --> 00:10:22.205
+and you can see how nicely
+it increases in the graphs.
+
+00:10:22.205 --> 00:10:27.830
+How the time to response actually
+reflects the current response times.
+
+00:10:27.830 --> 00:10:30.290
+And as you can also see,
+
+00:10:30.290 --> 00:10:37.550
+there's been, what was that 170 ish or
+
+00:10:37.550 --> 00:10:46.010
+so 160 seconds since the last time
+to call the list of expenses method,
+
+00:10:46.010 --> 00:10:48.680
+and then it drops and stays at 0.
+
+00:10:48.680 --> 00:10:51.770
+Because what the script we have
+just started does is, it
+
+00:10:51.770 --> 00:10:55.685
+continuously lists and
+create some expenses, right!
+
+00:10:55.685 --> 00:10:57.785
+So there we have it.
+
+00:10:57.785 --> 00:11:02.449
+Really easy ways of adding
+metrics to our application.
+
+00:11:02.449 --> 00:11:08.705
+You can now just press Control C to stop the
+generate data script and move over to
+
+00:11:08.705 --> 00:11:12.770
+the Quarkus window and stop that one as
+
+00:11:12.770 --> 00:11:17.015
+well by pressing Control C. And then
+simply run lab monitor-metrics
+
+00:11:17.015 --> 00:11:20.810
+finish script, which will
+clean everything up and stop
+
+00:11:20.810 --> 00:11:24.905
+the database and Grafana 
+and the Prometheus servers.
+
+00:11:24.905 --> 00:11:27.050
+And then join us in the next video,
+
+00:11:27.050 --> 00:11:29.375
+where we are going to have
+a look at how to trace
+
+00:11:29.375 --> 00:11:34.200
+requests among various
+numbers of microservices.
 

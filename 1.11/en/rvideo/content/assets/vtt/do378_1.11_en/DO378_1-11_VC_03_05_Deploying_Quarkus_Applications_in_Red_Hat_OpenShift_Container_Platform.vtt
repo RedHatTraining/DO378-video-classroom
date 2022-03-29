@@ -1,5 +1,800 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:02.430
+Welcome back! Having
+looked at how to deploy
 
+00:00:02.430 --> 00:00:05.010
+applications in OpenShift as such,
+
+00:00:05.010 --> 00:00:08.055
+so without any additional tools or help,
+
+00:00:08.055 --> 00:00:11.145
+let's have a look at how that
+changes when we're using Quarkus.
+
+00:00:11.145 --> 00:00:14.115
+Quarkus has an OpenShift extension,
+
+00:00:14.115 --> 00:00:19.170
+which is actually built on top of
+the Kubernetes Quarkus extension.
+
+00:00:19.170 --> 00:00:20.880
+So it shares a lot of functionality,
+
+00:00:20.880 --> 00:00:23.830
+and configuration properties with it.
+
+00:00:23.870 --> 00:00:28.320
+And simply if you want to
+deploy applications to OpenShift
+
+00:00:28.320 --> 00:00:31.725
+just add the extension
+using mvn quarkus:
+
+00:00:31.725 --> 00:00:33.405
+add-extension
+
+00:00:33.405 --> 00:00:36.355
+-Dextension equals openshift
+
+00:00:36.355 --> 00:00:40.640
+or you can also add it
+manually in your pom.xml.
+
+00:00:40.640 --> 00:00:44.240
+Then when you're building the application,
+
+00:00:44.240 --> 00:00:48.470
+so when you're packaging the application
+with the mvn package goal is simply
+
+00:00:48.470 --> 00:00:53.465
+set -Dquarkus.kubernetes.deploy equals true.
+
+00:00:53.465 --> 00:00:56.585
+And that will, after the
+package has been built,
+
+00:00:56.585 --> 00:00:58.955
+use your existing credentials,
+
+00:00:58.955 --> 00:01:03.035
+so existing session that you've
+established with OpenShift,
+
+00:01:03.035 --> 00:01:05.240
+the existing project
+which you're currently
+
+00:01:05.240 --> 00:01:08.269
+using and generate all the resources,
+
+00:01:08.269 --> 00:01:10.250
+start a binary source image
+
+00:01:10.250 --> 00:01:12.995
+build and deploy the application in OPenShift.
+
+00:01:12.995 --> 00:01:15.140
+As we said, it's opinionated,
+
+00:01:15.140 --> 00:01:16.430
+so for the most part,
+
+00:01:16.430 --> 00:01:18.665
+the default should be working fine.
+
+00:01:18.665 --> 00:01:25.130
+But let's have a look at how we
+can influence those settings in,
+
+00:01:25.130 --> 00:01:29.765
+well, what we want.
+
+00:01:29.765 --> 00:01:33.290
+As we said, you have to have logged in
+
+00:01:33.290 --> 00:01:36.290
+to OpenShift to be able
+to deploy applications.
+
+00:01:36.290 --> 00:01:40.715
+There is no way to specify OpenShift
+credentials and have the Quarkus
+
+00:01:40.715 --> 00:01:43.295
+OpenShift extension login for you,
+
+00:01:43.295 --> 00:01:46.250
+it's just using whatever
+you're currently using.
+
+00:01:46.250 --> 00:01:49.865
+So it's important to check
+that before building,
+
+00:01:49.865 --> 00:01:55.925
+lest you want to deploy
+applications to some random cluster.
+
+00:01:55.925 --> 00:01:59.975
+The way the OpenShift
+extension works is that it
+
+00:01:59.975 --> 00:02:05.360
+generates the resource files in the
+target directory of your project
+
+00:02:05.360 --> 00:02:08.780
+in the Kubernetes subdirectory.
+
+00:02:08.780 --> 00:02:12.350
+The kubernetes.yaml and
+openshift.yaml files
+
+00:02:12.350 --> 00:02:15.270
+and of course their JSON equivalent.
+
+00:02:15.550 --> 00:02:19.520
+Now the extension reuses
+your existing session
+
+00:02:19.520 --> 00:02:22.370
+and then after the
+package phase is completed,
+
+00:02:22.370 --> 00:02:27.170
+sends those generated resources
+to the control plane in order
+
+00:02:27.170 --> 00:02:32.285
+to deploy or even build a new image
+and then deploy your application.
+
+00:02:32.285 --> 00:02:37.190
+The most common configuration option
+that you will want to use when
+
+00:02:37.190 --> 00:02:42.860
+deploying to OpenShift is the quarkus.openshift. expose equals true.
+
+00:02:42.860 --> 00:02:45.260
+It doesn't do anything for Kubernetes
+
+00:02:45.260 --> 00:02:48.110
+but for OpenShift, which
+supports Ingress routes
+
+00:02:48.110 --> 00:02:50.750
+it actually creates an ingress route for
+
+00:02:50.750 --> 00:02:53.990
+your newly deployed application
+or updates the existing one
+
+00:02:53.990 --> 00:02:56.075
+of course, if that one already existed,
+
+00:02:56.075 --> 00:02:58.250
+in order for you to be able to access
+
+00:02:58.250 --> 00:03:00.980
+the application from outside the cluster.
+
+00:03:00.980 --> 00:03:08.090
+If you want to specifically set the
+name of your generated resources,
+
+00:03:08.090 --> 00:03:09.710
+such as the deployment, the service,
+
+00:03:09.710 --> 00:03:12.665
+the route and any other resources,
+
+00:03:12.665 --> 00:03:16.250
+you can use quarkus.openshift.name property
+
+00:03:16.250 --> 00:03:19.609
+and set it to whatever you
+want to name the application.
+
+00:03:19.609 --> 00:03:23.045
+By default it's going to be
+the project artifact ID.
+
+00:03:23.045 --> 00:03:26.285
+However, if you want to rename
+it, here's a way to do it.
+
+00:03:26.285 --> 00:03:30.290
+If you need to set any
+labels on your resources,
+
+00:03:30.290 --> 00:03:34.370
+you can also use 
+quarkus.openshift.labels property,
+
+00:03:34.370 --> 00:03:38.345
+where anything after
+labels becomes the key
+
+00:03:38.345 --> 00:03:43.475
+and then anything after the equal
+sign becomes the value of that label.
+
+00:03:43.475 --> 00:03:46.970
+If you want to set some environment
+variables in your deployment,
+
+00:03:46.970 --> 00:03:52.020
+you can use quarkus.openshift.env property.
+
+00:03:52.930 --> 00:03:56.690
+Now, env has several subsections,
+
+00:03:56.690 --> 00:03:57.890
+so if you just want to set
+
+00:03:57.890 --> 00:04:01.565
+a statically hard-coded
+variable into your deployment,
+
+00:04:01.565 --> 00:04:05.210
+you use the vars suffix 
+and then specify
+
+00:04:05.210 --> 00:04:07.430
+the variable name and specify
+
+00:04:07.430 --> 00:04:10.475
+the value that it should be
+set to after the equal sign.
+
+00:04:10.475 --> 00:04:15.170
+Of course, if it's sensitive data that
+you're setting in your deployment,
+
+00:04:15.170 --> 00:04:19.025
+then it's recommended to rather
+use a ConfigMap and a Secret,
+
+00:04:19.025 --> 00:04:21.230
+well, especially Secret
+for sensitive data.
+
+00:04:21.230 --> 00:04:24.560
+But even so it's better to use ConfigMaps and
+
+00:04:24.560 --> 00:04:28.040
+Secrets rather than hard code
+values into your deployments
+
+00:04:28.040 --> 00:04:31.580
+and that is actually possible
+using a different suffix.
+
+00:04:31.580 --> 00:04:32.990
+So it's going to be quarkus.
+
+00:04:32.990 --> 00:04:35.975
+openshift.env this time as well.
+
+00:04:35.975 --> 00:04:41.315
+But instead of vars it's
+going to be ConfigMaps
+
+00:04:41.315 --> 00:04:47.015
+and then a list, comma separated list
+of ConfigMaps that you want to take
+
+00:04:47.015 --> 00:04:49.370
+all the keys from and set
+
+00:04:49.370 --> 00:04:53.330
+the environment variable
+values based on the key names.
+
+00:04:53.330 --> 00:04:54.740
+There will be uppercase,
+
+00:04:54.740 --> 00:04:57.154
+any dashes will be
+replaced with underscores
+
+00:04:57.154 --> 00:05:01.640
+and the values of those keys in
+ConfigMaps will become the values
+
+00:05:01.640 --> 00:05:04.670
+of the environment variables
+and it's the same with secrets.
+
+00:05:04.670 --> 00:05:12.800
+So if you want to map a secret or secret
+content to environment variables,
+
+00:05:12.800 --> 00:05:17.780
+then use quarkus.openshift.env.secrets and specify again
+
+00:05:17.780 --> 00:05:19.940
+a comma separated list of
+secrets that you want
+
+00:05:19.940 --> 00:05:23.360
+to map into the environment variables.
+
+00:05:23.360 --> 00:05:27.215
+If you want to map specific keys,
+
+00:05:27.215 --> 00:05:31.280
+so just a subset or even rename
+
+00:05:31.280 --> 00:05:32.982
+the keys in flight as you're
+mapping them from ConfigMaps and
+
+00:05:34.684 --> 00:05:36.665
+Secrets in to environment variables,
+
+00:05:36.665 --> 00:05:38.450
+then you can use the,
+
+00:05:38.450 --> 00:05:41.135
+again quarkus.openshift.env
+
+00:05:41.135 --> 00:05:47.315
+but .mapping subsection where you specify
+the name of the environment variable,
+
+00:05:47.315 --> 00:05:50.480
+your setting, and then the source,
+
+00:05:50.480 --> 00:05:53.840
+which can be either from
+configmap or from secret
+
+00:05:53.840 --> 00:05:56.390
+and the key that contains
+
+00:05:56.390 --> 00:05:59.120
+the value that you want to set
+in the environment variables.
+
+00:05:59.120 --> 00:06:02.510
+So that would be with key in both cases
+
+00:06:02.510 --> 00:06:05.930
+of course. If you want to influence
+
+00:06:05.930 --> 00:06:10.040
+how the image build is going
+to happen inside OpenShift,
+
+00:06:10.040 --> 00:06:13.490
+of course, we are not talking about local
+container image builds, we are talking
+
+00:06:13.490 --> 00:06:17.960
+about building the image inside
+the OpenShift Container Platform.
+
+00:06:17.960 --> 00:06:23.930
+Again, by default, the
+image will get the name.
+
+00:06:23.930 --> 00:06:27.860
+So the image stream
+actually get the name of
+
+00:06:27.860 --> 00:06:32.390
+the artifact ID that you're
+configuring in your pom.xml
+
+00:06:32.390 --> 00:06:35.210
+and the tag is just going
+to be latest. So image stream
+
+00:06:35.210 --> 00:06:38.270
+tag is going to be artifact ID colon latest.
+
+00:06:38.270 --> 00:06:43.655
+If you want to configure the
+image name in some other format,
+
+00:06:43.655 --> 00:06:48.920
+then you can use quarkus.
+container-image.group,
+
+00:06:48.920 --> 00:06:51.575
+which is going to be the namespace,
+
+00:06:51.575 --> 00:06:59.570
+but the image is placed in, then
+quarkus.container-image.name,
+
+00:06:59.570 --> 00:07:01.280
+which is going to be the base name of
+
+00:07:01.280 --> 00:07:05.915
+the image and quarkus.container-image.tag,
+
+00:07:05.915 --> 00:07:07.130
+which becomes the tags.
+
+00:07:07.130 --> 00:07:08.855
+So with these 3 lines,
+
+00:07:08.855 --> 00:07:10.925
+we get the image name of com.
+
+00:07:10.925 --> 00:07:16.640
+myorganization/quarkus-app:1.0.
+
+00:07:16.640 --> 00:07:20.210
+You can set that on the command line
+or in the application properties
+
+00:07:20.210 --> 00:07:23.975
+and the same goes for all the previous
+options that we've discussed.
+
+00:07:23.975 --> 00:07:28.655
+So, it doesn't really
+matter where you set them,
+
+00:07:28.655 --> 00:07:30.395
+they will be picked up by
+
+00:07:30.395 --> 00:07:34.520
+the OpenShift extension
+and used. If you want to
+
+00:07:34.520 --> 00:07:37.220
+and that is probably the
+most common modification
+
+00:07:37.220 --> 00:07:39.920
+that you will perform during builds.
+
+00:07:39.920 --> 00:07:41.540
+If you want to pick
+
+00:07:41.540 --> 00:07:46.865
+a specific base image for your
+application to be built on top of,
+
+00:07:46.865 --> 00:07:53.120
+then you can use quarkus.s2i.base-jvm-image.
+
+00:07:53.120 --> 00:08:00.275
+So for example, if you wanted to
+use the UBI based OpenJDK image,
+
+00:08:00.275 --> 00:08:04.550
+you would set that property to
+registry.access.redhat.com
+
+00:08:04.550 --> 00:08:09.890
+/ubi8/openjdk-11 and an optional tag,
+
+00:08:09.890 --> 00:08:14.015
+of course, afterwards, if you want
+to use just a specific build,
+
+00:08:14.015 --> 00:08:17.360
+otherwise, the tag as
+usual defaults to latest.
+
+00:08:17.360 --> 00:08:20.465
+All the Quarkus builds that produce
+
+00:08:20.465 --> 00:08:22.400
+container images in OpenShift are to be
+
+00:08:22.400 --> 00:08:24.680
+considered binary source to image builds,
+
+00:08:24.680 --> 00:08:27.050
+which is different from
+your usual source image
+
+00:08:27.050 --> 00:08:29.630
+build where the source code is actually
+
+00:08:29.630 --> 00:08:34.850
+cloned from a Git repository into
+a container inside OpenShift
+
+00:08:34.850 --> 00:08:39.680
+and then the source-to-image assemble
+process builds the packages,
+
+00:08:39.680 --> 00:08:42.440
+the artifacts, the JAR files
+that you need to build
+
+00:08:42.440 --> 00:08:45.680
+and commits them into a
+new application image.
+
+00:08:45.680 --> 00:08:48.470
+So this is by far the safest way to
+
+00:08:48.470 --> 00:08:51.770
+build container images because
+the Java Virtual Machine,
+
+00:08:51.770 --> 00:08:56.315
+the Java compiler, the execution
+environment of the build,
+
+00:08:56.315 --> 00:08:58.760
+are the very same as they are going to
+
+00:08:58.760 --> 00:09:01.490
+be in your application once it's deployed.
+
+00:09:01.490 --> 00:09:04.040
+Binary source image builds are a bit
+
+00:09:04.040 --> 00:09:08.015
+riskier because they
+depend on the fact that
+
+00:09:08.015 --> 00:09:11.960
+the Java virtual machine and the
+compiler version that you're
+
+00:09:11.960 --> 00:09:15.890
+using on your workstation,
+match the target image.
+
+00:09:15.890 --> 00:09:20.330
+You do not want to have a class format
+error when you deploy or when you
+
+00:09:20.330 --> 00:09:22.445
+try to run your application
+simply because you use
+
+00:09:22.445 --> 00:09:25.160
+Java 17 on your workstation
+
+00:09:25.160 --> 00:09:28.220
+and the build, the image
+that the application has
+
+00:09:28.220 --> 00:09:33.500
+been deployed to, is using Java 11, right?
+
+00:09:33.500 --> 00:09:34.880
+So be careful about that,
+
+00:09:34.880 --> 00:09:38.180
+it's actually recommended to only use
+
+00:09:38.180 --> 00:09:41.840
+this process in development
+and in early testing.
+
+00:09:41.840 --> 00:09:48.845
+And then switch to fully blown source-to-image builds for further stages.
+
+00:09:48.845 --> 00:09:52.250
+If you want to build a
+container image locally on
+
+00:09:52.250 --> 00:09:54.650
+your system then test it in Podman
+
+00:09:54.650 --> 00:09:57.320
+or ship it somewhere where
+it's going to be deployed like
+
+00:09:57.320 --> 00:10:00.335
+Kubernetes. Then you can use
+
+00:10:00.335 --> 00:10:05.915
+quarkus.container-image.build
+option and set it to true.
+
+00:10:05.915 --> 00:10:08.360
+But for that to happen,
+
+00:10:08.360 --> 00:10:13.234
+you need to configure a specific
+container image extension.
+
+00:10:13.234 --> 00:10:16.580
+There is a document on quarkus.io,
+
+00:10:16.580 --> 00:10:22.220
+make sure you're looking at the correct
+version, our version is 1.11.
+
+00:10:22.220 --> 00:10:26.340
+That's a Red Hat build of
+Quarkus long-term support.
+
+00:10:26.380 --> 00:10:29.525
+Even though there are
+newer versions of Quarkus,
+
+00:10:29.525 --> 00:10:33.920
+they will be included
+in long-term support,
+
+00:10:33.920 --> 00:10:37.920
+eventually, for now we're using 1.11.
+
+00:10:38.650 --> 00:10:45.140
+So the Quarkus container image
+extensions are Jib, Docker and 
+
+00:10:45.140 --> 00:10:46.160
+S2I.
+
+00:10:46.160 --> 00:10:51.740
+Jib is probably the most
+platform independent because it's
+
+00:10:51.740 --> 00:10:57.260
+using a Google program called Jib
+that is written completely in Java,
+
+00:10:57.260 --> 00:10:59.840
+does not need any container runtime at all
+
+00:10:59.840 --> 00:11:03.634
+and performs the entire
+image build in a JVM.
+
+00:11:03.634 --> 00:11:09.635
+So you simply add the extension using
+the standard quarkus:add-extension.
+
+00:11:09.635 --> 00:11:12.800
+The extension name is
+container-image-jib.
+
+00:11:12.800 --> 00:11:16.490
+There are number of options for jib to configure
+
+00:11:16.490 --> 00:11:20.945
+the actual image build, of which
+probably the most important
+
+00:11:20.945 --> 00:11:24.710
+is where to push the resulting
+image because jib does not
+
+00:11:24.710 --> 00:11:27.380
+depend on an existing container runtime
+
+00:11:27.380 --> 00:11:29.780
+on the machine where
+you're building the image.
+
+00:11:29.780 --> 00:11:31.760
+It has to store the image somewhere,
+
+00:11:31.760 --> 00:11:34.160
+but it cannot store it in
+a Docker image repository.
+
+00:11:34.160 --> 00:11:36.500
+It cannot store it in a
+Podman image repository.
+
+00:11:36.500 --> 00:11:39.560
+It has push it into some
+sort of a registry
+
+00:11:39.560 --> 00:11:44.435
+and for that quarkus.container-image.push
+
+00:11:44.435 --> 00:11:47.570
+configuration value must be set to
+
+00:11:47.570 --> 00:11:51.215
+some sort of a registry
+where you have access.
+
+00:11:51.215 --> 00:11:54.545
+If you're using the Docker
+extension, then of course,
+
+00:11:54.545 --> 00:11:58.460
+Quarkus expects to have a
+local Docker daemon running,
+
+00:11:58.460 --> 00:12:01.760
+or at least they have the
+Docker client configured to be
+
+00:12:01.760 --> 00:12:05.240
+able to talk to some remote
+instance of a Docker daemon.
+
+00:12:05.240 --> 00:12:07.430
+If you're using the S2I extension,
+
+00:12:07.430 --> 00:12:11.150
+then you will also have to have the OpenShift
+extension added and of course,
+
+00:12:11.150 --> 00:12:15.290
+an existing OpenShift session
+running because that actually
+
+00:12:15.290 --> 00:12:20.855
+uses OpenShift source-to-image binary
+build as we just discussed previously,
+
+00:12:20.855 --> 00:12:24.260
+to actually create a build config
+
+00:12:24.260 --> 00:12:27.890
+in some image streams to
+store the image into.
+
+00:12:27.890 --> 00:12:30.230
+There is an alternative
+approach which you can
+
+00:12:30.230 --> 00:12:33.185
+use if you want to build container images,
+
+00:12:33.185 --> 00:12:35.690
+which is called JKube.
+
+00:12:35.690 --> 00:12:38.749
+It is a standalone Maven extension,
+
+00:12:38.749 --> 00:12:43.250
+so it's a generic plug-in
+from Maven, you can use with
+
+00:12:43.250 --> 00:12:49.970
+Quarkus applications and then target
+any sort of cloud environment,
+
+00:12:49.970 --> 00:12:52.925
+such as a Kubernetes or
+an OpenShift system.
+
+00:12:52.925 --> 00:12:57.905
+You can use JKube to deploy Quarkus
+applications, once they've been packaged.
+
+00:12:57.905 --> 00:13:01.039
+Of course, you can use them to deploy.
+
+00:13:01.039 --> 00:13:03.710
+You can use it to deploy
+them to OpenShift as well.
+
+00:13:03.710 --> 00:13:05.075
+But you do loose
+
+00:13:05.075 --> 00:13:08.285
+the extra capacities of,
+
+00:13:08.285 --> 00:13:11.089
+for example, configuring deployments,
+
+00:13:11.089 --> 00:13:15.275
+fine tuning them and so on using
+the OpenShift Quarkus extension.
+
+00:13:15.275 --> 00:13:19.100
+Now let's have a look at how to deploy
+Quarkus applications to OpenShift,
+
+00:13:19.100 --> 00:13:21.330
+in the next exercise.
 

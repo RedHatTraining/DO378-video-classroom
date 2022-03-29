@@ -1,5 +1,668 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:02.370
+Let's have a look at
+how simple it is to use
 
+00:00:02.370 --> 00:00:06.465
+JSON Web Tokens to authorize
+requests in an application.
+
+00:00:06.465 --> 00:00:10.275
+Starting with lab secure-jwt start script,
+
+00:00:10.275 --> 00:00:13.200
+which populates our exercise directories,
+
+00:00:13.200 --> 00:00:14.670
+let's move to it.
+
+00:00:14.670 --> 00:00:18.120
+That's /DO378/labs/secure-jwt.
+
+00:00:18.120 --> 00:00:21.000
+You can see by listing the files in it,
+
+00:00:21.000 --> 00:00:22.785
+we have a number of scripts here.
+
+00:00:22.785 --> 00:00:25.770
+For now we are just going to use
+the start-keycloak script,
+
+00:00:25.770 --> 00:00:28.695
+which starts the authorization server.
+
+00:00:28.695 --> 00:00:32.220
+It's containerized, so it's going to
+take a little bit to download the image,
+
+00:00:32.220 --> 00:00:35.935
+but then it just starts up magically.
+
+00:00:35.935 --> 00:00:38.900
+So in the meantime,
+while it's starting up,
+
+00:00:38.900 --> 00:00:44.510
+we can switch to another terminal
+window and go one level deeper.
+
+00:00:44.510 --> 00:00:45.680
+So DO378/
+
+00:00:45.680 --> 00:00:48.695
+labs/secure-jwt/expense-service/.
+
+00:00:48.695 --> 00:00:51.890
+This is where our familiar
+expense service is located.
+
+00:00:51.890 --> 00:00:53.690
+The source code is,
+
+00:00:53.690 --> 00:00:54.950
+as we are used to it,
+
+00:00:54.950 --> 00:00:59.780
+except with the addition of
+a single PkiResource file.
+
+00:00:59.780 --> 00:01:02.045
+If we have a look at that file,
+
+00:01:02.045 --> 00:01:05.780
+it's actually a simple rest endpoint,
+
+00:01:05.780 --> 00:01:09.455
+just registers the /pki context.
+
+00:01:09.455 --> 00:01:11.180
+And for any GET request,
+
+00:01:11.180 --> 00:01:14.690
+it tries to inject SecurityContext into
+
+00:01:14.690 --> 00:01:21.590
+the ctx variable and then prints it
+out in JSON, of course if it's available.
+
+00:01:21.590 --> 00:01:25.370
+So let's start quarkus, it starts up.
+
+00:01:25.370 --> 00:01:28.895
+Let's go over to the next terminal,
+
+00:01:28.895 --> 00:01:31.640
+where we are going to generate some tokens.
+
+00:01:31.640 --> 00:01:36.080
+So first, back to the
+secure-jwt directory.
+
+00:01:36.080 --> 00:01:39.875
+We have got the keycloak-token script,
+
+00:01:39.875 --> 00:01:42.725
+which we can invoke like this.
+
+00:01:42.725 --> 00:01:45.500
+So we are just basically saving
+
+00:01:45.500 --> 00:01:48.725
+its output and assigning
+it to the jane variable.
+
+00:01:48.725 --> 00:01:55.940
+So the invocation is the host name
+and the port of the authorization server.
+
+00:01:55.940 --> 00:01:58.550
+The name of the realm,
+
+00:01:58.550 --> 00:02:03.215
+the name of the client
+that we want to use,
+
+00:02:03.215 --> 00:02:06.185
+username, password.
+
+00:02:06.185 --> 00:02:08.210
+So that's the token name,
+
+00:02:08.210 --> 00:02:10.830
+the username and the password I believe.
+
+00:02:10.870 --> 00:02:13.010
+And here we go.
+
+00:02:13.010 --> 00:02:15.830
+There is some output from
+the script and it says,
+
+00:02:15.830 --> 00:02:18.140
+Hey, I have successfully
+retrieved the token,
+
+00:02:18.140 --> 00:02:22.370
+the roles that had been assigned
+in the authorization server to
+
+00:02:22.370 --> 00:02:27.755
+this token are modify, read, offline_access and uma_authorization.
+
+00:02:27.755 --> 00:02:29.540
+And this is the token itself.
+
+00:02:29.540 --> 00:02:34.235
+And the nice thing is this entire
+collection of information,
+
+00:02:34.235 --> 00:02:36.380
+so the identity of the user,
+
+00:02:36.380 --> 00:02:37.820
+the roles they had been assigned,
+
+00:02:37.820 --> 00:02:40.730
+is actually encoded in this token,
+
+00:02:40.730 --> 00:02:47.405
+which can be decoded on the
+side of the application.
+
+00:02:47.405 --> 00:02:52.325
+Now, john will also need their own token.
+
+00:02:52.325 --> 00:02:53.495
+And here we are.
+
+00:02:53.495 --> 00:02:56.570
+john has modify, read, offline_access,
+
+00:02:56.570 --> 00:02:58.040
+uma_authorization and
+
+00:02:58.040 --> 00:03:01.445
+an additional role that
+jane does not have, delete.
+
+00:03:01.445 --> 00:03:04.640
+He also has this token and
+
+00:03:04.640 --> 00:03:08.945
+the debug user will also
+generate a token for that one.
+
+00:03:08.945 --> 00:03:14.165
+The debug user just has offline_access
+and uma_authorization roles,
+
+00:03:14.165 --> 00:03:17.735
+and also gets a token. Right!
+
+00:03:17.735 --> 00:03:20.990
+So if we try invoking
+
+00:03:20.990 --> 00:03:24.855
+the pki endpoint without any
+sort of additional information,
+
+00:03:24.855 --> 00:03:27.665
+it just says, nope, it's not secure.
+
+00:03:27.665 --> 00:03:30.200
+I can't verify your
+identity, which is logical.
+
+00:03:30.200 --> 00:03:31.865
+We didn't provide any information.
+
+00:03:31.865 --> 00:03:35.270
+Now if we add jane's token to the request,
+
+00:03:35.270 --> 00:03:39.695
+so we are just going to turn on verbose
+output so that we see the headers
+
+00:03:39.695 --> 00:03:43.310
+and we are going to add Content-Type
+header because we know
+
+00:03:43.310 --> 00:03:47.885
+the pki endpoint only
+accepts json payloads.
+
+00:03:47.885 --> 00:03:51.290
+And the Authorization: Bearer with
+
+00:03:51.290 --> 00:03:54.830
+jane's token appended to it
+is the header that should,
+
+00:03:54.830 --> 00:03:57.095
+if everything was correct
+in the application,
+
+00:03:57.095 --> 00:04:01.250
+should turn on the authorization workflows
+
+00:04:01.250 --> 00:04:05.630
+and decode the token and
+actually recognize the subject.
+
+00:04:05.630 --> 00:04:09.860
+So if we send this to
+localhost:8080/pki
+
+00:04:09.860 --> 00:04:14.450
+the response is, yes, there is an
+authenticationScheme of Bearer
+
+00:04:14.450 --> 00:04:17.645
+but I cannot recognize what this is.
+
+00:04:17.645 --> 00:04:20.780
+This is because we haven't
+yet added and configured
+
+00:04:20.780 --> 00:04:23.870
+the OpenID Connect
+extension to the project.
+
+00:04:23.870 --> 00:04:27.290
+So we're going to have to
+add it using the quarkus:
+
+00:04:27.290 --> 00:04:32.010
+add-extension command or by
+adding it manually to pom.xml.
+
+00:04:32.260 --> 00:04:38.315
+Then we have to edit the application.properties 
+file and configure
+
+00:04:38.315 --> 00:04:44.360
+the oidc.client to connect to
+this URL for the quarkus realm
+
+00:04:44.360 --> 00:04:46.340
+to use the client-id of
+
+00:04:46.340 --> 00:04:51.020
+backend-service and the credentials
+for the client are secret.
+
+00:04:51.020 --> 00:04:53.810
+So once we have added these 3 lines of
+
+00:04:53.810 --> 00:04:57.964
+configuration in addition to
+the OpenID Connect extension,
+
+00:04:57.964 --> 00:05:00.979
+if we repeat the same request,
+
+00:05:00.979 --> 00:05:06.500
+the security context is now injected
+into the pki endpoint and it says,
+
+00:05:06.500 --> 00:05:08.885
+well, it's not secure because it isn't,
+
+00:05:08.885 --> 00:05:10.310
+we're not using TLS.
+
+00:05:10.310 --> 00:05:13.115
+But I do recognize the userPrincipal,
+
+00:05:13.115 --> 00:05:15.695
+these are the claimNames in the token,
+
+00:05:15.695 --> 00:05:18.260
+and this is the expirationTime of the
+
+00:05:18.260 --> 00:05:20.750
+token it was issued at
+this particular time.
+
+00:05:20.750 --> 00:05:25.160
+And the issuer was this OIDC server
+and this is the rawToken,
+
+00:05:25.160 --> 00:05:26.945
+and so on and so on.
+
+00:05:26.945 --> 00:05:30.290
+And then finally, towards the end,
+
+00:05:30.290 --> 00:05:34.820
+here we have the roles that
+jane has been assigned with.
+
+00:05:34.820 --> 00:05:39.755
+So in the realm_access and
+both in resource_access,
+
+00:05:39.755 --> 00:05:43.999
+there are some account roles
+for certain resources.
+
+00:05:43.999 --> 00:05:47.310
+These are all configuring
+the OIDC server.
+
+00:05:48.040 --> 00:05:51.050
+There is a preferred_username for
+
+00:05:51.050 --> 00:05:54.530
+the user and a bit of
+additional information as well.
+
+00:05:54.530 --> 00:05:55.400
+Great!
+
+00:05:55.400 --> 00:05:59.255
+Now let's go over to the expense-service,
+
+00:05:59.255 --> 00:06:03.575
+open it in an editor and make sure that
+
+00:06:03.575 --> 00:06:08.705
+only authenticated users can access
+endpoints from the ExpenseResource.
+
+00:06:08.705 --> 00:06:12.470
+We can do that by simply adding
+the @Authenticated annotation at
+
+00:06:12.470 --> 00:06:15.755
+the top of the class, saving it,
+
+00:06:15.755 --> 00:06:18.875
+exiting and just repeating the request to,
+
+00:06:18.875 --> 00:06:20.645
+we are sending a request we haven't made it
+
+00:06:20.645 --> 00:06:23.780
+yet to the expenses endpoint
+which will generate lists.
+
+00:06:23.780 --> 00:06:25.909
+The 2 default expenses,
+
+00:06:25.909 --> 00:06:30.530
+says we are not allowed to proceed
+because we are not authorized.
+
+00:06:30.530 --> 00:06:33.590
+If we add the Authorization token of
+
+00:06:33.590 --> 00:06:37.459
+jane, for example, we do
+get the normal response
+
+00:06:37.459 --> 00:06:40.250
+because jane's token, as we just saw,
+
+00:06:40.250 --> 00:06:45.080
+is recognized and verified by the
+OpenID Connect server and we can get
+
+00:06:45.080 --> 00:06:50.795
+the content because now jane is
+authorized, is authenticated.
+
+00:06:50.795 --> 00:06:53.360
+If we go further and add
+
+00:06:53.360 --> 00:06:57.860
+some role related restrictions
+to individual endpoints,
+
+00:06:57.860 --> 00:07:01.850
+starting with the GET endpoint, we'll say
+
+00:07:01.850 --> 00:07:04.040
+that the list of Expenses can only
+
+00:07:04.040 --> 00:07:06.590
+be obtained by people
+who have the read role.
+
+00:07:06.590 --> 00:07:08.120
+So we will add @Roles
+
+00:07:08.120 --> 00:07:10.460
+Allowed annotation and set it to read.
+
+00:07:10.460 --> 00:07:13.970
+Now the debug user does not have a read role.
+
+00:07:13.970 --> 00:07:20.330
+It just has a offline access
+and authentication roles.
+
+00:07:20.330 --> 00:07:24.350
+If we try using the debug
+users token to connect,
+
+00:07:24.350 --> 00:07:27.290
+see that the response is Forbidden.
+
+00:07:27.290 --> 00:07:31.490
+And then if we add another set of
+
+00:07:31.490 --> 00:07:35.975
+restrictions to the modifying endpoints
+to create and the update,
+
+00:07:35.975 --> 00:07:39.920
+so the POST and the PUT request, adding
+
+00:07:39.920 --> 00:07:44.970
+@RolesAllowed modify annotation
+on top of those 2 methods.
+
+00:07:45.400 --> 00:07:49.520
+One level above the source code directory,
+
+00:07:49.520 --> 00:07:51.695
+we have a payload.json file,
+
+00:07:51.695 --> 00:07:56.975
+which we can use to try to
+create a new, a new expense.
+
+00:07:56.975 --> 00:08:01.160
+So we will try sending a
+POST request containing
+
+00:08:01.160 --> 00:08:04.010
+the contents of the payload.json file
+
+00:08:04.010 --> 00:08:06.770
+and the Authorization
+token of the debug user,
+
+00:08:06.770 --> 00:08:12.140
+which again does not have any roles
+except offline access and authorization.
+
+00:08:12.140 --> 00:08:16.355
+If we try to send that as a
+post request to/expenses
+
+00:08:16.355 --> 00:08:19.175
+endpoint, we are again Forbidden.
+
+00:08:19.175 --> 00:08:22.910
+However, if we change the Bearer token
+
+00:08:22.910 --> 00:08:27.360
+to that of jane and send
+the same POST request,
+
+00:08:27.640 --> 00:08:30.140
+the request is accepted,
+
+00:08:30.140 --> 00:08:35.820
+processed and a new expense is created.
+
+00:08:36.010 --> 00:08:37.280
+Right!
+
+00:08:37.280 --> 00:08:42.140
+So let's add a restriction
+for the deletion of expenses.
+
+00:08:42.140 --> 00:08:46.130
+So we are again going to be opening
+the ExpenseResource file and simply
+
+00:08:46.130 --> 00:08:50.945
+adding a @RolesAllowed delete
+annotation on the delete method.
+
+00:08:50.945 --> 00:08:56.795
+If we try to delete an expense
+using jane's Bearer token,
+
+00:08:56.795 --> 00:08:59.390
+remember only john has a delete role.
+
+00:08:59.390 --> 00:09:05.255
+So if you try to delete an expense
+using jane's token, we are Forbidden.
+
+00:09:05.255 --> 00:09:06.590
+Now there's a trick.
+
+00:09:06.590 --> 00:09:12.620
+If we try to delete this new
+expense, it won't be there.
+
+00:09:12.620 --> 00:09:17.630
+See, even if I use john's
+Authorization token,
+
+00:09:17.630 --> 00:09:23.120
+the expense is gone because while
+we were adding the @RolesAllowed
+
+00:09:23.120 --> 00:09:28.265
+annotation and sending a new
+request to DELETE an expense,
+
+00:09:28.265 --> 00:09:30.755
+which we thought was already there
+
+00:09:30.755 --> 00:09:34.415
+between these 2 moments in
+time that the server restarted.
+
+00:09:34.415 --> 00:09:37.265
+And of course since the
+database is not persistant
+
+00:09:37.265 --> 00:09:38.945
+this expense is gone.
+
+00:09:38.945 --> 00:09:42.650
+Now let's have a look at one
+of the existing expenses.
+
+00:09:42.650 --> 00:09:47.270
+So just using john's token to
+get a list and just choose,
+
+00:09:47.270 --> 00:09:52.880
+for example, this Civilization VI uuid
+and try to delete it as user john.
+
+00:09:52.880 --> 00:09:56.765
+We see that the response is OK
+
+00:09:56.765 --> 00:09:58.415
+and it says, well, yes,
+
+00:09:58.415 --> 00:10:02.105
+this expense was deleted and if we
+try to review the list,
+
+00:10:02.105 --> 00:10:05.315
+it is indeed gone and only
+the Groceries are left.
+
+00:10:05.315 --> 00:10:10.505
+So, we see that role-based
+authorization is now working for us.
+
+00:10:10.505 --> 00:10:13.505
+Now all that remains is to restrict
+
+00:10:13.505 --> 00:10:17.540
+any other unannotated
+endpoint in the application,
+
+00:10:17.540 --> 00:10:20.570
+so let's open the
+application.properties file
+
+00:10:20.570 --> 00:10:23.360
+once more and simply add quarkus.security.
+
+00:10:23.360 --> 00:10:28.250
+jaxrs.deny-unannotated-endpoints
+setting it to true.
+
+00:10:28.250 --> 00:10:30.950
+I bet you forgot there is a pki
+
+00:10:30.950 --> 00:10:32.900
+endpoint somewhere in
+another file, right?
+
+00:10:32.900 --> 00:10:36.470
+So if we send the curl GET request to
+
+00:10:36.470 --> 00:10:40.130
+the pki endpoint, we now get
+an Unauthorized response,
+
+00:10:40.130 --> 00:10:41.540
+which is correct, of course.
+
+00:10:41.540 --> 00:10:45.365
+And that's regardless
+of what token we use,
+
+00:10:45.365 --> 00:10:48.589
+is that endpoint is not annotated,
+
+00:10:48.589 --> 00:10:52.520
+so it doesn't have any
+security-related instructions with it
+
+00:10:52.520 --> 00:10:55.940
+and that's why it's just
+simply Forbidden. We can now
+
+00:10:55.940 --> 00:11:00.275
+stop the Quarkus server pressing Control C,
+
+00:11:00.275 --> 00:11:03.620
+and then simply go back to
+
+00:11:03.620 --> 00:11:07.460
+the home directory and run the
+lab secure-jwt finish script,
+
+00:11:07.460 --> 00:11:09.110
+then move on to the next video,
+
+00:11:09.110 --> 00:11:12.810
+which is the end of chapter
+review lab. See you there.
 

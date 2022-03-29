@@ -1,5 +1,1015 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:02.100
+In this chapter, we are
+going to have a look at
 
+00:00:02.100 --> 00:00:04.830
+how to secure microservices
+communication
+
+00:00:04.830 --> 00:00:11.115
+both by validating the origin of
+incoming requests using CORS
+
+00:00:11.115 --> 00:00:18.720
+and by securing the microservice
+origin by using TLS and mutual TLS.
+
+00:00:18.720 --> 00:00:21.690
+We are also going to put
+this in practice in
+
+00:00:21.690 --> 00:00:25.004
+a guided exercise and then we are
+going to move on to how to
+
+00:00:25.004 --> 00:00:28.230
+apply authentication authorization
+rules and techniques to
+
+00:00:28.230 --> 00:00:32.415
+Quarkus microservices and take a look
+at that in an exercise as well.
+
+00:00:32.415 --> 00:00:34.645
+At the end of the chapter, we have the
+
+00:00:34.645 --> 00:00:38.075
+usual securing
+microservices end of chapter,
+
+00:00:38.075 --> 00:00:40.730
+review lab. Word on CORS first.
+
+00:00:40.730 --> 00:00:47.990
+So the problem is not with
+direct requests that,
+
+00:00:47.990 --> 00:00:54.965
+for example, users make from the browser
+by typing a URL into the address bar.
+
+00:00:54.965 --> 00:00:57.440
+You can see where your,
+
+00:00:57.440 --> 00:00:59.360
+request is going in that case.
+
+00:00:59.360 --> 00:01:03.050
+And of course, if TLS and HTTPS are in use,
+
+00:01:03.050 --> 00:01:08.240
+you can also verify that the response
+is coming from the correct resource.
+
+00:01:08.240 --> 00:01:13.310
+The issue is that many modern
+web applications are dynamic,
+
+00:01:13.310 --> 00:01:19.850
+so they download into the browser and then
+they perform certain communication with
+
+00:01:19.850 --> 00:01:23.360
+the backend microservices
+using JavaScript and
+
+00:01:23.360 --> 00:01:29.495
+sending JSON requests to some
+microservices running in the back-end.
+
+00:01:29.495 --> 00:01:36.200
+Now the issue here is that
+a rogue attacker could
+
+00:01:36.200 --> 00:01:43.475
+fool the browser into making requests
+that aren't really authorized.
+
+00:01:43.475 --> 00:01:48.184
+Or someone could have deployed
+a rogue user interface
+
+00:01:48.184 --> 00:01:53.150
+and try to make use of our microservices
+from that rogue user interface.
+
+00:01:53.150 --> 00:01:55.790
+And we need to be able to prevent that.
+
+00:01:55.790 --> 00:01:58.760
+And the problem is that users generally do
+
+00:01:58.760 --> 00:02:02.375
+not understand JavaScript well enough to,
+
+00:02:02.375 --> 00:02:05.330
+see what's going on under
+the hood of the browser.
+
+00:02:05.330 --> 00:02:07.730
+They just see the reactions to
+
+00:02:07.730 --> 00:02:10.505
+the Document Object Model
+in the browser window.
+
+00:02:10.505 --> 00:02:13.445
+And even if they do understand
+JavaScript well enough,
+
+00:02:13.445 --> 00:02:16.040
+if they are just users of an application,
+
+00:02:16.040 --> 00:02:18.365
+they are not going to go and look for it.
+
+00:02:18.365 --> 00:02:21.920
+Additionally, of course, if it's
+
+00:02:21.920 --> 00:02:25.340
+a rogue user interface that is
+trying to abuse our service,
+
+00:02:25.340 --> 00:02:28.340
+there's nothing, there's no
+control we have over that.
+
+00:02:28.340 --> 00:02:31.550
+So what is the solution to
+
+00:02:31.550 --> 00:02:35.810
+that distribution is actually
+something called CORS,
+
+00:02:35.810 --> 00:02:39.410
+Cross-origin resource sharing that allows
+
+00:02:39.410 --> 00:02:42.990
+a web page to request resources
+from an external domain.
+
+00:02:42.990 --> 00:02:46.940
+So not from the domain
+that it originated from,
+
+00:02:46.940 --> 00:02:51.720
+but actually from some other
+host name or other domain.
+
+00:02:51.790 --> 00:02:54.500
+Generally images, style sheets,
+
+00:02:54.500 --> 00:02:58.325
+and other resources aren't
+
+00:02:58.325 --> 00:03:01.040
+an issue because they
+typically bundled with
+
+00:03:01.040 --> 00:03:04.145
+the web application on the same server,
+
+00:03:04.145 --> 00:03:08.255
+Rest requests are. So,
+
+00:03:08.255 --> 00:03:11.630
+how does CORS work? First of all,
+
+00:03:11.630 --> 00:03:16.385
+most modern browsers enable
+CORS, origin requests
+
+00:03:16.385 --> 00:03:18.650
+by default. It is something that both
+
+00:03:18.650 --> 00:03:20.900
+the browser needs to be able or capable of
+
+00:03:20.900 --> 00:03:25.760
+doing and the server needs
+to be capable of handling.
+
+00:03:25.760 --> 00:03:30.080
+Now, what happens is when
+an application loads in
+
+00:03:30.080 --> 00:03:36.005
+a browser and send a request
+to some external server,
+
+00:03:36.005 --> 00:03:38.150
+not one that it originated from,
+
+00:03:38.150 --> 00:03:41.465
+the browser actually adds a header.
+
+00:03:41.465 --> 00:03:45.410
+Setting the Origin key to
+
+00:03:45.410 --> 00:03:48.200
+the value of the server or
+
+00:03:48.200 --> 00:03:51.050
+the host name that the web
+application was loaded from
+
+00:03:51.050 --> 00:03:58.970
+initially. Then the server that receives
+this request, can recognize it,
+
+00:03:58.970 --> 00:04:09.260
+and respond with an access control header
+named Access-Control-Allow-Origin,
+
+00:04:09.260 --> 00:04:14.030
+pointing to the fact that
+the application coming from
+
+00:04:14.030 --> 00:04:16.280
+some sort of a server is allowed
+
+00:04:16.280 --> 00:04:19.310
+to actually make requests
+to that other service.
+
+00:04:19.310 --> 00:04:22.760
+Of course, it's always possible to
+
+00:04:22.760 --> 00:04:28.275
+configure the back-end
+application to allow any origin
+
+00:04:28.275 --> 00:04:34.315
+and in that case it responds to the
+request with Access-Control-Allow-Origin,
+
+00:04:34.315 --> 00:04:37.495
+anything which is what the asterisk means.
+
+00:04:37.495 --> 00:04:41.094
+For visualization of
+what's going on in CORS,
+
+00:04:41.094 --> 00:04:45.250
+let's assume a Frontend user interface.
+
+00:04:45.250 --> 00:04:48.910
+Let's say one that the user downloads
+
+00:04:48.910 --> 00:04:52.915
+into their browser from
+myapp-fe.com
+
+00:04:52.915 --> 00:04:56.935
+and the Backend API that this
+application needs to use running
+
+00:04:56.935 --> 00:05:01.000
+at myapp-backend.com.
+
+00:05:01.000 --> 00:05:05.260
+Now the browser is running
+
+00:05:05.260 --> 00:05:07.495
+the frontend user
+interface and the JavaScript
+
+00:05:07.495 --> 00:05:10.710
+makes an AJAX call to the Backend API.
+
+00:05:10.710 --> 00:05:13.475
+Because the browser is a modern one,
+
+00:05:13.475 --> 00:05:19.910
+it includes the origin header in the
+request and the backend may respond.
+
+00:05:19.910 --> 00:05:21.350
+Okay, I know you,
+
+00:05:21.350 --> 00:05:25.325
+you can send me AJAX requests
+and I will be happy to handle them.
+
+00:05:25.325 --> 00:05:30.620
+If the attacker sets up a fake
+user interface and the user
+
+00:05:30.620 --> 00:05:36.410
+loads the application
+from that fake host name,
+
+00:05:36.410 --> 00:05:40.970
+say with the intent of
+stealing data or doing
+
+00:05:40.970 --> 00:05:45.395
+whatever breaches, that the
+attacker might want to perform.
+
+00:05:45.395 --> 00:05:47.810
+The browser is actually going to send to
+
+00:05:47.810 --> 00:05:50.570
+the Backend API that the
+fact that it's coming from
+
+00:05:50.570 --> 00:05:54.260
+myfakeapp-fe.com and backend will
+
+00:05:54.260 --> 00:05:58.775
+respond with the CORS error not
+allowing the client to proceed.
+
+00:05:58.775 --> 00:06:04.310
+Obviously during development, a wild card
+CORS policy may be convenient,
+
+00:06:04.310 --> 00:06:08.240
+but as we are moving towards production,
+
+00:06:08.240 --> 00:06:13.400
+it becomes increasingly more important
+to lock down the origins that we allow
+
+00:06:13.400 --> 00:06:17.840
+the request from. CORS
+actually allows us to specify
+
+00:06:17.840 --> 00:06:23.570
+not just the origin host of the
+request of the clients application,
+
+00:06:23.570 --> 00:06:30.290
+but even control over the types of
+HTTP methods that are performed
+
+00:06:30.290 --> 00:06:35.915
+and of course, additional headers as well.
+
+00:06:35.915 --> 00:06:41.240
+In Quarkus applications, CORS
+is configured out of the box.
+
+00:06:41.240 --> 00:06:47.000
+We just simply need to enable it by
+setting quarkus.http.cors to true.
+
+00:06:47.000 --> 00:06:52.130
+And then we can specify more
+fine-grained configuration by
+
+00:06:52.130 --> 00:06:57.365
+specifying which origins dynamic
+requests may be coming from.
+
+00:06:57.365 --> 00:07:01.340
+That is which origins the clients that are
+
+00:07:01.340 --> 00:07:07.775
+invoking our backend APIs may load
+the application from, so to speak.
+
+00:07:07.775 --> 00:07:10.820
+Which methods are allowed and what
+
+00:07:10.820 --> 00:07:17.160
+additional headers are going to be
+allowed in CORS requests as well.
+
+00:07:17.440 --> 00:07:22.040
+Of course, CORS is only
+one layer of security,
+
+00:07:22.040 --> 00:07:26.030
+we need to be able to secure
+data in transit as well.
+
+00:07:26.030 --> 00:07:28.369
+And for that we use TLS.
+
+00:07:28.369 --> 00:07:33.380
+Transport Layer Security is a way of
+encrypting network communications
+
+00:07:33.380 --> 00:07:38.570
+and it's particularly important
+whenever there is sensitive data involved,
+
+00:07:38.570 --> 00:07:43.040
+which is practically anytime, any sort
+of authentication is taking place
+
+00:07:43.040 --> 00:07:46.505
+and anytime we are
+shuffling back and forth
+
+00:07:46.505 --> 00:07:52.790
+critical corporate data. TLS is based
+around the concept of certificates,
+
+00:07:52.790 --> 00:07:55.040
+and it works if you imagine that on
+
+00:07:55.040 --> 00:07:58.730
+the left-hand side we
+have microservice A,
+
+00:07:58.730 --> 00:08:01.655
+on the right-hand side,
+we have microservice B.
+
+00:08:01.655 --> 00:08:03.695
+Let's say microservice A,
+
+00:08:03.695 --> 00:08:08.015
+acting as a client is invoking
+an endpoint in microservice B,
+
+00:08:08.015 --> 00:08:10.580
+it wouldn't have been any
+different if we were talking
+
+00:08:10.580 --> 00:08:12.980
+about a web browser and a backend service.
+
+00:08:12.980 --> 00:08:17.030
+But for our intents, it's going to be
+
+00:08:17.030 --> 00:08:21.905
+more common to see chained microservices
+communicating to each other,
+
+00:08:21.905 --> 00:08:24.350
+we have to protect that
+communication as well.
+
+00:08:24.350 --> 00:08:25.970
+Now, let's say the client is
+
+00:08:25.970 --> 00:08:29.390
+invoking the server. With
+plain texts communication
+
+00:08:29.390 --> 00:08:31.670
+all that happens is a request is send,
+
+00:08:31.670 --> 00:08:32.915
+and a response is received.
+
+00:08:32.915 --> 00:08:38.675
+That's it. With TLS though the
+client connects to the server and says,
+
+00:08:38.675 --> 00:08:41.615
+Hello, I want to speak HTTPS.
+
+00:08:41.615 --> 00:08:48.065
+Do you have some sort of
+identification document for me?
+
+00:08:48.065 --> 00:08:52.790
+The server loads a
+certificate from the key store
+
+00:08:52.790 --> 00:08:57.845
+that is configured with the application
+and sends it to the client.
+
+00:08:57.845 --> 00:09:01.205
+The client then verifies
+that the certificate is
+
+00:09:01.205 --> 00:09:06.065
+trustworthy by looking at
+its own trust store and
+
+00:09:06.065 --> 00:09:10.910
+responds to the server by sending
+
+00:09:10.910 --> 00:09:15.875
+its own private session key
+encrypted with the server certificate,
+
+00:09:15.875 --> 00:09:17.450
+which the server can then decrypt
+
+00:09:17.450 --> 00:09:20.240
+because in addition to the certificate,
+
+00:09:20.240 --> 00:09:21.950
+which is basically the public key.
+
+00:09:21.950 --> 00:09:24.680
+It also has access to the private key,
+
+00:09:24.680 --> 00:09:29.780
+which is needed to decrypt encrypted
+communications send from the client.
+
+00:09:29.780 --> 00:09:31.850
+So the client sends its own session key,
+
+00:09:31.850 --> 00:09:33.230
+the server decrypts it,
+
+00:09:33.230 --> 00:09:37.370
+encrypts the response with
+the clients session key
+
+00:09:37.370 --> 00:09:41.360
+and encrypted communication
+can begin. Configuring TLS in
+
+00:09:41.360 --> 00:09:47.015
+Quarkus is done in application.
+properties file completely.
+
+00:09:47.015 --> 00:09:52.130
+So there are 2 choices, you
+can either provide PEM
+
+00:09:52.130 --> 00:09:57.995
+encoded certificates or use a key store. We would
+use key store in this course.
+
+00:09:57.995 --> 00:10:00.860
+So the keytool is a tool that can be used to
+
+00:10:00.860 --> 00:10:05.460
+generate a new certificate or key pairs.
+
+00:10:05.680 --> 00:10:10.609
+What you would specifies the
+type of the key, its size,
+
+00:10:10.609 --> 00:10:15.740
+its validity, the distinguished
+name for the server.
+
+00:10:15.740 --> 00:10:19.520
+The important thing is
+that the CN part maps to
+
+00:10:19.520 --> 00:10:27.140
+the applications host name or to add
+an extension subject alternative name,
+
+00:10:27.140 --> 00:10:35.480
+specifying that the alternative name
+could also be my server or IP of x, y, z.
+
+00:10:35.480 --> 00:10:39.215
+And then simply store
+everything into a key store,
+
+00:10:39.215 --> 00:10:42.300
+which is protected by a password.
+
+00:10:43.450 --> 00:10:50.795
+You can then configure Quarkus to
+serve the certificate of that server
+
+00:10:50.795 --> 00:10:54.500
+by specifying quarkus.http.ssl.
+
+00:10:54.500 --> 00:10:59.450
+certificate.key-store-file option
+pointing to the keystore file.
+
+00:10:59.450 --> 00:11:02.900
+Of course, you need the keystore
+password to decrypt it.
+
+00:11:02.900 --> 00:11:05.570
+And you would provide that password
+
+00:11:05.570 --> 00:11:11.905
+in that parameter and simply specify
+the ssl-port if you want to,
+
+00:11:11.905 --> 00:11:13.790
+something other than 8443,
+
+00:11:13.790 --> 00:11:18.500
+which is the default, you can
+set it using quarkus.http.
+
+00:11:18.500 --> 00:11:21.770
+ssl-port. When loading Quarkus,
+
+00:11:21.770 --> 00:11:25.730
+it first tries to load
+whatever keystore file
+
+00:11:25.730 --> 00:11:30.020
+you have specified from the classpath.
+
+00:11:30.020 --> 00:11:32.540
+And even if it cannot find it,
+
+00:11:32.540 --> 00:11:35.150
+then it will try reading
+it from the file system.
+
+00:11:35.150 --> 00:11:38.795
+There are several different types
+of key stores that can be supplied.
+
+00:11:38.795 --> 00:11:42.260
+So the quarkus.http.
+
+00:11:42.260 --> 00:11:49.430
+ssl.certificate.key-store-file-type
+can be used to set the keystore type 2,
+
+00:11:49.430 --> 00:11:53.270
+one of the implementation
+supported by the JVM.
+
+00:11:53.270 --> 00:11:54.965
+If it's not specified,
+
+00:11:54.965 --> 00:11:59.660
+Quarkus expects the keystone
+to be in JKS format.
+
+00:11:59.660 --> 00:12:03.124
+For your native builds
+to be able to use TLS,
+
+00:12:03.124 --> 00:12:08.670
+you have to set the quarkus.ssl.native property to true.
+
+00:12:09.010 --> 00:12:14.840
+And actually it's also possible
+to go even a step further
+
+00:12:14.840 --> 00:12:20.570
+to disable the plain text port
+and to do HTTPS exclusively.
+
+00:12:20.570 --> 00:12:22.940
+You can do that by using
+
+00:12:22.940 --> 00:12:27.230
+the quarkus.http.insecure-requests property.
+
+00:12:27.230 --> 00:12:31.880
+If you disable it by
+setting it to disabled,
+
+00:12:31.880 --> 00:12:34.625
+then the port will not be opened at all.
+
+00:12:34.625 --> 00:12:37.520
+If you set the value to redirect,
+
+00:12:37.520 --> 00:12:42.365
+then plain text HTTP requests
+will be responded to.
+
+00:12:42.365 --> 00:12:44.540
+But with the redirect response,
+
+00:12:44.540 --> 00:12:48.350
+that's an HTTP 302 response code
+
+00:12:48.350 --> 00:12:52.640
+pointing to the secure port
+on the HTTPS protocol.
+
+00:12:52.640 --> 00:12:55.445
+This is probably the most
+user-friendly option.
+
+00:12:55.445 --> 00:13:00.770
+But if you have the need to serve both
+encrypted and unencrypted traffic,
+
+00:13:00.770 --> 00:13:06.350
+then you can simply set the quarkus.http.insecure-requests property to enabled.
+
+00:13:06.350 --> 00:13:09.410
+Now TLS, as we have looked at it so far,
+
+00:13:09.410 --> 00:13:12.335
+provides the server
+identity to the client.
+
+00:13:12.335 --> 00:13:15.170
+That is fine if the client is the browser,
+
+00:13:15.170 --> 00:13:18.935
+if the user just wants to know that
+they are really talking to someone
+
+00:13:18.935 --> 00:13:23.915
+trustworthy and not a fake
+implementation of the application.
+
+00:13:23.915 --> 00:13:28.640
+Particularly because after
+establishing secure communication,
+
+00:13:28.640 --> 00:13:30.680
+the client will probably
+have to authenticate
+
+00:13:30.680 --> 00:13:32.900
+and to be able to access the application
+
+00:13:32.900 --> 00:13:33.890
+anyway.
+
+00:13:33.890 --> 00:13:37.550
+It's a little bit different with
+microservices talking to each other.
+
+00:13:37.550 --> 00:13:39.830
+In microservices talking to each other,
+
+00:13:39.830 --> 00:13:45.320
+we will have a client that will request
+the server to introduce itself by
+
+00:13:45.320 --> 00:13:47.690
+presenting the server certificate and then
+
+00:13:47.690 --> 00:13:50.930
+verify that the server is trustworthy.
+
+00:13:50.930 --> 00:13:53.360
+But that's only one half of the story.
+
+00:13:53.360 --> 00:13:57.290
+The server needs to know that the
+client microservice is actually
+
+00:13:57.290 --> 00:14:01.910
+microservice that is authorized
+to perform these requests.
+
+00:14:01.910 --> 00:14:03.950
+So with mutual TLS,
+
+00:14:03.950 --> 00:14:05.735
+the server can also,
+
+00:14:05.735 --> 00:14:09.140
+in addition to providing the
+server certificate to the client,
+
+00:14:09.140 --> 00:14:13.130
+challenge the client to provide
+its own certificate as well.
+
+00:14:13.130 --> 00:14:17.420
+And the client then has to have a
+key store in addition to the trust store
+
+00:14:17.420 --> 00:14:22.535
+and send back to the server, their own client certificate,
+
+00:14:22.535 --> 00:14:25.130
+which the server can verify by having
+
+00:14:25.130 --> 00:14:27.710
+its own trust or so. It's basically mutual
+
+00:14:27.710 --> 00:14:31.610
+TLS is literally just TLS done both ways.
+
+00:14:31.610 --> 00:14:35.765
+First, the client asks for
+identification and gets it.
+
+00:14:35.765 --> 00:14:40.055
+Then as the server provides a response
+at the same time, it also says,
+
+00:14:40.055 --> 00:14:42.350
+what about you, where are your credentials and
+
+00:14:42.350 --> 00:14:45.170
+then the client has to do the same thing
+
+00:14:45.170 --> 00:14:50.240
+in regards to the server. How we configure
+this in Quarkus, is just a couple
+
+00:14:50.240 --> 00:14:55.955
+of extra steps. When we have
+already established one-way TLS,
+
+00:14:55.955 --> 00:14:59.585
+we need to, first of all,
+
+00:14:59.585 --> 00:15:03.575
+generates a keystore for the client as well,
+
+00:15:03.575 --> 00:15:06.590
+containing the clients
+private and public key.
+
+00:15:06.590 --> 00:15:13.070
+Then use keytool to export the public
+key from the client's keystore,
+
+00:15:13.070 --> 00:15:15.780
+export it to a file.
+
+00:15:15.910 --> 00:15:25.685
+And then use keytool to import the
+client's public key into a truststore;
+
+00:15:25.685 --> 00:15:28.430
+truststore are usually also encrypted.
+
+00:15:28.430 --> 00:15:32.330
+We take that truststore and
+place it onto the server.
+
+00:15:32.330 --> 00:15:35.075
+Then we configure the server,
+
+00:15:35.075 --> 00:15:40.234
+telling it where the trust-store-file
+is containing trusted certificates,
+
+00:15:40.234 --> 00:15:42.920
+what the password to access that file is,
+
+00:15:42.920 --> 00:15:45.065
+and this is the crucial bit.
+
+00:15:45.065 --> 00:15:50.480
+We set quarkus.http.ssl.client-auth to
+
+00:15:50.480 --> 00:15:56.525
+required. That switches from optional
+mutual TLS to required mutual TLS.
+
+00:15:56.525 --> 00:16:01.145
+Now that means after the client had
+been sent the server certificate,
+
+00:16:01.145 --> 00:16:04.745
+if they do not also provide
+their own certificate,
+
+00:16:04.745 --> 00:16:08.630
+and if that certificate is
+not found in the trust or
+
+00:16:08.630 --> 00:16:12.650
+they will be refused service. If the client is microservice,
+
+00:16:12.650 --> 00:16:14.780
+which obviously usually it is,
+
+00:16:14.780 --> 00:16:18.770
+we have to add some extra
+mp-rest properties for
+
+00:16:18.770 --> 00:16:23.960
+the rest easy clients to be able to
+perform that mutual TLS authentication.
+
+00:16:23.960 --> 00:16:28.250
+So for the interface class
+that the client is using,
+
+00:16:28.250 --> 00:16:32.375
+in addition to specifying the
+URL where it should connect.
+
+00:16:32.375 --> 00:16:37.220
+We add the truststore
+location to the properties.
+
+00:16:37.220 --> 00:16:40.010
+We add the trustStorePassword
+of course,
+
+00:16:40.010 --> 00:16:43.414
+that is for the verification
+of the server certificate.
+
+00:16:43.414 --> 00:16:47.569
+And then we also add the keyStore
+paths containing the client's
+
+00:16:47.569 --> 00:16:52.880
+private and public key and the key
+store location as well, of course.
+
+00:16:52.880 --> 00:16:55.355
+So Quarkus does enable you to
+
+00:16:55.355 --> 00:16:59.255
+implement secure communication
+on the network layer.
+
+00:16:59.255 --> 00:17:03.630
+But this is obviously
+
+00:17:03.880 --> 00:17:07.999
+something you have to do for
+each microservice individually.
+
+00:17:07.999 --> 00:17:11.810
+It does not scale well for applications or
+
+00:17:11.810 --> 00:17:16.670
+for corporate environments that
+have thousands of microservices.
+
+00:17:16.670 --> 00:17:19.340
+So there is another option,
+
+00:17:19.340 --> 00:17:21.890
+there is another approach
+to do it on a larger scale
+
+00:17:21.890 --> 00:17:25.520
+where the special control plane,
+
+00:17:25.520 --> 00:17:26.990
+which we can deploy in
+
+00:17:26.990 --> 00:17:30.635
+our platform as a service
+environment such as OpenShift.
+
+00:17:30.635 --> 00:17:33.260
+For OpenShift that
+
+00:17:33.260 --> 00:17:36.940
+control plane is called Red
+Hat OpenShift Service Mesh.
+
+00:17:36.940 --> 00:17:40.640
+That control plane can be configured with
+
+00:17:40.640 --> 00:17:44.540
+policies that automatically
+issue certificates to
+
+00:17:44.540 --> 00:17:49.310
+individual microservices in the
+form mutual TLS configuration as
+
+00:17:49.310 --> 00:17:54.140
+and as a layer above the
+application configuration.
+
+00:17:54.140 --> 00:17:59.120
+So its functionality
+that is implemented and
+
+00:17:59.120 --> 00:18:01.190
+provided to the applications by
+
+00:18:01.190 --> 00:18:04.160
+the control plane of the environment
+that they are deployed to,
+
+00:18:04.160 --> 00:18:08.735
+so the applications do not have to be
+specifically configured to do that.
+
+00:18:08.735 --> 00:18:12.560
+If you are interested in that kind of
+approach to implementing security and
+
+00:18:12.560 --> 00:18:15.020
+fault tolerance and many other things that
+
+00:18:15.020 --> 00:18:18.425
+we have actually discussed
+in this course so far,
+
+00:18:18.425 --> 00:18:22.010
+you can have a look at
+the DO328 course,
+
+00:18:22.010 --> 00:18:25.805
+which is also included in your
+Red Hat Learning subscription.
+
+00:18:25.805 --> 00:18:29.480
+It is about Red Hat OpenShift Service Mesh.
+
+00:18:29.480 --> 00:18:31.940
+Let's move on to the next video,
+
+00:18:31.940 --> 00:18:33.980
+which is the exercise where we
+
+00:18:33.980 --> 00:18:38.430
+configure secure communication
+between microservices.
 

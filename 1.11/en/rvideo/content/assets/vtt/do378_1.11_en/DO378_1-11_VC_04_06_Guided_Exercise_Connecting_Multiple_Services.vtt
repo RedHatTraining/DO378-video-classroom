@@ -1,5 +1,796 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:01.230
+In this guided exercise,
 
+00:00:01.230 --> 00:00:03.960
+we are going to decompose
+solver microservice,
+
+00:00:03.960 --> 00:00:08.309
+which has a single endpoint and then
+calculates equations internally.
+
+00:00:08.309 --> 00:00:10.320
+We are going to make it more modular.
+
+00:00:10.320 --> 00:00:16.290
+So we are going to externalize the
+adder and the multiplier operations
+
+00:00:16.290 --> 00:00:18.555
+into individual microservices and then
+
+00:00:18.555 --> 00:00:22.770
+use the solver as a REST client
+to invoke those.
+
+00:00:22.770 --> 00:00:26.945
+However, those two we'll call back
+into the solver applications,
+
+00:00:26.945 --> 00:00:29.090
+as we have seen in one of
+the previous examples,
+
+00:00:29.090 --> 00:00:33.010
+because the solve method
+is used recursively.
+
+00:00:33.010 --> 00:00:37.475
+We are going to start with lab
+apps-connect start script,
+
+00:00:37.475 --> 00:00:44.015
+which publishes the source code
+and creates an OpenShift project
+
+00:00:44.015 --> 00:00:46.400
+because at the end we are going to deploy
+
+00:00:46.400 --> 00:00:48.965
+the three applications in
+OpenShift as well.
+
+00:00:48.965 --> 00:00:52.235
+Now, looking at the DO378/labs/
+
+00:00:52.235 --> 00:00:56.750
+apps-connect/ directory, we see there's
+only the solver application in it.
+
+00:00:56.750 --> 00:01:00.860
+And if we have a look at the
+microservice implementation,
+
+00:01:00.860 --> 00:01:04.685
+the rest implementation
+in SolverResource,
+
+00:01:04.685 --> 00:01:13.445
+we can see that it has the two
+Pattern compilation representations.
+
+00:01:13.445 --> 00:01:23.315
+It exposes the equation parameter.
+
+00:01:23.315 --> 00:01:28.740
+It solves the equation recursively,
+
+00:01:28.750 --> 00:01:33.290
+as you can see here in the
+add and multiply methods.
+
+00:01:33.290 --> 00:01:37.835
+It calls the solve method
+again in order to drill down
+
+00:01:37.835 --> 00:01:43.055
+if there are nested equations and of
+course then returns the result.
+
+00:01:43.055 --> 00:01:46.160
+Right! So first things
+first, we are going to add
+
+00:01:46.160 --> 00:01:49.925
+the rest-client extension
+to the solver application.
+
+00:01:49.925 --> 00:01:59.165
+When it's added, we are going to simply
+edit the SolverService.java interface
+
+00:01:59.165 --> 00:02:05.105
+and we are going to add the @RegisterRestClient
+annotation to it.
+
+00:02:05.105 --> 00:02:07.310
+This is where the base
+path is actually set.
+
+00:02:07.310 --> 00:02:10.355
+If you're wondering why there
+is no path annotation at
+
+00:02:10.355 --> 00:02:13.610
+the top of the SolverResource class,
+
+00:02:13.610 --> 00:02:17.105
+note that it implements
+SolverService interface.
+
+00:02:17.105 --> 00:02:21.949
+That's where we added the
+RegisterRestClient annotation.
+
+00:02:21.949 --> 00:02:28.170
+And we are going to copy that one
+to the other two new applications.
+
+00:02:28.510 --> 00:02:32.090
+There's going to be a
+new interface that we
+
+00:02:32.090 --> 00:02:36.380
+create for the benefit of
+the solver application,
+
+00:02:36.380 --> 00:02:38.075
+which is the adder service, right?
+
+00:02:38.075 --> 00:02:43.430
+So the adder service will simply
+be listening at the adder endpoint
+
+00:02:43.430 --> 00:02:49.265
+and define a single endpoint
+underneath it called add,
+
+00:02:49.265 --> 00:02:51.020
+which accepts two parameters,
+
+00:02:51.020 --> 00:02:52.730
+the left-hand side and
+the right-hand side of
+
+00:02:52.730 --> 00:02:55.490
+the equation separated by slashes.
+
+00:02:55.490 --> 00:02:58.940
+And then we will see how
+
+00:02:58.940 --> 00:03:02.870
+the implementation goes in the
+next segment of the exercise.
+
+00:03:02.870 --> 00:03:06.620
+Similarly, we are going to create
+a multiplier service interface.
+
+00:03:06.620 --> 00:03:11.585
+In both cases, of course we'll
+register them as RestClient,
+
+00:03:11.585 --> 00:03:16.145
+so for both the adder and their multiplier services,
+
+00:03:16.145 --> 00:03:18.980
+multiplier services just has
+a different base path,
+
+00:03:18.980 --> 00:03:22.910
+but also uses two expressions separated by
+
+00:03:22.910 --> 00:03:24.940
+slashes to define the left-hand side and
+
+00:03:24.940 --> 00:03:28.145
+the right-hand side operand of the equation.
+
+00:03:28.145 --> 00:03:33.080
+Then we are going to create
+the two new project.
+
+00:03:33.080 --> 00:03:35.435
+So going back to labs/
+
+00:03:35.435 --> 00:03:43.640
+apps-connect/ directory using
+mavens quarkus plugins create goal.
+
+00:03:43.640 --> 00:03:46.175
+We are going to configure a new project
+
+00:03:46.175 --> 00:03:48.965
+called adder and a group
+of com.redhat.training.
+
+00:03:48.965 --> 00:03:53.300
+We are going to call the
+class AdderResource,
+
+00:03:53.300 --> 00:03:55.790
+configure it at path /adder
+
+00:03:55.790 --> 00:03:58.940
+and add the rest-client
+extension to it as well.
+
+00:03:58.940 --> 00:04:01.310
+So that generates the code
+
+00:04:01.310 --> 00:04:04.310
+and we will be doing the
+same for the multipliers.
+
+00:04:04.310 --> 00:04:07.250
+So the group ID is the same com.redhat.
+
+00:04:07.250 --> 00:04:10.955
+training except the artifact
+ID is called multiplier.
+
+00:04:10.955 --> 00:04:13.220
+The path is called /multiplier,
+
+00:04:13.220 --> 00:04:17.270
+and also it needs the rest-client extension as well.
+
+00:04:17.270 --> 00:04:21.575
+So then source code is generated here too.
+
+00:04:21.575 --> 00:04:23.900
+And now I have three projects,
+
+00:04:23.900 --> 00:04:25.775
+adder, multiplier and solver.
+
+00:04:25.775 --> 00:04:28.220
+Solver already contains
+the REST interfaces
+
+00:04:28.220 --> 00:04:30.680
+which we are now going to copy around.
+
+00:04:30.680 --> 00:04:35.510
+But what we do not need is
+the test directories in
+
+00:04:35.510 --> 00:04:37.670
+the adder and multipliers
+services because we
+
+00:04:37.670 --> 00:04:40.205
+discuss testing in another chapter.
+
+00:04:40.205 --> 00:04:50.520
+So we will simply going to remove them
+and then edit the adder resource.
+
+00:04:50.650 --> 00:04:55.010
+So the adder resource
+in the adder project,
+
+00:04:55.010 --> 00:04:59.465
+what we are going to do is replace
+the initial hello method.
+
+00:04:59.465 --> 00:05:03.470
+We are going to state that
+
+00:05:03.470 --> 00:05:07.220
+this AdderResource implements
+the AdderService interface,
+
+00:05:07.220 --> 00:05:09.455
+which we are going to copy there later on.
+
+00:05:09.455 --> 00:05:12.980
+We are going to inject the RestClient
+for the SolverService,
+
+00:05:12.980 --> 00:05:18.890
+so the adder project two will need the
+SolverService interface place there.
+
+00:05:18.890 --> 00:05:23.300
+We define the add method,
+
+00:05:23.300 --> 00:05:27.259
+annotating it with the
+correct path annotation.
+
+00:05:27.259 --> 00:05:30.185
+So we will simply basically
+just cut and paste
+
+00:05:30.185 --> 00:05:33.905
+this method from the solver into the adder
+
+00:05:33.905 --> 00:05:39.065
+and we are going to do the
+same with the multiplier.
+
+00:05:39.065 --> 00:05:44.950
+So the multiplier resource is going
+to have similar modifications,
+
+00:05:44.950 --> 00:05:47.180
+so we are going to note that
+
+00:05:47.180 --> 00:05:51.275
+the MultiplierResource implements
+the MultiplierService.
+
+00:05:51.275 --> 00:05:58.370
+It is going to inject the RestClient
+for the solverService.
+
+00:05:58.370 --> 00:06:01.790
+And again, simply cutting and pasting
+
+00:06:01.790 --> 00:06:05.780
+the multiplier method from the
+solver class and into this one,
+
+00:06:05.780 --> 00:06:09.185
+adding the @Path annotation
+as we go along, of course.
+
+00:06:09.185 --> 00:06:16.910
+So what we are going to do now
+is copy the interfaces from
+
+00:06:16.910 --> 00:06:26.000
+solver to both multipliers service package
+and to the adder service package.
+
+00:06:26.000 --> 00:06:30.784
+Just make sure that all three interfaces
+are present in all three projects.
+
+00:06:30.784 --> 00:06:36.500
+Next, we have a review of
+what the current state is,
+
+00:06:36.500 --> 00:06:38.585
+so we have the adder project,
+
+00:06:38.585 --> 00:06:40.625
+which has the AdderResource
+
+00:06:40.625 --> 00:06:43.940
+implementing the add method
+and all three interfaces,
+
+00:06:43.940 --> 00:06:46.850
+although it doesn't really
+need the multiplier one.
+
+00:06:46.850 --> 00:06:48.950
+We have the MultiplierService,
+
+00:06:48.950 --> 00:06:51.380
+again implementing the multiplier method,
+
+00:06:51.380 --> 00:06:53.870
+and it has all three interfaces as well.
+
+00:06:53.870 --> 00:06:57.094
+Although again, it does not
+need the adder interface
+
+00:06:57.094 --> 00:07:00.230
+and we have the solver project,
+
+00:07:00.230 --> 00:07:04.550
+which simply implements
+the solve method and
+
+00:07:04.550 --> 00:07:09.380
+actively uses the adder and the multiplier
+service interfaces as a client,
+
+00:07:09.380 --> 00:07:13.415
+and of course, it implements
+the SolverService itself.
+
+00:07:13.415 --> 00:07:15.380
+Let's have a look,
+
+00:07:15.380 --> 00:07:18.425
+we need to configure first of all,
+
+00:07:18.425 --> 00:07:21.980
+the applications themselves, we need
+to be able to test them locally,
+
+00:07:21.980 --> 00:07:24.770
+we need to have them use unique names.
+
+00:07:24.770 --> 00:07:30.575
+So what we will be adding to the
+application.properties of each is, in adder
+
+00:07:30.575 --> 00:07:34.040
+we will be configuring quarkus.
+application.name to the adder
+
+00:07:34.040 --> 00:07:39.710
+and we will set the http.port
+for dev profile to be 8081.
+
+00:07:39.710 --> 00:07:43.190
+In multiplier we will do the same,
+
+00:07:43.190 --> 00:07:45.950
+except we will be calling the
+application.multiplier and
+
+00:07:45.950 --> 00:07:48.965
+selecting port 8082 in dev mode
+
+00:07:48.965 --> 00:07:53.600
+and for the solver we'll be doing the
+same except the name of the application
+
+00:07:53.600 --> 00:07:57.485
+is solver and the port is
+8080 when running it in dev mode.
+
+00:07:57.485 --> 00:08:00.619
+Now, that's for the
+applications themselves,
+
+00:08:00.619 --> 00:08:03.740
+we have configured them to listen each on
+
+00:08:03.740 --> 00:08:06.680
+their own separate port when
+running in dev mode and they
+
+00:08:06.680 --> 00:08:10.880
+have unique names, representative names.
+
+00:08:10.880 --> 00:08:12.320
+Now what we also need to do,
+
+00:08:12.320 --> 00:08:13.790
+and that's why I'm going to open
+
+00:08:13.790 --> 00:08:18.035
+the application properties of
+all three projects once more.
+
+00:08:18.035 --> 00:08:21.290
+We need to configure the REST client,
+
+00:08:21.290 --> 00:08:22.850
+so we will just use
+
+00:08:22.850 --> 00:08:24.980
+the same REST client configuration across
+
+00:08:24.980 --> 00:08:27.650
+all three applications,
+although not everywhere,
+
+00:08:27.650 --> 00:08:29.810
+do we need that.
+
+00:08:29.810 --> 00:08:34.624
+So for prod, which is going to
+be a deployment to OpenShift,
+
+00:08:34.624 --> 00:08:40.070
+we are configuring the solver
+client to connect to http://
+
+00:08:40.070 --> 00:08:45.800
+solver:8080, that is the solver
+Kubernetes service in the same project.
+
+00:08:45.800 --> 00:08:50.630
+That's also why we named the
+application solver because this has
+
+00:08:50.630 --> 00:08:54.320
+implicit consequences on the naming
+
+00:08:54.320 --> 00:08:56.795
+of the OpenShift resources
+created among others,
+
+00:08:56.795 --> 00:08:58.850
+also the Kubernetes service, right!
+
+00:08:58.850 --> 00:09:01.805
+Similarly for the AdderService in prod,
+
+00:09:01.805 --> 00:09:06.935
+it's going to be called Adder port 8080
+and the MultiplierService is the same.
+
+00:09:06.935 --> 00:09:09.125
+For dev profile,
+
+00:09:09.125 --> 00:09:14.074
+we simply state that the SolverService is
+listening on localhost port 8080.
+
+00:09:14.074 --> 00:09:17.045
+The Adder is listening on port 8081
+
+00:09:17.045 --> 00:09:20.435
+and the Multiplier is
+listening on port 8082.
+
+00:09:20.435 --> 00:09:23.795
+This is all configuration
+for the REST client,
+
+00:09:23.795 --> 00:09:25.760
+whichever project uses it,
+
+00:09:25.760 --> 00:09:27.140
+whenever it uses it, right?
+
+00:09:27.140 --> 00:09:29.990
+If we have too many configuration items
+
+00:09:29.990 --> 00:09:33.110
+here and we are not using
+a particular REST Client,
+
+00:09:33.110 --> 00:09:34.925
+well, who cares, it doesn't hurt,
+
+00:09:34.925 --> 00:09:36.605
+it's easier to maintain though.
+
+00:09:36.605 --> 00:09:43.550
+We just copied these 6 lines to the
+other 2 application.properties files.
+
+00:09:43.550 --> 00:09:47.540
+So this was for adder and
+we add the same lines
+
+00:09:47.540 --> 00:09:51.330
+to multiplier and the solver.
+
+00:09:51.690 --> 00:09:54.490
+It's now time to test our application.
+
+00:09:54.490 --> 00:09:57.309
+So in the solver project,
+
+00:09:57.309 --> 00:09:59.620
+run, maven quarkus:dev,
+
+00:09:59.620 --> 00:10:02.755
+and when it starts up,
+
+00:10:02.755 --> 00:10:05.695
+we are going to exercise it a little bit,
+
+00:10:05.695 --> 00:10:11.515
+note that it listens on localhost port
+8080. While waiting  for it to startup,
+
+00:10:11.515 --> 00:10:15.880
+we can also start the the adder project.
+
+00:10:15.880 --> 00:10:18.490
+So going to the adder location
+
+00:10:18.490 --> 00:10:21.910
+mvn quarkus:dev will take
+care of starting up the adder
+
+00:10:21.910 --> 00:10:23.710
+and you can see that it
+
+00:10:23.710 --> 00:10:26.155
+listens on port 8081 as well.
+
+00:10:26.155 --> 00:10:28.540
+Then finally, of course,
+
+00:10:28.540 --> 00:10:31.735
+each of them in a separate
+terminal window or tab.
+
+00:10:31.735 --> 00:10:34.125
+The multiplier project,
+
+00:10:34.125 --> 00:10:41.059
+started upon quarkus dev mode states
+that it's listening on port 8082.
+
+00:10:41.059 --> 00:10:50.585
+Right! Now, let's test sending a curl
+GET request to port 8080 to the solver,
+
+00:10:50.585 --> 00:10:55.160
+simply stating the parameter is
+5 gives us the correct response.
+
+00:10:55.160 --> 00:10:59.735
+If we invoke adder and add 5 and 3 together,
+
+00:10:59.735 --> 00:11:01.835
+we get 8, which is correct.
+
+00:11:01.835 --> 00:11:05.990
+And if we call multiplier and
+multiply 5 and 4, we get 20.
+
+00:11:05.990 --> 00:11:11.300
+Now, both of these two operations 
+are here in this equation.
+
+00:11:11.300 --> 00:11:15.140
+So if we invoke solver 5 times 4 is 20,
+
+00:11:15.140 --> 00:11:17.825
+plus three is 23.
+
+00:11:17.825 --> 00:11:19.560
+Perfect.
+
+00:11:19.960 --> 00:11:25.640
+Now, let us deploy this on OpenShift.
+
+00:11:25.640 --> 00:11:30.660
+We're going to add the OpenShift
+extension to all three projects.
+
+00:11:31.270 --> 00:11:36.950
+There we go. So just
+simply stopping quarkus:
+
+00:11:36.950 --> 00:11:38.810
+and using mvn quarkus:add-
+
+00:11:38.810 --> 00:11:43.280
+extension with Dextension
+equals openshift parameter.
+
+00:11:43.280 --> 00:11:48.920
+What we are also going to do is
+just once, we only need to login
+
+00:11:48.920 --> 00:11:51.320
+once, load the OpenShift configuration
+
+00:11:51.320 --> 00:11:54.230
+and login to the OpenShift
+Container Platform,
+
+00:11:54.230 --> 00:11:57.470
+making sure that we are using the project,
+
+00:11:57.470 --> 00:12:00.830
+your username-apps-connect.
+
+00:12:00.830 --> 00:12:03.500
+And then we are just going
+to use mvn package with
+
+00:12:03.500 --> 00:12:08.240
+Dquarkus.kubernetes.deploy set
+to true, Dquarkus.s2i.
+
+00:12:08.240 --> 00:12:11.900
+base-jvm-image set to
+registry.access.redhat.
+
+00:12:11.900 --> 00:12:17.225
+com/ubi8/openjdk-11 and with solver
+
+00:12:17.225 --> 00:12:20.840
+setting also quarkus.openshift.expose 
+equals true to get
+
+00:12:20.840 --> 00:12:26.929
+an external access point where we
+can invoke the solver application.
+
+00:12:26.929 --> 00:12:28.565
+The build starts running,
+
+00:12:28.565 --> 00:12:31.550
+we don't have to wait 
+for it to finish.
+
+00:12:31.550 --> 00:12:36.470
+We just switch to the next
+application, which is the adder.
+
+00:12:36.470 --> 00:12:43.040
+I use the openshift.expose option
+with both adder and multiplier as well,
+
+00:12:43.040 --> 00:12:45.860
+just because it simplifies the
+tests. Of course, in production,
+
+00:12:45.860 --> 00:12:48.875
+we would want these two
+services not to be available,
+
+00:12:48.875 --> 00:12:51.335
+so we wouldn't actually expose them.
+
+00:12:51.335 --> 00:12:53.990
+Again as the adder build is running,
+
+00:12:53.990 --> 00:12:58.880
+we can proceed onto the multiplier
+build and do the same thing.
+
+00:12:58.880 --> 00:13:03.170
+It takes a couple of minutes
+for the builds to finish
+
+00:13:03.170 --> 00:13:06.935
+and as they all report success,
+
+00:13:06.935 --> 00:13:10.730
+we can move on to testing
+the applications.
+
+00:13:10.730 --> 00:13:13.580
+Getting the solver route points us to
+
+00:13:13.580 --> 00:13:16.415
+the host name of the solver application
+
+00:13:16.415 --> 00:13:21.020
+sending a request of 5 times 4 plus 3,
+
+00:13:21.020 --> 00:13:24.185
+yields the correct result.
+
+00:13:24.185 --> 00:13:28.069
+Just use the route to test
+the other 2 applications.
+
+00:13:28.069 --> 00:13:33.335
+You could have used the method described
+in the book, in the exercise by
+
+00:13:33.335 --> 00:13:36.620
+logging into the pods and
+running a curl command
+
+00:13:36.620 --> 00:13:40.565
+inside the pod connecting
+to localhost port 8080.
+
+00:13:40.565 --> 00:13:43.160
+I did it through an external route
+
+00:13:43.160 --> 00:13:51.530
+so adding 5 and 6 does yield 11 and
+multiplying 5 and 6 does result in 30.
+
+00:13:51.530 --> 00:13:52.700
+That's it.
+
+00:13:52.700 --> 00:13:54.440
+Let's run the labs apps-
+
+00:13:54.440 --> 00:13:57.560
+connect finish script and wait
+for it to clean everything up.
+
+00:13:57.560 --> 00:13:59.555
+Then join us in the next video,
+
+00:13:59.555 --> 00:14:03.390
+which is the end of chapter
+review lab. See you there.
 

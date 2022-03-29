@@ -1,5 +1,532 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:01.605
+In this end of Chapter lab,
 
+00:00:01.605 --> 00:00:05.520
+we're going to implement
+some tracing and then add
+
+00:00:05.520 --> 00:00:07.020
+some monitoring capabilities to
+
+00:00:07.020 --> 00:00:11.280
+our microservices from the
+quarkus conference application.
+
+00:00:11.280 --> 00:00:15.450
+So let's run lab monitor-review 
+start script which
+
+00:00:15.450 --> 00:00:20.865
+populates the exercise directory
+with some files going there.
+
+00:00:20.865 --> 00:00:23.940
+Listing the
+contents of the directory,
+
+00:00:23.940 --> 00:00:26.970
+we see that there are a couple
+of files in addition to
+
+00:00:26.970 --> 00:00:30.490
+our schedule, session and
+speaker microservices.
+
+00:00:30.490 --> 00:00:33.335
+Look at the containers script first.
+
+00:00:33.335 --> 00:00:35.510
+What we're going to do here,
+
+00:00:35.510 --> 00:00:39.545
+what we're going to see here is starting
+of the Postgres database container,
+
+00:00:39.545 --> 00:00:43.520
+Jaeger, front end web application,
+
+00:00:43.520 --> 00:00:47.690
+Prometheus, and finally Grafana as well.
+
+00:00:47.690 --> 00:00:51.920
+And then the script waits for us to
+press Enter to terminate those services.
+
+00:00:51.920 --> 00:00:55.610
+So we just basically start those to
+
+00:00:55.610 --> 00:00:58.520
+have all the supporting services come up.
+
+00:00:58.520 --> 00:01:01.355
+Then move over to the next terminal,
+
+00:01:01.355 --> 00:01:03.410
+going again to monitor-
+
+00:01:03.410 --> 00:01:08.705
+review directory and looking
+at the services.sh script.
+
+00:01:08.705 --> 00:01:11.765
+Now you see that the services.sh
+script actually just
+
+00:01:11.765 --> 00:01:14.810
+simply starts the microservice-session ,
+
+00:01:14.810 --> 00:01:17.870
+the microservice-speaker  and
+the microservice-schedule.
+
+00:01:17.870 --> 00:01:22.655
+And again waits for us to
+press Enter to terminate them.
+
+00:01:22.655 --> 00:01:28.445
+So let's just run those and wait for
+the services to come up.
+
+00:01:28.445 --> 00:01:32.780
+And then we're going 
+to the web browser.
+
+00:01:32.780 --> 00:01:36.920
+So in the web browser we
+can have a look around,
+
+00:01:36.920 --> 00:01:39.110
+look at the Schedules.
+
+00:01:39.110 --> 00:01:41.465
+Click on Schedule detail,
+
+00:01:41.465 --> 00:01:42.905
+have a look at that.
+
+00:01:42.905 --> 00:01:47.165
+Move over to the Sessions
+part of the application.
+
+00:01:47.165 --> 00:01:50.330
+Have a look at the sessions
+detail and note how long it
+
+00:01:50.330 --> 00:01:55.340
+takes for a session 
+detail page to load.
+
+00:01:55.340 --> 00:01:57.890
+Then move on to the speaker section and
+
+00:01:57.890 --> 00:02:00.125
+have look at the speaker
+detail. Pretty much everything,
+
+00:02:00.125 --> 00:02:04.025
+looks okay in this application
+except for sessions,
+
+00:02:04.025 --> 00:02:08.150
+which take an extremely long
+amount of time to load.
+
+00:02:08.150 --> 00:02:12.979
+So what we're going to do is,
+we're going to implement tracing.
+
+00:02:12.979 --> 00:02:17.240
+So stopping the services
+by pressing Enter,
+
+00:02:17.240 --> 00:02:20.645
+making sure there are no
+more Java processes running.
+
+00:02:20.645 --> 00:02:24.530
+We're going to go and add
+the extension of smallrye-
+
+00:02:24.530 --> 00:02:29.210
+opentracing to all three
+of the Reactor projects.
+
+00:02:29.210 --> 00:02:30.770
+There they are.
+
+00:02:30.770 --> 00:02:35.915
+And the extensions having been added
+successfully to all three of them.
+
+00:02:35.915 --> 00:02:39.170
+Now what we're going to
+also do is edit every
+
+00:02:39.170 --> 00:02:42.080
+one of these microservices
+application properties file.
+
+00:02:42.080 --> 00:02:45.200
+We're going to be adding the
+same block to those files,
+
+00:02:45.200 --> 00:02:49.040
+which is the jaeger.service-name,
+
+00:02:49.040 --> 00:02:51.440
+the jaeger.sampler-type, sampler-param,
+
+00:02:51.440 --> 00:02:53.090
+the log.console.format,
+
+00:02:53.090 --> 00:02:55.970
+the endpoint for the jaeger collector and
+
+00:02:55.970 --> 00:02:57.920
+the propagation of headers of
+
+00:02:57.920 --> 00:03:00.680
+b3 and the reporting of
+the spans in the console.
+
+00:03:00.680 --> 00:03:03.590
+So the same configuration for all three of
+
+00:03:03.590 --> 00:03:07.700
+those services will be added
+to application properties,
+
+00:03:07.700 --> 00:03:10.520
+except that the name
+of the service will be
+
+00:03:10.520 --> 00:03:13.265
+set differently to each
+of those, of course.
+
+00:03:13.265 --> 00:03:15.440
+So in the application properties for
+
+00:03:15.440 --> 00:03:19.430
+the microservice-schedule will
+use quarkus.jaeger.service-name
+
+00:03:19.430 --> 00:03:22.910
+property of schedule and session and
+
+00:03:22.910 --> 00:03:26.870
+speaker for the other
+two respectively. Right!
+
+00:03:26.870 --> 00:03:28.730
+Let's restart the services.
+
+00:03:28.730 --> 00:03:32.310
+And once they've started up,
+
+00:03:32.620 --> 00:03:36.800
+open the Sessions page
+one's more and display
+
+00:03:36.800 --> 00:03:44.075
+some details about the session. Going to
+the jaeager console then on page 16686,
+
+00:03:44.075 --> 00:03:47.120
+that's localhost port 16686.
+
+00:03:47.120 --> 00:03:50.195
+We're looking for the session -> service,
+
+00:03:50.195 --> 00:03:53.060
+Clicking find traces and
+having a look at the
+
+00:03:53.060 --> 00:03:56.480
+latest collected retrieve
+Session information.
+
+00:03:56.480 --> 00:03:58.790
+So looking at the details of this trace,
+
+00:03:58.790 --> 00:04:03.544
+we see that it takes, actually,
+six seconds to complete
+
+00:04:03.544 --> 00:04:10.040
+the retrieveSession
+method invocation of which the
+
+00:04:10.040 --> 00:04:12.830
+Get and List all actually
+
+00:04:12.830 --> 00:04:16.955
+take almost no time at all
+compared to the rest of it.
+
+00:04:16.955 --> 00:04:20.090
+So let's have a look at the
+retrieve session method.
+
+00:04:20.090 --> 00:04:24.695
+We can see that the
+retrieveSession method
+
+00:04:24.695 --> 00:04:28.070
+invokes another method
+called sessionStore.
+
+00:04:28.070 --> 00:04:32.059
+findByID and then returns that result.
+
+00:04:32.059 --> 00:04:35.600
+Now, the findByID method
+
+00:04:35.600 --> 00:04:40.085
+is not traced because this is
+an internal application call.
+
+00:04:40.085 --> 00:04:41.840
+It's an internal invocation.
+
+00:04:41.840 --> 00:04:45.500
+So what we're going to
+do is we're going to
+
+00:04:45.500 --> 00:04:50.210
+edit the SessionStore source code file.
+
+00:04:50.210 --> 00:04:53.630
+We're going to add the Traced import.
+
+00:04:53.630 --> 00:04:59.375
+And we're going to annotate the findByID 
+method with a Traced annotation.
+
+00:04:59.375 --> 00:05:02.540
+Having done that, we can then reload
+
+00:05:02.540 --> 00:05:07.130
+the page with the session details
+that we were looking at before.
+
+00:05:07.130 --> 00:05:09.530
+Return to jaeager, search for
+
+00:05:09.530 --> 00:05:12.995
+SessionService traces again
+and look at the latest one.
+
+00:05:12.995 --> 00:05:15.770
+And we are able to see
+now that the findById
+
+00:05:15.770 --> 00:05:19.220
+invocation is actually
+shown in the Trace as well.
+
+00:05:19.220 --> 00:05:22.400
+And we see that it's the findById trace,
+
+00:05:22.400 --> 00:05:25.475
+the span actually findById span
+
+00:05:25.475 --> 00:05:30.860
+that takes the six seconds that
+the total invocation time is.
+
+00:05:30.860 --> 00:05:34.550
+So there's clearly a
+problem in that method.
+
+00:05:34.550 --> 00:05:36.905
+Going back to the source code,
+
+00:05:36.905 --> 00:05:43.670
+we can see that there actually
+is a bogus SQL query here,
+
+00:05:43.670 --> 00:05:49.325
+that just simply selects static
+value From pg sleep(5) function.
+
+00:05:49.325 --> 00:05:52.940
+So, this literally sleeps for
+five seconds doing nothing.
+
+00:05:52.940 --> 00:05:55.130
+And then the result is just thrown away.
+
+00:05:55.130 --> 00:05:59.930
+We'll just remove that bit of
+code from the SessionStore.
+
+00:05:59.930 --> 00:06:01.430
+java.
+
+00:06:01.430 --> 00:06:07.640
+Go back and reload the
+Session detail page,
+
+00:06:07.640 --> 00:06:11.165
+noting that it takes a lot
+less now than it used to.
+
+00:06:11.165 --> 00:06:15.320
+Going back to Jaeger, searching 
+or updating the session traces
+
+00:06:15.320 --> 00:06:17.780
+and we see that now as opposed to before
+
+00:06:17.780 --> 00:06:20.735
+where traces took over six seconds,
+
+00:06:20.735 --> 00:06:24.305
+now the retrieveSession is
+only taking about 1 second.
+
+00:06:24.305 --> 00:06:26.300
+And looking at the details of this trace,
+
+00:06:26.300 --> 00:06:30.230
+we see that indeed the, while findById
+
+00:06:30.230 --> 00:06:32.180
+method is still taking
+
+00:06:32.180 --> 00:06:35.030
+quite a bit of time because
+it is hitting the database,
+
+00:06:35.030 --> 00:06:40.760
+it's no longer wasting five
+seconds on doing nothing. Right!
+
+00:06:40.760 --> 00:06:44.060
+So let's stop the Quarkus services for
+
+00:06:44.060 --> 00:06:48.545
+the moment and move on to the
+next assignment, which is,
+
+00:06:48.545 --> 00:06:54.560
+we've been asked to enable some metrics
+because our applications team wants to
+
+00:06:54.560 --> 00:07:01.160
+know when people click the 'I am interested'
+button in the session overview.
+
+00:07:01.160 --> 00:07:04.460
+So what we'll do is in
+the microservice-session
+
+00:07:04.460 --> 00:07:10.295
+application we will add the extension
+micrometer-registry-prometheus.
+
+00:07:10.295 --> 00:07:17.390
+And we're going to add a couple of lines
+of code to the SessionResource file,
+
+00:07:17.390 --> 00:07:22.310
+namely the Counted and
+the Timed annotations.
+
+00:07:22.310 --> 00:07:26.270
+Then we're going to add those annotations.
+
+00:07:26.270 --> 00:07:30.485
+The Counted annotation is going
+to be added to the subscribe method.
+
+00:07:30.485 --> 00:07:34.805
+And the Timed annotation
+is going to be added
+
+00:07:34.805 --> 00:07:41.220
+to the GET sessionDetails method.
+
+00:07:41.290 --> 00:07:43.970
+Right! Having done that,
+
+00:07:43.970 --> 00:07:48.185
+let's restart the services using
+the services.sh script.
+
+00:07:48.185 --> 00:07:52.520
+Wait for them to start and go back to
+
+00:07:52.520 --> 00:07:59.465
+the session overview, actually to go
+to the Grafana page on port 3000,
+
+00:07:59.465 --> 00:08:02.720
+logging in as user admin
+and password of admin.
+
+00:08:02.720 --> 00:08:05.030
+Opening the conference
+following clicking on
+
+00:08:05.030 --> 00:08:08.900
+the Conference App Metrics dashboard.
+
+00:08:08.900 --> 00:08:14.015
+And it's initially showing
+zeros and no Page Fetch Time.
+
+00:08:14.015 --> 00:08:15.635
+But when we click,
+
+00:08:15.635 --> 00:08:18.170
+'I am interested' a couple of
+times, we will see that
+
+00:08:18.170 --> 00:08:20.720
+the page fetches have actually gotten
+
+00:08:20.720 --> 00:08:25.940
+some data and that the Subscriber
+Count has successfully increase.
+
+00:08:25.940 --> 00:08:28.550
+So it's showing some results.
+
+00:08:28.550 --> 00:08:34.235
+Having done that, we can stop the service.
+
+00:08:34.235 --> 00:08:37.340
+Actually, we still have
+the grading to perform.
+
+00:08:37.340 --> 00:08:42.860
+So let's not forget that. We've successfully
+fulfilled all our assignments.
+
+00:08:42.860 --> 00:08:47.705
+Let's run the lab monitor-review grade
+script to see that it actually is so.
+
+00:08:47.705 --> 00:08:51.800
+And then once we get
+them all passing score,
+
+00:08:51.800 --> 00:08:54.905
+we can run the lab monitor-
+review finish script which will
+
+00:08:54.905 --> 00:08:58.460
+clean everything up and
+conclude this chapter as well.
+
+00:08:58.460 --> 00:09:00.020
+Join us in the next video
+
+00:09:00.020 --> 00:09:04.530
+which is the comprehensive
+review of this training course.
 

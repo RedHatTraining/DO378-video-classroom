@@ -1,5 +1,1450 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:03.405
+Let's have a look at some of the
+most common technical patterns
 
+00:00:03.405 --> 00:00:07.200
+that are used in the
+architecture of microservices.
+
+00:00:07.200 --> 00:00:11.355
+So first one is about communication.
+
+00:00:11.355 --> 00:00:15.015
+Even though they are typically
+deployed individually,
+
+00:00:15.015 --> 00:00:19.200
+most microservices will
+eventually have to interact with
+
+00:00:19.200 --> 00:00:23.625
+each other through some sort
+of a communications protocol.
+
+00:00:23.625 --> 00:00:26.580
+And of course there will
+be some external services,
+
+00:00:26.580 --> 00:00:29.850
+that would occasionally have
+to communicate as well.
+
+00:00:29.850 --> 00:00:32.715
+Depending on an
+application's requirements,
+
+00:00:32.715 --> 00:00:38.170
+the communication implemented can be
+either synchronous or asynchronous.
+
+00:00:38.170 --> 00:00:42.290
+Synchronous communication is
+very simple for us humans
+
+00:00:42.290 --> 00:00:47.375
+to imagine and understand and is
+based on a request response model.
+
+00:00:47.375 --> 00:00:50.570
+In this model, the client simply
+
+00:00:50.570 --> 00:00:53.990
+has to wait for a timely
+response from a service.
+
+00:00:53.990 --> 00:01:01.340
+Basic example is the communication
+using a REST service over HTTP.
+
+00:01:01.340 --> 00:01:05.480
+So in this case, if a passenger
+smartphone makes a request to
+
+00:01:05.480 --> 00:01:11.300
+the trip management microservice through
+some sort of a REST in vacation,
+
+00:01:11.300 --> 00:01:17.390
+that REST request ends up in
+the trip management application,
+
+00:01:17.390 --> 00:01:19.490
+which has to fulfill some information such
+
+00:01:19.490 --> 00:01:22.220
+as obtain some customer information from
+
+00:01:22.220 --> 00:01:26.630
+the passenger management
+application so that one in turn
+
+00:01:26.630 --> 00:01:31.880
+sends a cascaded REST request to the
+passenger management application,
+
+00:01:31.880 --> 00:01:33.380
+which has to respond.
+
+00:01:33.380 --> 00:01:36.080
+And that amount of time that
+
+00:01:36.080 --> 00:01:38.690
+the passenger management
+application needs to
+
+00:01:38.690 --> 00:01:41.870
+respond just simply adds
+to the overall time
+
+00:01:41.870 --> 00:01:46.130
+that the initial passenger has to wait
+
+00:01:46.130 --> 00:01:51.780
+for the response to its
+initial request arrives.
+
+00:01:51.910 --> 00:01:57.290
+So the advantages of this approach
+are that, it's easy to program,
+
+00:01:57.290 --> 00:01:58.655
+it's easy to test.
+
+00:01:58.655 --> 00:02:02.375
+It generally provides a
+better real-time response
+
+00:02:02.375 --> 00:02:04.265
+when everything is working okay.
+
+00:02:04.265 --> 00:02:08.780
+And it's also commonly quite
+firewall friendly because it uses
+
+00:02:08.780 --> 00:02:11.750
+standard ports and has no need to use
+
+00:02:11.750 --> 00:02:15.350
+an intermediate broker or some
+other integration software.
+
+00:02:15.350 --> 00:02:19.550
+If the services have known locations,
+
+00:02:19.550 --> 00:02:22.250
+then it's quite easy to
+implement the communication.
+
+00:02:22.250 --> 00:02:27.470
+Now, this already falls into the
+second disadvantage category.
+
+00:02:27.470 --> 00:02:30.740
+So the one thing that
+
+00:02:30.740 --> 00:02:33.050
+synchronous communication does is, it
+
+00:02:33.050 --> 00:02:35.660
+supports only request
+response style interaction.
+
+00:02:35.660 --> 00:02:37.445
+If you need to inform
+
+00:02:37.445 --> 00:02:41.810
+several downstream services of
+something that had just happened,
+
+00:02:41.810 --> 00:02:46.280
+if you need to fetch data from 3 or
+4 catalogs before you can fulfill
+
+00:02:46.280 --> 00:02:52.625
+a request, that will incrementally simply
+add to the overall response time.
+
+00:02:52.625 --> 00:02:56.720
+Additionally, you require
+both the client and
+
+00:02:56.720 --> 00:03:00.680
+the service to be available for the
+entire duration of the exchange.
+
+00:03:00.680 --> 00:03:04.910
+If the trip management
+microservice is trying to get
+
+00:03:04.910 --> 00:03:06.440
+the passenger information from
+
+00:03:06.440 --> 00:03:09.830
+the passenger management
+microservice and that one is down,
+
+00:03:09.830 --> 00:03:13.355
+then it won't be able
+to fulfill the request.
+
+00:03:13.355 --> 00:03:16.160
+Similarly, the passengers smartphone,
+
+00:03:16.160 --> 00:03:20.134
+when it sends a POST request to
+the trip management application,
+
+00:03:20.134 --> 00:03:23.840
+waits for the response and
+if the connection is broken,
+
+00:03:23.840 --> 00:03:28.730
+there is no easy way to retrieve, to resume from that point except
+
+00:03:28.730 --> 00:03:31.325
+for creating another request which might
+
+00:03:31.325 --> 00:03:34.130
+end up in duplicate
+requests being processed.
+
+00:03:34.130 --> 00:03:36.725
+So it's tricky at some points.
+
+00:03:36.725 --> 00:03:40.745
+There are some thin ice areas that
+we need to be careful about.
+
+00:03:40.745 --> 00:03:48.800
+Also, the client needs to be able
+to find their target service.
+
+00:03:48.800 --> 00:03:51.830
+So if we look at it from the viewpoint of
+
+00:03:51.830 --> 00:03:55.744
+the passengers smartphone in the
+trip management application,
+
+00:03:55.744 --> 00:03:59.030
+there needs to be some
+well-known address where
+
+00:03:59.030 --> 00:04:01.655
+the trip management
+microservice can be reached
+
+00:04:01.655 --> 00:04:05.120
+and is the same when we're cascading
+the request down the stream.
+
+00:04:05.120 --> 00:04:08.195
+So when a trip management
+
+00:04:08.195 --> 00:04:12.020
+microservice needs to talk to the
+passenger management microservice,
+
+00:04:12.020 --> 00:04:14.390
+it needs to know where
+to send that request,
+
+00:04:14.390 --> 00:04:15.815
+what the host name is,
+
+00:04:15.815 --> 00:04:18.710
+and what the port to use has to be.
+
+00:04:18.710 --> 00:04:22.370
+In asynchronous based communication,
+
+00:04:22.370 --> 00:04:26.780
+it is possible to use an intermediary,
+
+00:04:26.780 --> 00:04:31.535
+which is sort of like a
+message oriented middleware,
+
+00:04:31.535 --> 00:04:34.070
+let's call it. AMQP
+
+00:04:34.070 --> 00:04:39.215
+and MQTT protocols are
+typical for these use cases.
+
+00:04:39.215 --> 00:04:42.590
+And microservices can use message-
+
+00:04:42.590 --> 00:04:45.950
+based patterns such as point-to-point,
+publish-subscribe, request-
+
+00:04:45.950 --> 00:04:49.565
+reply, request-a-notification patterns.
+
+00:04:49.565 --> 00:04:54.005
+And the best advantage of asynchronous
+communication is that it's
+
+00:04:54.005 --> 00:04:57.740
+non-blocking and does not
+
+00:04:57.740 --> 00:05:02.360
+require the client and the service
+to be active at the same time.
+
+00:05:02.360 --> 00:05:05.900
+So the client can just simply
+continue making requests
+
+00:05:05.900 --> 00:05:09.560
+without the need to wait for a response
+
+00:05:09.560 --> 00:05:11.855
+because even when responses arrive,
+
+00:05:11.855 --> 00:05:16.100
+they are typically identified using
+some sort of a correlation ID.
+
+00:05:16.100 --> 00:05:18.830
+So if you have an example workflow,
+
+00:05:18.830 --> 00:05:20.450
+it's slightly different from the one
+
+00:05:20.450 --> 00:05:23.930
+that we've been looking in
+synchronous communication.
+
+00:05:23.930 --> 00:05:29.150
+If the trip management application has to,
+
+00:05:29.150 --> 00:05:34.190
+for example, register a new trip
+with the dispatch application,
+
+00:05:34.190 --> 00:05:40.160
+it simply sends an asynchronous
+message through a broker,
+
+00:05:40.160 --> 00:05:44.630
+which essentially stores that message
+and relieves it from waiting,
+
+00:05:44.630 --> 00:05:47.735
+from having to wait for an acknowledgment
+
+00:05:47.735 --> 00:05:49.805
+on the dispatch side.
+
+00:05:49.805 --> 00:05:52.970
+The message is safe in
+store in the broker
+
+00:05:52.970 --> 00:05:56.600
+and whenever the dispatcher
+application is free to process it,
+
+00:05:56.600 --> 00:05:59.825
+it will retrieve it
+from the dispatcher and
+
+00:05:59.825 --> 00:06:03.650
+from the broker and perform
+its dispatch processing.
+
+00:06:03.650 --> 00:06:07.145
+And let's say this involves the
+
+00:06:07.145 --> 00:06:12.335
+sending a notification to a driver or
+assigning a driver in the first place,
+
+00:06:12.335 --> 00:06:16.249
+sending a confirmation
+message to the passenger
+
+00:06:16.249 --> 00:06:19.940
+that requested a ride, and of course,
+
+00:06:19.940 --> 00:06:25.910
+confirming the ride had been arranged
+with trip management application,
+
+00:06:25.910 --> 00:06:27.560
+the dispatcher can actually use
+
+00:06:27.560 --> 00:06:31.880
+a publish-subscribe channel to
+
+00:06:31.880 --> 00:06:35.255
+send a single message to
+more than 1 recipient
+
+00:06:35.255 --> 00:06:39.170
+because these recipients
+could have actually expressed
+
+00:06:39.170 --> 00:06:41.270
+their desire to receive messages from
+
+00:06:41.270 --> 00:06:43.715
+that publish-subscribe
+channel ahead of time.
+
+00:06:43.715 --> 00:06:45.650
+Which means that the broker, again,
+
+00:06:45.650 --> 00:06:49.010
+which is in charge of receiving
+the message from the dispatcher,
+
+00:06:49.010 --> 00:06:55.745
+can store the message until each of
+these 3 components comes up online
+
+00:06:55.745 --> 00:06:57.890
+or if it's available immediately,
+
+00:06:57.890 --> 00:07:00.215
+then it's just simply
+delivered immediately.
+
+00:07:00.215 --> 00:07:03.545
+But the broker can store messages until
+
+00:07:03.545 --> 00:07:08.825
+component becomes active and deliver
+them whenever that's appropriate.
+
+00:07:08.825 --> 00:07:12.710
+The advantages of asynchronous
+communication are clearly
+
+00:07:12.710 --> 00:07:17.375
+that it's possible to decouple
+the client from the service.
+
+00:07:17.375 --> 00:07:20.900
+The client is unaware how
+many dispatcher instances,
+
+00:07:20.900 --> 00:07:22.955
+for example, there are.
+
+00:07:22.955 --> 00:07:28.265
+It doesn't really even need to know
+where the dispatcher is running.
+
+00:07:28.265 --> 00:07:32.405
+And of course, because broker
+is an intermediate component,
+
+00:07:32.405 --> 00:07:36.830
+message buffering is immediately
+available out of the box.
+
+00:07:36.830 --> 00:07:40.235
+So the broker queues messages,
+
+00:07:40.235 --> 00:07:45.995
+stores them safely whenever the
+consumer is slow or unavailable,
+
+00:07:45.995 --> 00:07:51.155
+and they will wait for the consumer
+to be able to process them.
+
+00:07:51.155 --> 00:07:54.035
+We also have the ability to implement
+
+00:07:54.035 --> 00:07:57.410
+complex and flexible client
+service interactions.
+
+00:07:57.410 --> 00:08:00.890
+So the communication between
+the clients and the service
+
+00:08:00.890 --> 00:08:07.460
+need not be uninterrupted.
+
+00:08:07.460 --> 00:08:10.910
+The client really doesn't
+have to be available
+
+00:08:10.910 --> 00:08:14.000
+to receive the messages from the service.
+
+00:08:14.000 --> 00:08:17.660
+It can simply pop up at a
+certain point in time and then
+
+00:08:17.660 --> 00:08:22.035
+retrieve and process a batch
+of messages if need be.
+
+00:08:22.035 --> 00:08:25.585
+Of course, the disadvantages
+are also rather clear.
+
+00:08:25.585 --> 00:08:28.660
+We do have an additional
+infrastructure component,
+
+00:08:28.660 --> 00:08:33.340
+which is the broker that does
+increase the operational complexity.
+
+00:08:33.340 --> 00:08:36.730
+We need to make sure the
+broker is highly available.
+
+00:08:36.730 --> 00:08:37.765
+We need to secure it.
+
+00:08:37.765 --> 00:08:40.210
+Somebody needs to deploy and configure it.
+
+00:08:40.210 --> 00:08:43.870
+And of course, request
+response based interactions
+
+00:08:43.870 --> 00:08:46.510
+are quite difficult to implement
+
+00:08:46.510 --> 00:08:49.390
+because we need to make sure there is
+
+00:08:49.390 --> 00:08:53.050
+a correlation identifier
+and the reply channel
+
+00:08:53.050 --> 00:08:59.485
+that is expected for each request for
+the response to be, to be received.
+
+00:08:59.485 --> 00:09:02.890
+Microservice based
+applications, in that they
+
+00:09:02.890 --> 00:09:06.770
+do have external dependencies.
+They can still fail.
+
+00:09:06.770 --> 00:09:10.730
+And failure can happen either in
+
+00:09:10.730 --> 00:09:13.430
+an individual service or
+even in a chain of services
+
+00:09:13.430 --> 00:09:17.255
+if it's not handled correctly
+at the point of origin.
+
+00:09:17.255 --> 00:09:22.670
+If one service in the
+dependency chain fails,
+
+00:09:22.670 --> 00:09:26.870
+then generally the upstream clients
+must either implement some sort of
+
+00:09:26.870 --> 00:09:32.580
+fault tolerance or will end up
+experiencing a cascaded fader.
+
+00:09:33.460 --> 00:09:37.910
+Several different approaches
+
+00:09:37.910 --> 00:09:40.880
+to working towards for tolerance
+
+00:09:40.880 --> 00:09:44.000
+but generally we focus on 5 topics.
+
+00:09:44.000 --> 00:09:45.445
+First of all,
+
+00:09:45.445 --> 00:09:50.240
+when is the request taking
+too long to be serviced?
+
+00:09:50.240 --> 00:09:56.195
+So it might be that the service we
+are talking about is quite resilient,
+
+00:09:56.195 --> 00:10:00.245
+can wait for minutes at a
+time to receive responses.
+
+00:10:00.245 --> 00:10:04.640
+But in synchronous communication that
+is often blocking other processes.
+
+00:10:04.640 --> 00:10:09.080
+So there has to be a limit
+on the amount of time that
+
+00:10:09.080 --> 00:10:14.090
+the client of the services prepared
+to wait for a response.
+
+00:10:14.090 --> 00:10:15.590
+However,
+
+00:10:15.590 --> 00:10:20.045
+most failures are not
+terminal and persistent.
+
+00:10:20.045 --> 00:10:21.470
+They're transient failures,
+
+00:10:21.470 --> 00:10:27.020
+so chances are that if we have
+failed in an initial request,
+
+00:10:27.020 --> 00:10:32.750
+we might actually have more
+success if we retry after a while.
+
+00:10:32.750 --> 00:10:36.920
+And retries are a fairly important thing
+
+00:10:36.920 --> 00:10:39.830
+to bear in mind when configuring
+resilience on the client side,
+
+00:10:39.830 --> 00:10:41.945
+of course, just like time-outs.
+
+00:10:41.945 --> 00:10:45.920
+Especially in the area of how
+
+00:10:45.920 --> 00:10:50.780
+often and how quickly to repeat an
+operation if it has previously failed.
+
+00:10:50.780 --> 00:10:55.625
+We need to be able to
+defer subsequent retries,
+
+00:10:55.625 --> 00:10:58.280
+but defer them only again up to
+
+00:10:58.280 --> 00:11:01.490
+a point where they become a
+disruption in themselves.
+
+00:11:01.490 --> 00:11:08.015
+So has to be some sort of
+an incremental delay increase.
+
+00:11:08.015 --> 00:11:12.575
+But there also has to be a maximum
+amount of time we're prepared to wait,
+
+00:11:12.575 --> 00:11:15.815
+maximum number of attempts
+we're prepared to make before
+
+00:11:15.815 --> 00:11:19.620
+actually gracefully responding with
+
+00:11:21.190 --> 00:11:26.385
+unavailability of service
+response or something like that.
+
+00:11:26.385 --> 00:11:29.630
+Fallback is another category
+
+00:11:30.150 --> 00:11:36.490
+which allows us to very gracefully
+handle downstream failures.
+
+00:11:36.490 --> 00:11:41.170
+If a failure happens in the
+dependency we're trying to use,
+
+00:11:41.170 --> 00:11:43.570
+that does not necessarily
+mean we have to fail.
+
+00:11:43.570 --> 00:11:46.360
+We may have some cached responses,
+
+00:11:46.360 --> 00:11:49.690
+cached data that might not
+be a 100 percent up to date,
+
+00:11:49.690 --> 00:11:51.310
+but good enough to work with.
+
+00:11:51.310 --> 00:11:53.830
+We may have alternative responses,
+
+00:11:53.830 --> 00:11:56.875
+such as a simple apology,
+
+00:11:56.875 --> 00:11:58.165
+let's say,
+
+00:11:58.165 --> 00:12:03.040
+recipe ratings are
+currently unavailable. Like for
+
+00:12:03.040 --> 00:12:08.325
+a cookbook which allows customers
+to rate the recipes or whichever.
+
+00:12:08.325 --> 00:12:11.570
+So, it's possible, using fallbacks
+
+00:12:11.570 --> 00:12:15.710
+to handle failures somewhere in the
+downstream infrastructure quite
+
+00:12:15.710 --> 00:12:19.400
+gracefully and prevent
+cascading failures by
+
+00:12:19.400 --> 00:12:24.695
+simply providing some sort
+of an alternative response.
+
+00:12:24.695 --> 00:12:29.450
+The 2 most powerful and to a degree
+
+00:12:29.450 --> 00:12:36.410
+also popular topics are the
+circuit breaker and the bulkhead.
+
+00:12:36.410 --> 00:12:39.605
+And the circuit breaker, which
+are about to have a look at
+
+00:12:39.605 --> 00:12:44.450
+next, is a pattern that allows us to
+
+00:12:44.450 --> 00:12:47.990
+avoid repeating the request
+
+00:12:47.990 --> 00:12:51.665
+to a service that we know
+to be unavailable anyway.
+
+00:12:51.665 --> 00:12:55.025
+There are several parameters which
+we are going to have a look at,
+
+00:12:55.025 --> 00:12:58.350
+as I said immediately afterwards.
+
+00:12:59.020 --> 00:13:05.390
+But essentially, while the circuit
+breaker is normally in a closed circuit state,
+
+00:13:05.390 --> 00:13:07.400
+if a downstream service fails,
+
+00:13:07.400 --> 00:13:10.205
+we can temporarily break the circuit,
+
+00:13:10.205 --> 00:13:14.840
+prevent from any requests for being
+sent to that downstream service.
+
+00:13:14.840 --> 00:13:18.950
+And then carefully try to
+close the circuit once
+
+00:13:18.950 --> 00:13:23.975
+more to see if the situation has
+improved. It has two important side effects,
+
+00:13:23.975 --> 00:13:26.960
+first of all, a request we are
+
+00:13:26.960 --> 00:13:30.605
+sending to the failing service which
+are going to be failed anyway,
+
+00:13:30.605 --> 00:13:33.260
+do not overload, do not present
+
+00:13:33.260 --> 00:13:36.815
+any additional load to the service
+which is in trouble to begin with.
+
+00:13:36.815 --> 00:13:42.335
+And second of all, by combining an
+open-circuit with a fallback response,
+
+00:13:42.335 --> 00:13:48.290
+we can promptly return response that
+make some sense to the client
+
+00:13:48.290 --> 00:13:53.660
+and we don't even have to request
+anything from the failing service.
+
+00:13:53.660 --> 00:13:57.860
+Bulkheads are generally used
+for downstream services,
+
+00:13:57.860 --> 00:14:03.559
+we know that have a limited
+capacity to process requests.
+
+00:14:03.559 --> 00:14:06.890
+Sometimes they're called
+connection pools as well.
+
+00:14:06.890 --> 00:14:12.470
+It is basically simply a maximum amount of
+
+00:14:12.470 --> 00:14:15.620
+pending requests going downstream to
+
+00:14:15.620 --> 00:14:21.155
+a particular service alongside
+request queue mostly
+
+00:14:21.155 --> 00:14:24.560
+and this allows us to just like is
+
+00:14:24.560 --> 00:14:29.285
+the concept of database
+connection pools allows us to,
+
+00:14:29.285 --> 00:14:34.250
+first of all, diminish the stress
+on the downstream service.
+
+00:14:34.250 --> 00:14:40.685
+And if ensuring that downstream service
+can process request quickly enough,
+
+00:14:40.685 --> 00:14:46.490
+actually improve the overall
+throughput and use less connections,
+
+00:14:46.490 --> 00:14:48.995
+concurrent connections at the same time.
+
+00:14:48.995 --> 00:14:52.910
+It's something that we're also
+going to look at right now.
+
+00:14:52.910 --> 00:14:54.920
+So first the circuit breaker.
+
+00:14:54.920 --> 00:14:58.939
+So the circuit breaker is actually
+
+00:14:58.939 --> 00:15:04.670
+a very powerful approach to an
+unstable downstream service.
+
+00:15:04.670 --> 00:15:07.880
+Because whenever everything is normal
+
+00:15:07.880 --> 00:15:10.955
+and the calls to downstream
+service are succeeding,
+
+00:15:10.955 --> 00:15:12.815
+and it is a client approach,
+
+00:15:12.815 --> 00:15:17.420
+of course, the circuit breaker is
+in what we call a closed state.
+
+00:15:17.420 --> 00:15:19.190
+In a closed state,
+
+00:15:19.190 --> 00:15:21.140
+request go out is normal.
+
+00:15:21.140 --> 00:15:22.640
+We wait for the response,
+
+00:15:22.640 --> 00:15:25.370
+return the response or
+process the results
+
+00:15:25.370 --> 00:15:26.990
+and that's that.
+
+00:15:26.990 --> 00:15:31.790
+Now, whenever a specific
+number of failures,
+
+00:15:31.790 --> 00:15:37.175
+either timeouts or errors returned by
+the downstream service is reached,
+
+00:15:37.175 --> 00:15:39.170
+and this is all configurable,
+
+00:15:39.170 --> 00:15:41.135
+the circuit breaker opens,
+
+00:15:41.135 --> 00:15:43.430
+which means any subsequent request to
+
+00:15:43.430 --> 00:15:45.920
+the downstream service
+will immediately fail.
+
+00:15:45.920 --> 00:15:48.050
+We won't have to wait for a response,
+
+00:15:48.050 --> 00:15:49.955
+won't have to wait for a timeout,
+
+00:15:49.955 --> 00:15:55.655
+we just don't use that service anymore
+for a configurable amount of time.
+
+00:15:55.655 --> 00:15:59.000
+Now, after that configurable
+amount of time,
+
+00:15:59.000 --> 00:16:02.420
+the circuit breaker moves
+to a half-open state,
+
+00:16:02.420 --> 00:16:06.230
+which means that we just simply execute
+
+00:16:06.230 --> 00:16:12.695
+downstream service calls every now and
+then to see if it's working or not.
+
+00:16:12.695 --> 00:16:15.695
+And if the service
+proves to be healthy again,
+
+00:16:15.695 --> 00:16:18.140
+we're getting close the circuit
+and start working with it
+
+00:16:18.140 --> 00:16:19.115
+normally.
+
+00:16:19.115 --> 00:16:25.310
+Bulkhead as opposed to circuit
+breaker does not react to failures,
+
+00:16:25.310 --> 00:16:29.390
+but instead tries to prevent
+the failures by limiting
+
+00:16:29.390 --> 00:16:33.950
+the amount of load we are
+imposing on a downstream service.
+
+00:16:33.950 --> 00:16:37.520
+So it means basically that we allow up
+
+00:16:37.520 --> 00:16:41.270
+to a specific amount of pending requests.
+
+00:16:41.270 --> 00:16:44.960
+So requests that our client has
+sent to a downstream service,
+
+00:16:44.960 --> 00:16:46.730
+typically on behalf of others,
+
+00:16:46.730 --> 00:16:49.190
+on behalf of application users
+
+00:16:49.190 --> 00:16:52.820
+and when that limit is reached,
+
+00:16:52.820 --> 00:16:55.955
+any additional requests
+are placed into a queue.
+
+00:16:55.955 --> 00:16:58.025
+If that queue fills up,
+
+00:16:58.025 --> 00:16:59.540
+then both of them are configurable,
+
+00:16:59.540 --> 00:17:03.965
+so both the concurrent pending
+requests and the size of the queue.
+
+00:17:03.965 --> 00:17:05.570
+If the queue fills up,
+
+00:17:05.570 --> 00:17:10.100
+then any additional requests are
+rejected, failed immediately.
+
+00:17:10.100 --> 00:17:14.180
+Then of course, as pending requests
+
+00:17:14.180 --> 00:17:17.780
+complete, request from
+the queue are added to
+
+00:17:17.780 --> 00:17:22.910
+the active communications
+queue or to the active group,
+
+00:17:22.910 --> 00:17:26.750
+and so on and so forth until
+hopefully we've cleared the queue and
+
+00:17:26.750 --> 00:17:31.370
+everybody has gotten a
+successful response.
+
+00:17:31.370 --> 00:17:37.415
+It is common need to combine the bulkhead
+pattern with timeouts, of course.
+
+00:17:37.415 --> 00:17:42.050
+And as in the case of both
+circuit breaker and bulkhead,
+
+00:17:42.050 --> 00:17:46.445
+it's common to combine them with failover
+responses or fallback responses.
+
+00:17:46.445 --> 00:17:50.900
+There are several different fault
+tolerance implementations available.
+
+00:17:50.900 --> 00:17:54.875
+Quarkus relies on the
+SmallRye implementation,
+
+00:17:54.875 --> 00:17:57.710
+which in turn is an implementation of
+
+00:17:57.710 --> 00:18:01.745
+the Eclipse Microprofile
+Fault Tolerance specification.
+
+00:18:01.745 --> 00:18:06.875
+Microprofile
+Fault Tolerance was originally based on Hystrix.
+
+00:18:06.875 --> 00:18:10.115
+But it's true power is that it allows you,
+
+00:18:10.115 --> 00:18:11.960
+if you're programming in Java,
+
+00:18:11.960 --> 00:18:14.510
+to use simple annotation
+
+00:18:14.510 --> 00:18:18.500
+driven fault tolerance features
+in Java microservices.
+
+00:18:18.500 --> 00:18:21.275
+So it's not a matter of coding things,
+
+00:18:21.275 --> 00:18:24.740
+Hystrix used to be quite
+difficult to use because it did
+
+00:18:24.740 --> 00:18:28.865
+require you to code a lot of
+the functionality manually.
+
+00:18:28.865 --> 00:18:32.090
+Microprofile Fault
+Tolerance specification
+
+00:18:32.090 --> 00:18:35.600
+actually moves that to
+annotation based approach,
+
+00:18:35.600 --> 00:18:39.890
+which is obviously much easier to
+add on even as an afterthought,
+
+00:18:39.890 --> 00:18:42.140
+but at least you're not making
+
+00:18:42.140 --> 00:18:48.695
+the non-functional specification
+part of your business logic.
+
+00:18:48.695 --> 00:18:51.995
+There are obviously other implementations,
+
+00:18:51.995 --> 00:18:54.035
+as we said, Hystrix,
+
+00:18:54.035 --> 00:18:57.320
+Red Hat OpenShift Service Mesh is one
+
+00:18:57.320 --> 00:19:01.205
+and of course it's upstream
+project Istio is as well,
+
+00:19:01.205 --> 00:19:03.560
+and they provide fault tolerance at
+
+00:19:03.560 --> 00:19:07.550
+a network communications level
+globally throughout let's say
+
+00:19:07.550 --> 00:19:10.670
+an OpenShift Container Platform cluster.
+
+00:19:10.670 --> 00:19:13.670
+There is a circuit breaker
+component, for example,
+
+00:19:13.670 --> 00:19:17.599
+for Vert.x, there's a
+Camel Fault Tolerance EIP,
+
+00:19:17.599 --> 00:19:21.245
+and there's an Apache Commons
+Circuit Breaker interface
+
+00:19:21.245 --> 00:19:25.249
+and various implementations. In monolithic applications,
+
+00:19:25.249 --> 00:19:28.430
+tracing a single user's
+interaction with the system
+
+00:19:28.430 --> 00:19:31.640
+can actually be debugged quite easily.
+
+00:19:31.640 --> 00:19:36.380
+You simply attach a debugger
+to the application.
+
+00:19:36.380 --> 00:19:38.440
+You see where the request comes in,
+
+00:19:38.440 --> 00:19:41.690
+and then you can simply trace
+the path of that request
+
+00:19:41.690 --> 00:19:46.250
+throughout the application by using
+a debugger step functionality.
+
+00:19:46.250 --> 00:19:49.730
+With microservices that's
+much more complex.
+
+00:19:49.730 --> 00:19:53.900
+You need to be able to tell with
+precision and certainty which of
+
+00:19:53.900 --> 00:19:58.415
+the microservices were involved in the
+processing of an end user's request.
+
+00:19:58.415 --> 00:20:01.745
+But that cannot be done by
+
+00:20:01.745 --> 00:20:05.285
+attaching a simple
+debugger to an instance of,
+
+00:20:05.285 --> 00:20:07.490
+let's say, Java virtual machine.
+
+00:20:07.490 --> 00:20:10.760
+We need to be able to trace the path of
+
+00:20:10.760 --> 00:20:15.575
+the request using some
+sort of a network tagging
+
+00:20:15.575 --> 00:20:19.130
+but it shouldn't be that
+low level network tagging
+
+00:20:19.130 --> 00:20:22.940
+functionality that we can
+do in network engineering.
+
+00:20:22.940 --> 00:20:28.400
+It should be some high level tags
+that they're easy to aggregate,
+
+00:20:28.400 --> 00:20:29.960
+they are easy to process.
+
+00:20:29.960 --> 00:20:32.240
+And distributed tracing is a tool that
+
+00:20:32.240 --> 00:20:34.640
+actually provides us with the ability to
+
+00:20:34.640 --> 00:20:39.725
+do this by using simple request headers
+
+00:20:39.725 --> 00:20:43.655
+and then number of collector tools
+
+00:20:43.655 --> 00:20:49.040
+that aggregate the data for storage,
+reporting and visualization.
+
+00:20:49.040 --> 00:20:56.585
+And Jaeger is one of such tools along
+with traffic that allows us for
+
+00:20:56.585 --> 00:20:58.940
+Visualization analysis.
+
+00:20:58.940 --> 00:21:02.975
+Now every request in tracing
+gets a unique request ID.
+
+00:21:02.975 --> 00:21:08.270
+And then as requests are passed down
+
+00:21:08.270 --> 00:21:14.465
+to downstream services, spans are created.
+
+00:21:14.465 --> 00:21:17.390
+So service A, invoking
+
+00:21:17.390 --> 00:21:21.320
+service B in turn invoking
+service C and then returning
+
+00:21:21.320 --> 00:21:24.290
+the information back to the origin
+
+00:21:24.290 --> 00:21:28.460
+would basically constitute 2
+spans within a single trace.
+
+00:21:28.460 --> 00:21:32.240
+1 span is A to B
+and B to A communication
+
+00:21:32.240 --> 00:21:35.150
+and that span will include the B to
+
+00:21:35.150 --> 00:21:39.680
+C and C to B communication
+because that happens in sequence.
+
+00:21:39.680 --> 00:21:47.150
+And the OpenTracing API is actually
+vendor-neutral standard for
+
+00:21:47.150 --> 00:21:50.870
+tracing and is implemented by
+
+00:21:50.870 --> 00:21:54.845
+several applications in various
+different languages such as Java,
+
+00:21:54.845 --> 00:21:57.260
+JavaScript, Go and so on.
+
+00:21:57.260 --> 00:22:02.525
+And the implementations can be
+as varying as Zipkin from Twitter,
+
+00:22:02.525 --> 00:22:05.735
+Jaeger from Uber, or even Hawkular
+
+00:22:05.735 --> 00:22:08.255
+APM from Red Hat.
+
+00:22:08.255 --> 00:22:11.510
+Of course, it's also very
+important to be able to
+
+00:22:11.510 --> 00:22:17.210
+tell the performance indicators for
+the application at any moment in time.
+
+00:22:17.210 --> 00:22:21.860
+And that's commonly achieved by
+adding metrics to a microservice.
+
+00:22:21.860 --> 00:22:24.605
+Again, metrics can range from
+
+00:22:24.605 --> 00:22:28.385
+simple number of requests
+having been processed so far,
+
+00:22:28.385 --> 00:22:32.810
+to various response times trackings,
+
+00:22:32.810 --> 00:22:36.680
+to the amount of memory
+used to response ratios.
+
+00:22:36.680 --> 00:22:39.740
+We can actually use those
+metrics with a great degree
+
+00:22:39.740 --> 00:22:43.040
+of success to implement
+performance optimizations,
+
+00:22:43.040 --> 00:22:45.965
+in day 2 operations.
+
+00:22:45.965 --> 00:22:51.605
+They also detect us to pre-empt failures,
+
+00:22:51.605 --> 00:22:55.430
+to detect indications
+
+00:22:55.430 --> 00:22:59.839
+of imminent failures through
+various performance indicators
+
+00:22:59.839 --> 00:23:04.100
+and of course, act ahead
+of time proactively.
+
+00:23:04.100 --> 00:23:07.460
+Several tools such as
+Prometheus and Grafana exists
+
+00:23:07.460 --> 00:23:11.510
+that gather metrics and provide
+visualization tools and
+
+00:23:11.510 --> 00:23:15.560
+microservice based applications
+also have the benefit of
+
+00:23:15.560 --> 00:23:19.970
+being able to use various
+implementations of metrics,
+
+00:23:19.970 --> 00:23:26.480
+exposing frameworks such as the Eclipse
+microprofile metrics specification.
+
+00:23:26.480 --> 00:23:32.300
+Ultimately, maintaining
+identity and access
+
+00:23:32.300 --> 00:23:34.520
+controlled throughout a series of
+
+00:23:34.520 --> 00:23:39.185
+independent services is
+sometimes a real challenge.
+
+00:23:39.185 --> 00:23:44.600
+Fortunately, we have a number of
+solutions such as single sign-on,
+
+00:23:44.600 --> 00:23:46.550
+which is a common approach for
+
+00:23:46.550 --> 00:23:51.200
+authentication authorization
+using permitting a client to
+
+00:23:51.200 --> 00:23:54.350
+use a single set of logging
+credentials to access
+
+00:23:54.350 --> 00:23:58.070
+multiple services which then
+simply verify an access token.
+
+00:23:58.070 --> 00:24:03.245
+One of them is also the
+distribution of sessions,
+
+00:24:03.245 --> 00:24:07.340
+so distributing identity
+between microservices and
+
+00:24:07.340 --> 00:24:12.740
+the entire system whereby microservices
+can contact single resilient
+
+00:24:12.740 --> 00:24:15.560
+highly available cache system,
+
+00:24:15.560 --> 00:24:18.230
+for example, a data grid
+where they can inquire
+
+00:24:18.230 --> 00:24:21.935
+about the state of a particular session.
+
+00:24:21.935 --> 00:24:28.385
+Client-side tokens are also an
+interesting great solution to this issue.
+
+00:24:28.385 --> 00:24:32.600
+Token being signed by an
+authentication service and then
+
+00:24:32.600 --> 00:24:36.605
+simply being passed along side
+which each and every request,
+
+00:24:36.605 --> 00:24:39.530
+such that the microservice
+that receives the request and
+
+00:24:39.530 --> 00:24:42.380
+receives the token can validate it without
+
+00:24:42.380 --> 00:24:46.190
+invoking the issuer, the
+authentication service.
+
+00:24:46.190 --> 00:24:50.510
+JSON Web Token is an example
+of such authentication.
+
+00:24:50.510 --> 00:24:56.600
+And then also client-side
+tokens with API gateways,
+
+00:24:56.600 --> 00:25:03.395
+whereby the client-side token is
+validated by the API gateway itself.
+
+00:25:03.395 --> 00:25:05.765
+These are all very common approaches
+
+00:25:05.765 --> 00:25:08.480
+and we will see a couple of these,
+
+00:25:08.480 --> 00:25:10.730
+a couple of all of these
+that we've discussed in
+
+00:25:10.730 --> 00:25:13.535
+this section in the
+remainder of this course.
+
+00:25:13.535 --> 00:25:18.200
+So head on to the quiz that's
+coming up and then join us in
+
+00:25:18.200 --> 00:25:23.670
+the first exercise of this course where
+we validate OpenShift credentials.
 

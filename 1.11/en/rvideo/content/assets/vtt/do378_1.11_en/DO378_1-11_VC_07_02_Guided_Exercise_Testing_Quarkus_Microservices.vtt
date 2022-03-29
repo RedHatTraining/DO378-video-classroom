@@ -1,5 +1,709 @@
 WEBVTT
 
 00:00:00.000 --> 00:00:01.320
+In this guided exercise,
 
+00:00:01.320 --> 00:00:02.925
+we are going to create 2,
+
+00:00:02.925 --> 00:00:08.160
+actually 3 tests, 2
+Java based and 1 native
+
+00:00:08.160 --> 00:00:12.195
+one. Starting with lab
+test-junit start script,
+
+00:00:12.195 --> 00:00:17.040
+we will be able to join the DO378/labs/test-
+
+00:00:17.040 --> 00:00:22.875
+junit/ directory where we have
+our sample expenses resource,
+
+00:00:22.875 --> 00:00:25.230
+of course expenses microservice.
+
+00:00:25.230 --> 00:00:28.365
+But we also have two test files.
+
+00:00:28.365 --> 00:00:30.420
+If we have a look at those test files,
+
+00:00:30.420 --> 00:00:34.845
+they do not really contain
+too much useful code.
+
+00:00:34.845 --> 00:00:39.750
+The ExpensesCreationTest does have
+
+00:00:39.750 --> 00:00:45.620
+some cleanDatabase method which is
+supposed to be involved before every test.
+
+00:00:45.620 --> 00:00:48.440
+But it's got an empty
+test method called
+
+00:00:48.440 --> 00:00:51.739
+testCreateExpense and it's
+not properly annotated.
+
+00:00:51.739 --> 00:00:55.830
+So probably the injection here will break.
+
+00:00:55.990 --> 00:01:00.440
+The other one, the EndPointTest
+is even empty.
+
+00:01:00.440 --> 00:01:06.005
+I just got expensesURI.getPort test.
+
+00:01:06.005 --> 00:01:13.100
+That expects the test instance of
+Quarkus to be listening on port 8888,
+
+00:01:13.100 --> 00:01:15.290
+but as well is not annotated
+
+00:01:15.290 --> 00:01:20.075
+and is missing a couple of resource
+injection annotations as well.
+
+00:01:20.075 --> 00:01:21.860
+So if we try to run the tests,
+
+00:01:21.860 --> 00:01:23.555
+they simply blow up.
+
+00:01:23.555 --> 00:01:27.590
+As you can see, there is a
+NullPointerException in
+
+00:01:27.590 --> 00:01:32.430
+the EndPointTest because the
+resource injection does not work.
+
+00:01:32.590 --> 00:01:40.340
+And the ExpensesCreationTest
+does nothing really.
+
+00:01:40.340 --> 00:01:44.855
+So let's fix this. First,
+
+00:01:44.855 --> 00:01:46.400
+let's annotate the classes.
+
+00:01:46.400 --> 00:01:51.530
+So ExpenseCreationTest needs a
+quarkus.test import in an annotation.
+
+00:01:51.530 --> 00:01:54.665
+The same for the EndPointTest.
+
+00:01:54.665 --> 00:01:59.030
+We add a QuarkusTest import
+and a @QuarkusTest annotation.
+
+00:01:59.030 --> 00:02:02.255
+Then we move on to the EndPointTest
+
+00:02:02.255 --> 00:02:03.635
+finishing.
+
+00:02:03.635 --> 00:02:07.460
+What we need is to annotate
+the expensesURI with
+
+00:02:07.460 --> 00:02:11.854
+the @TestHTTPResource and
+@TestHTTPEndpoint annotation,
+
+00:02:11.854 --> 00:02:16.850
+where the latter is pointing to the
+expenses resource ExpenseResource.class,
+
+00:02:16.850 --> 00:02:20.345
+which is what we are actually
+testing in the method.
+
+00:02:20.345 --> 00:02:24.020
+For this to work,
+
+00:02:24.020 --> 00:02:29.435
+we also need to change the test port
+in application.properties file.
+
+00:02:29.435 --> 00:02:32.330
+So we will just be adding 1 property at
+
+00:02:32.330 --> 00:02:35.360
+the end called quarkus.http.test-port and
+
+00:02:35.360 --> 00:02:36.965
+setting it to 8888.
+
+00:02:36.965 --> 00:02:41.300
+It should take care
+of the EndPointTest,
+
+00:02:41.300 --> 00:02:45.570
+now let's have a look at
+the ExpensesCreationTest.
+
+00:02:45.700 --> 00:02:49.640
+Right! So the first thing
+is we needed to annotate
+
+00:02:49.640 --> 00:02:54.470
+the cleanDatabase method with
+@BeforeEach annotation, ofcourse,
+
+00:02:54.470 --> 00:02:56.945
+we had to import that too.
+
+00:02:56.945 --> 00:02:59.780
+The create expense could be
+
+00:02:59.780 --> 00:03:03.080
+implemented now in all manner
+of different approaches,
+
+00:03:03.080 --> 00:03:06.680
+but I have decided to use RESTAssured.
+
+00:03:06.680 --> 00:03:12.110
+So I will be using some restassured
+static imports like given
+
+00:03:12.110 --> 00:03:17.135
+and when, some hamcrest static
+imports like containsString is.
+
+00:03:17.135 --> 00:03:20.720
+And I will need the Expense.PaymentMethod
+
+00:03:20.720 --> 00:03:24.065
+import and the ContentType
+from restassured,
+
+00:03:24.065 --> 00:03:30.965
+such as to construct request and
+of course, validate the response.
+
+00:03:30.965 --> 00:03:35.840
+So what I am doing here is, I will be
+setting up the given condition.
+
+00:03:35.840 --> 00:03:42.709
+We say, ok, we have a
+request body of type Expense,
+
+00:03:42.709 --> 00:03:45.920
+where we use the following browsers to
+
+00:03:45.920 --> 00:03:51.559
+construct it and the content we want
+it to be serialized into is JSON
+
+00:03:51.559 --> 00:03:56.195
+and we are going to post it to /expenses.
+
+00:03:56.195 --> 00:04:02.450
+Now, when we get the
+expenses, after doing that,
+
+00:04:02.450 --> 00:04:10.024
+we expect the status code to be 200
+and the body size should be 1
+
+00:04:10.024 --> 00:04:13.790
+and the body should contain a string,
+
+00:04:13.790 --> 00:04:18.860
+including name set to Test Expense
+paymentMethod to be set to whatever
+
+00:04:18.860 --> 00:04:24.560
+PaymentMethod CASH is and the amount
+being set to 1234.0.
+
+00:04:24.560 --> 00:04:29.390
+So this is the assertion that
+we test for after having
+
+00:04:29.390 --> 00:04:35.165
+posted a new Expense to
+the expenses endpoint.
+
+00:04:35.165 --> 00:04:40.040
+Now, I can't just run test
+yet because I will be
+
+00:04:40.040 --> 00:04:44.480
+getting a bunch of errors about missing
+restassured and missing hamcrest.
+
+00:04:44.480 --> 00:04:47.195
+So I need to actually add
+
+00:04:47.195 --> 00:04:53.120
+the rest-assured dependency
+with the test scope to pom.xml.
+
+00:04:53.120 --> 00:04:56.630
+After that, the test will run,
+
+00:04:56.630 --> 00:05:03.079
+but we get an error about not
+being able to connect to Postgres.
+
+00:05:03.079 --> 00:05:06.020
+That is because the expenses service
+
+00:05:06.020 --> 00:05:08.795
+expects the Postgres
+database to be running.
+
+00:05:08.795 --> 00:05:11.120
+So what we need to do is actually
+
+00:05:11.120 --> 00:05:16.055
+swap the Postgres database with
+an in-memory one during testing.
+
+00:05:16.055 --> 00:05:20.240
+For that purpose, we will be editing
+the ExpensesCreationTest again,
+
+00:05:20.240 --> 00:05:22.580
+adding the QuarkusTestResource and
+
+00:05:22.580 --> 00:05:25.775
+the H2DatabaseTestResource imports
+
+00:05:25.775 --> 00:05:29.645
+and annotate the entire class
+with the QuarkusTestResource
+
+00:05:29.645 --> 00:05:32.840
+(H2DatabaseTestResource.class).
+
+00:05:32.840 --> 00:05:34.730
+Now that's as far as test is concerned,
+
+00:05:34.730 --> 00:05:41.930
+now we have to also add H2
+database dependency to pom.xml.
+
+00:05:41.930 --> 00:05:45.440
+So we need quarkus-test-h2,
+
+00:05:45.440 --> 00:05:49.055
+that one contains the H2DatabaseTestResource.class.
+
+00:05:49.055 --> 00:05:52.385
+And of course it only
+needs a scope of test.
+
+00:05:52.385 --> 00:05:58.489
+Next, we need to configure the test
+profile in application.properties,
+
+00:05:58.489 --> 00:06:05.255
+we need to add the quarkus.datasource.db-kind set to h2; quarkus.datasource.
+
+00:06:05.255 --> 00:06:09.530
+jdbc.url set to localhost/mem:
+
+00:06:09.530 --> 00:06:12.605
+test and quarkus.hibernate-orm.dialect
+
+00:06:12.605 --> 00:06:15.165
+being set to H2Dialect
+
+00:06:15.165 --> 00:06:18.920
+such as hibernate can talk to our H2database,
+
+00:06:18.920 --> 00:06:24.470
+all of these in the
+test section in the test profile of
+
+00:06:24.470 --> 00:06:31.595
+our configuration. For the database
+driver to be available during testing,
+
+00:06:31.595 --> 00:06:36.200
+we also need to add 
+quarkus-jdbc-h2 dependency
+
+00:06:36.200 --> 00:06:38.390
+again, only with the test scope,
+
+00:06:38.390 --> 00:06:41.705
+we don't needed it in the other phase.
+
+00:06:41.705 --> 00:06:44.120
+Now, when running the test,
+
+00:06:44.120 --> 00:06:47.990
+we can see that the 3
+dependencies are loaded
+
+00:06:47.990 --> 00:06:52.820
+and here we have H2
+database reporting that
+
+00:06:52.820 --> 00:06:58.760
+the TCP server is running at port
+9092 only for local connections,
+
+00:06:58.760 --> 00:07:03.230
+which means that the Quarkus test
+resource annotation is doing
+
+00:07:03.230 --> 00:07:08.075
+its job and the tests
+execute successfully.
+
+00:07:08.075 --> 00:07:09.920
+And that is great.
+
+00:07:09.920 --> 00:07:13.069
+Now that the Java tests have succeeded,
+
+00:07:13.069 --> 00:07:15.605
+let's create a native test.
+
+00:07:15.605 --> 00:07:19.580
+And a native test isn't
+just as simple as creating
+
+00:07:19.580 --> 00:07:25.250
+another class named something
+test.java. Is if we do that,
+
+00:07:25.250 --> 00:07:31.640
+even if we run the test phase or the
+test goal in the native profile,
+
+00:07:31.640 --> 00:07:37.070
+we'll be mixing Java
+tests and native tests.
+
+00:07:37.070 --> 00:07:41.630
+So it's not actually a good idea to
+
+00:07:41.630 --> 00:07:46.730
+have both Java and native
+test called the same.
+
+00:07:46.730 --> 00:07:50.060
+That's why we usually
+put native tests into
+
+00:07:50.060 --> 00:07:54.905
+the integration test phase which
+is invoked using mvn verify.
+
+00:07:54.905 --> 00:08:00.350
+mvn verify in native
+mode of course would,
+
+00:08:00.350 --> 00:08:05.660
+then first build the native
+executable and then treat the native tests as
+
+00:08:05.660 --> 00:08:11.270
+integration tests, right? So we
+have to call them native test IT
+
+00:08:11.270 --> 00:08:14.615
+dot java or native check IT
+
+00:08:14.615 --> 00:08:18.260
+dot java, it has to end in IT dot java.
+
+00:08:18.260 --> 00:08:24.230
+And what's specific about native test
+is that you cannot use any injection,
+
+00:08:24.230 --> 00:08:27.245
+as we already said, you cannot use
+
+00:08:27.245 --> 00:08:34.040
+any particular Quarkus
+lifecycle control for
+
+00:08:34.040 --> 00:08:37.370
+external resources with any
+benefit because you are
+
+00:08:37.370 --> 00:08:41.255
+running the native test
+in the prod profile.
+
+00:08:41.255 --> 00:08:45.710
+Now while there is an option
+to use a Quarkus property to
+
+00:08:45.710 --> 00:08:51.125
+specify which profile you want
+to switch to in the native test,
+
+00:08:51.125 --> 00:08:55.190
+be aware that any additional codes such as
+
+00:08:55.190 --> 00:08:59.360
+jdbc drivers and external dependency,
+
+00:08:59.360 --> 00:09:02.300
+resource configuration,
+and additional
+
+00:09:02.300 --> 00:09:06.139
+classes have already been built
+into the native executable.
+
+00:09:06.139 --> 00:09:08.360
+So there is no easy way to switch
+
+00:09:08.360 --> 00:09:12.135
+between an actual database
+in an in-memory database.
+
+00:09:12.135 --> 00:09:14.645
+We have to be careful with
+these things a little bit.
+
+00:09:14.645 --> 00:09:17.525
+Now once these are cleared,
+
+00:09:17.525 --> 00:09:20.060
+what we can do is we can just simply
+
+00:09:20.060 --> 00:09:23.390
+take the existing ExpensesCreationTests,
+
+00:09:23.390 --> 00:09:25.460
+for example, as a template,
+
+00:09:25.460 --> 00:09:29.225
+copy it into NativeExpensesCreationIT.
+
+00:09:29.225 --> 00:09:33.360
+java, note how the file ends in IT.
+
+00:09:33.360 --> 00:09:35.935
+And then change a couple of things.
+
+00:09:35.935 --> 00:09:39.160
+The changes are basically
+that we are going to throw
+
+00:09:39.160 --> 00:09:42.280
+out the QuarkusTest annotation.
+
+00:09:42.280 --> 00:09:46.359
+We are going to throw out the QuarkusTestResource and
+
+00:09:46.359 --> 00:09:47.800
+H2DatabaseTestResource.
+
+00:09:47.800 --> 00:09:51.475
+As we said, we cannot switch
+jdbc drivers on the fly.
+
+00:09:51.475 --> 00:09:54.265
+Our production profile is
+configured to use Postgres,
+
+00:09:54.265 --> 00:09:56.980
+so we can't use H2.
+
+00:09:56.980 --> 00:10:02.110
+We are going to remove the @QuarkusTest
+and @QuarkusTestResource annotations
+
+00:10:02.110 --> 00:10:05.950
+and of course we are going to
+have to rename the tests into
+
+00:10:05.950 --> 00:10:10.960
+NativeExpensesCreationIT.
+Instead of QuarkusTest annotation,
+
+00:10:10.960 --> 00:10:14.320
+we will be using the NativeImageTest annotation
+
+00:10:14.320 --> 00:10:18.020
+And apart from removing
+
+00:10:18.020 --> 00:10:25.550
+the cleanDatabase method which relies
+on the injection of entityManager,
+
+00:10:25.550 --> 00:10:28.085
+which is something we cannot do.
+
+00:10:28.085 --> 00:10:31.430
+So what we will be doing is essentially just
+
+00:10:31.430 --> 00:10:37.355
+that, annotating the NativeExpensesCreationIT 
+as a NativeImageTest.
+
+00:10:37.355 --> 00:10:39.455
+Changing nothing else about it,
+
+00:10:39.455 --> 00:10:44.435
+the client code that actually
+invokes the endpoint is correct.
+
+00:10:44.435 --> 00:10:49.655
+We just really need to make sure that
+we remove the code that relies on
+
+00:10:49.655 --> 00:10:51.770
+injection and that we remove
+
+00:10:51.770 --> 00:10:56.240
+any external resource lifecycle
+management annotations.
+
+00:10:56.240 --> 00:10:57.950
+Once you've done that, as I said,
+
+00:10:57.950 --> 00:11:02.120
+we could just as well selected the -Dquarkus.
+
+00:11:02.120 --> 00:11:06.290
+test.native-image-profile
+and set it to test.
+
+00:11:06.290 --> 00:11:10.490
+But that would actually require us
+
+00:11:10.490 --> 00:11:14.750
+to build in the H2 drivers as well
+
+00:11:14.750 --> 00:11:18.980
+and just end up with the larger
+executable without any good reason.
+
+00:11:18.980 --> 00:11:22.715
+Now, looking at application.properties,
+
+00:11:22.715 --> 00:11:27.095
+the option we do have for a
+successful test is actually to start
+
+00:11:27.095 --> 00:11:30.110
+a postgres container that
+
+00:11:30.110 --> 00:11:33.590
+is configured to use expenses,
+user, expenses password
+
+00:11:33.590 --> 00:11:36.350
+and of course to create
+an expenses database,
+
+00:11:36.350 --> 00:11:38.210
+we will just run that in a container.
+
+00:11:38.210 --> 00:11:40.880
+And actually, this is
+something that I have done here.
+
+00:11:40.880 --> 00:11:43.490
+Here we go.
+
+00:11:43.490 --> 00:11:48.065
+So I have just mapped port 5432 on to host
+
+00:11:48.065 --> 00:11:54.454
+5432 and use the environment
+variables needed to run postgres,
+
+00:11:54.454 --> 00:11:57.125
+serving the expenses database,
+
+00:11:57.125 --> 00:12:00.470
+which is the equivalent of
+the production settings here.
+
+00:12:00.470 --> 00:12:02.030
+It's not the production database,
+
+00:12:02.030 --> 00:12:05.450
+but it's going to be used for test,
+
+00:12:05.450 --> 00:12:07.910
+like an integration test.
+
+00:12:07.910 --> 00:12:12.470
+Right! We run the mvn
+verify because the test is
+
+00:12:12.470 --> 00:12:17.075
+now called it.java
+in the native profile
+
+00:12:17.075 --> 00:12:20.480
+and what we will see is
+that the Java tests are
+
+00:12:20.480 --> 00:12:23.660
+executed all the same because
+I didn't explicitly skip them.
+
+00:12:23.660 --> 00:12:27.425
+The native image is then built,
+
+00:12:27.425 --> 00:12:29.615
+there we go.
+
+00:12:29.615 --> 00:12:35.270
+And after the NativeImageBuild
+completes in just over 2,
+
+00:12:35.270 --> 00:12:38.180
+in just under 2.5 minutes,
+
+00:12:38.180 --> 00:12:44.060
+we see that the integration tests starts
+running NativeExpensesCreationIT.
+
+00:12:44.060 --> 00:12:50.345
+We can see that the H2 database
+was still started for some reason,
+
+00:12:50.345 --> 00:12:55.830
+but it's not due to my code.
+
+00:12:56.620 --> 00:13:00.005
+However, this is the,
+
+00:13:00.005 --> 00:13:05.750
+command line use for
+our native image application
+
+00:13:05.750 --> 00:13:11.600
+and the integration test
+executes successfully,
+
+00:13:11.600 --> 00:13:15.065
+finishing in a BUILD SUCCESS.
+
+00:13:15.065 --> 00:13:19.490
+All that remains now is
+to run lab test-junit
+
+00:13:19.490 --> 00:13:21.845
+finish and join us in the next video,
+
+00:13:21.845 --> 00:13:25.740
+we are going to talk about
+testing using mock frameworks.
 

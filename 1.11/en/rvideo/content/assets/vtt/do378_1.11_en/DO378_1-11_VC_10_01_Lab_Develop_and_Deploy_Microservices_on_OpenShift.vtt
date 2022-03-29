@@ -1,5 +1,1335 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:01.320
+00:00:00.000 --> 00:00:03.000
+Welcome to the final
+course review exercise,
 
+00:00:03.000 --> 00:00:05.190
+also known as the comprehensive review,
+
+00:00:05.190 --> 00:00:08.400
+where we're going to configure, enrich,
+
+00:00:08.400 --> 00:00:12.030
+and then deploy a currency
+exchange application
+
+00:00:12.030 --> 00:00:14.235
+which consists of several microservices,
+
+00:00:14.235 --> 00:00:17.490
+one of which is actually completely
+missing in our exercise.
+
+00:00:17.490 --> 00:00:21.510
+Take care to read through the
+instructions, through the introduction,
+
+00:00:21.510 --> 00:00:24.090
+the objectives of the
+comprehensive review,
+
+00:00:24.090 --> 00:00:27.210
+making sure you do not miss any details.
+
+00:00:27.210 --> 00:00:31.320
+There are certain services you're
+expected to start before the exercise,
+
+00:00:31.320 --> 00:00:34.980
+or at least at certain key
+points during the exercise,
+
+00:00:34.980 --> 00:00:37.300
+otherwise your tests will fail.
+
+00:00:37.300 --> 00:00:41.840
+Now, also, feel free
+to just simply proceed
+
+00:00:41.840 --> 00:00:45.860
+one objective at a time and then
+return to the instruction,
+
+00:00:45.860 --> 00:00:48.635
+testing as often as possible.
+
+00:00:48.635 --> 00:00:53.120
+But when you're ready, just run the
+lab comprehensive-review start script,
+
+00:00:53.120 --> 00:00:57.170
+which populates everything and puts it in
+
+00:00:57.170 --> 00:01:02.104
+our D0378/labs/comprehensive
+-review directory.
+
+00:01:02.104 --> 00:01:05.075
+You'll be able to see a number of scripts,
+
+00:01:05.075 --> 00:01:08.960
+number of files that we'll
+use throughout the exercise,
+
+00:01:08.960 --> 00:01:11.270
+such as the certificate,
+
+00:01:11.270 --> 00:01:13.025
+the keystore, truststore,
+
+00:01:13.025 --> 00:01:20.255
+an import file for the SQL
+tables and database and others.
+
+00:01:20.255 --> 00:01:23.075
+Now what we're first going to have to
+
+00:01:23.075 --> 00:01:27.860
+do is to create the currency microservice,
+
+00:01:27.860 --> 00:01:30.815
+which will basically return
+
+00:01:30.815 --> 00:01:35.765
+all the currencies that our exchange
+office or exchange application supports.
+
+00:01:35.765 --> 00:01:41.525
+So we're going to use the mvn plugin
+for quarkus using the create goal,
+
+00:01:41.525 --> 00:01:47.210
+placing the resulting project in
+the GroupID of org.redhat.
+
+00:01:47.210 --> 00:01:50.195
+We're going to give it a name of currency.
+
+00:01:50.195 --> 00:01:53.210
+And the class that we're going to use for
+
+00:01:53.210 --> 00:01:56.630
+the REST endpoints is going to
+be called CurrencyResource,
+
+00:01:56.630 --> 00:01:59.240
+in a package of org.redhat.currency.
+
+00:01:59.240 --> 00:02:05.389
+We're also going to initially already
+add the orm-panache extension,
+
+00:02:05.389 --> 00:02:10.640
+the h2 database and the
+RESTEasy jsonb extension
+
+00:02:10.640 --> 00:02:16.820
+to be able to marshall and unmarshall
+objects to and from JSON.
+
+00:02:16.820 --> 00:02:19.415
+So once this plugin completes,
+
+00:02:19.415 --> 00:02:23.240
+we can enter the currency directory
+
+00:02:23.240 --> 00:02:27.410
+and initially configure our application
+according to the specifications,
+
+00:02:27.410 --> 00:02:34.955
+setting the HTTP port 5000 and
+testing port to 5001.
+
+00:02:34.955 --> 00:02:42.200
+Now, we also need to create
+a data model object.
+
+00:02:42.200 --> 00:02:44.614
+It's going to be called currency.
+
+00:02:44.614 --> 00:02:47.510
+And it's going to simply extend
+the PanacheEntityBase.
+
+00:02:47.510 --> 00:02:51.560
+That's by far the simplest way
+of implementing persistence.
+
+00:02:51.560 --> 00:02:54.710
+So we'll annotate it with
+entity and we'll select
+
+00:02:54.710 --> 00:02:58.685
+the name of the currency
+is actually its key.
+
+00:02:58.685 --> 00:03:01.610
+Then we're going to add a couple
+
+00:03:01.610 --> 00:03:04.430
+of additional properties
+to application.properties
+
+00:03:04.430 --> 00:03:09.830
+file, selecting the datasource.
+Type an URL,
+
+00:03:09.830 --> 00:03:12.260
+and telling that upon
+
+00:03:12.260 --> 00:03:15.740
+first start database should
+be created and the script that
+
+00:03:15.740 --> 00:03:18.349
+should initialize the 
+content of database is
+
+00:03:18.349 --> 00:03:21.560
+called currencies.sql. 
+We are going to later,
+
+00:03:21.560 --> 00:03:26.960
+also copy it into the project files
+before we start the application.
+
+00:03:26.960 --> 00:03:30.470
+Now the next thing is 
+we have to modify
+
+00:03:30.470 --> 00:03:34.550
+the example Hello World
+Restful Web Service.
+
+00:03:34.550 --> 00:03:37.850
+So what we're going to do is replace
+
+00:03:37.850 --> 00:03:44.990
+the initial hello method
+with three endpoints.
+
+00:03:44.990 --> 00:03:50.975
+The DELETE endpoint, which is
+going to delete the currency.
+
+00:03:50.975 --> 00:03:53.645
+Then a GET endpoint,
+
+00:03:53.645 --> 00:03:57.605
+both with an 'id' parameter.
+
+00:03:57.605 --> 00:04:00.170
+The GET endpoint which will return
+
+00:04:00.170 --> 00:04:04.895
+the currency information or throw
+an exception, if it's not found.
+
+00:04:04.895 --> 00:04:10.625
+And another method which just simply
+lists all the currency names.
+
+00:04:10.625 --> 00:04:14.690
+Looking at the resources directory,
+
+00:04:14.690 --> 00:04:19.190
+there's also an index.html
+file. Because if you note that
+
+00:04:19.190 --> 00:04:22.040
+the Path of this microservice
+is actually configured
+
+00:04:22.040 --> 00:04:25.130
+to listen at the top
+level, the root context.
+
+00:04:25.130 --> 00:04:28.550
+This is in conflict with
+the index.html file because
+
+00:04:28.550 --> 00:04:32.750
+it's being served by quarkus
+out of the box, if it's there.
+
+00:04:32.750 --> 00:04:36.920
+Overtaking the context and
+preventing us from being able to
+
+00:04:36.920 --> 00:04:41.600
+invoke the getCurrencyNames method.
+
+00:04:41.600 --> 00:04:45.545
+So we'll just remove the entire
+method in the directory.
+
+00:04:45.545 --> 00:04:50.300
+Now, next thing we're going to do is add
+
+00:04:50.300 --> 00:04:55.115
+the test extension called io.quarkus:
+
+00:04:55.115 --> 00:04:58.580
+quarkus-test-h2 to be able to implement
+
+00:04:58.580 --> 00:05:03.260
+a unit test to see that the currency
+service is working correctly.
+
+00:05:03.260 --> 00:05:06.080
+We're also going to mark it as
+
+00:05:06.080 --> 00:05:11.180
+test scope extension, we don't
+needed in the compiled application.
+
+00:05:11.180 --> 00:05:13.354
+And we're going to configure
+
+00:05:13.354 --> 00:05:19.280
+the test datasource to both
+drop-and-create tables upon
+
+00:05:19.280 --> 00:05:26.315
+startup and to use a in-memory
+database called currency,
+
+00:05:26.315 --> 00:05:34.625
+Right, so we're going to also modify the
+existing test file in src/test/java.
+
+00:05:34.625 --> 00:05:38.240
+The one that is there out
+of the box is fairly useless.
+
+00:05:38.240 --> 00:05:43.715
+So we're going to essentially remove
+the existing Test method code.
+
+00:05:43.715 --> 00:05:46.760
+And we're going to make sure that
+
+00:05:46.760 --> 00:05:49.745
+it is annotated with the
+QuarkusTestResource,
+
+00:05:49.745 --> 00:05:55.785
+which starts up an H2 database in
+memory when we start the tests.
+
+00:05:55.785 --> 00:06:00.235
+We're just going to make sure that
+the defaults are present in our test.
+
+00:06:00.235 --> 00:06:06.160
+So we're going to invoke
+basically the list method.
+
+00:06:06.160 --> 00:06:07.510
+We're actually not the best method.
+
+00:06:07.510 --> 00:06:09.970
+We're going to invoke the
+GET method for each of
+
+00:06:09.970 --> 00:06:13.750
+the default currencies that are
+built into our application,
+
+00:06:13.750 --> 00:06:17.665
+as you can see in the application code,
+
+00:06:17.665 --> 00:06:24.310
+a bit later on. Right! we are also going to
+copy the currencies.sql file into
+
+00:06:24.310 --> 00:06:26.605
+/src/main/resources so as to
+
+00:06:26.605 --> 00:06:30.385
+enable the initialization of
+the database upon startup.
+
+00:06:30.385 --> 00:06:33.460
+So that's basically these currencies being
+
+00:06:33.460 --> 00:06:36.985
+tested; they're being loaded upon startup,
+
+00:06:36.985 --> 00:06:39.100
+from this file.
+
+00:06:39.100 --> 00:06:42.130
+We can run the tests now.
+
+00:06:42.130 --> 00:06:46.360
+And upon startup of the tests,
+
+00:06:46.360 --> 00:06:49.420
+we can see H2 database was
+started in accordance with
+
+00:06:49.420 --> 00:06:54.385
+our annotation and the test has succeeded.
+
+00:06:54.385 --> 00:07:01.794
+Right! going further, we have to add
+some health checks to the application.
+
+00:07:01.794 --> 00:07:05.530
+So we're going to simply add an
+extension called smallrye-health,
+
+00:07:05.530 --> 00:07:11.620
+quarkus-smallrye-health, and
+start the service in dev mode.
+
+00:07:11.620 --> 00:07:15.160
+Moving over to the next
+terminal where we check that
+
+00:07:15.160 --> 00:07:19.494
+the health endpoint actually does
+report the database connection
+
+00:07:19.494 --> 00:07:22.310
+has been succeeded.
+
+00:07:23.160 --> 00:07:30.714
+What we'll also do now is use OpenID
+Connect to protect some of the endpoints.
+
+00:07:30.714 --> 00:07:35.065
+So we're going to add the
+quarkus-oidc extension.
+
+00:07:35.065 --> 00:07:38.875
+And then configure the
+application properties to
+
+00:07:38.875 --> 00:07:43.690
+use the OAuth server
+at localhost port 8081
+
+00:07:43.690 --> 00:07:48.040
+in the realms/quarkus having the client ID
+
+00:07:48.040 --> 00:07:52.960
+of backend-service and the
+secret key, simply secret.
+
+00:07:52.960 --> 00:07:55.150
+Now what do we do next?
+
+00:07:55.150 --> 00:08:02.230
+We will annotate the DELETE method
+with the RolesAllowed annotation,
+
+00:08:02.230 --> 00:08:05.840
+which will only allow the deleting of
+
+00:08:05.840 --> 00:08:11.435
+currencies to users that
+have a Role of 'confidential'.
+
+00:08:11.435 --> 00:08:17.720
+That is all basically. Just checking
+that everything works well.
+
+00:08:17.720 --> 00:08:20.630
+It didn't work for me because as I said,
+
+00:08:20.630 --> 00:08:26.060
+some services need to be started either
+at the beginning of the exercise.
+
+00:08:26.060 --> 00:08:30.215
+And among them is the
+KeyCloak server, which
+
+00:08:30.215 --> 00:08:34.355
+I have personally started
+in another terminal window,
+
+00:08:34.355 --> 00:08:39.650
+which I've personally started
+after the failed attempt to test.
+
+00:08:39.650 --> 00:08:42.440
+There it is. Here's the
+keycloak service starting
+
+00:08:42.440 --> 00:08:46.400
+up and we'll be running into
+
+00:08:46.400 --> 00:08:49.040
+we press Ctrl+C in the console.
+
+00:08:49.040 --> 00:08:52.580
+We can just leave it running for
+the remainder of the exercise.
+
+00:08:52.580 --> 00:08:57.425
+Then we can try testing our application,
+
+00:08:57.425 --> 00:09:01.775
+trying to obtain the sign
+for the currency of USD.
+
+00:09:01.775 --> 00:09:07.670
+Here we go. The application seems
+to be working on the GET endpoint.
+
+00:09:07.670 --> 00:09:10.400
+However, if we send a
+DELETE request in order
+
+00:09:10.400 --> 00:09:13.100
+to delete the US dollar currency,
+
+00:09:13.100 --> 00:09:16.025
+we get an Unauthorized response.
+
+00:09:16.025 --> 00:09:18.800
+So we need to initiate a token.
+
+00:09:18.800 --> 00:09:21.575
+This first attempt is
+going to be for alice.
+
+00:09:21.575 --> 00:09:24.830
+alice does not have
+the 'confidential' role.
+
+00:09:24.830 --> 00:09:29.255
+So if we try to repeat the same
+request with alice's token,
+
+00:09:29.255 --> 00:09:31.790
+we get Forbidden response.
+
+00:09:31.790 --> 00:09:34.220
+Then we're going to reinitialize
+
+00:09:34.220 --> 00:09:37.730
+the token variable with the
+token belonging to John Doe.
+
+00:09:37.730 --> 00:09:42.110
+John Doe does have the confidential role.
+
+00:09:42.110 --> 00:09:45.230
+So when we tried to
+repeat the same request,
+
+00:09:45.230 --> 00:09:48.770
+we do get a 204 response
+without any content,
+
+00:09:48.770 --> 00:09:52.580
+which means that the currency
+was successfully deleted. Right!
+
+00:09:52.580 --> 00:09:57.320
+So we've implemented role-based
+access control and authentication.
+
+00:09:57.320 --> 00:10:00.110
+But for that to make any sense,
+
+00:10:00.110 --> 00:10:04.190
+we also need to protect the
+communication channels.
+
+00:10:04.190 --> 00:10:07.400
+So we're going to implement SSL,
+
+00:10:07.400 --> 00:10:09.365
+TLS if you want.
+
+00:10:09.365 --> 00:10:12.230
+So we'll be adding a couple
+of additional properties to
+
+00:10:12.230 --> 00:10:14.900
+application.properties
+files such as selecting
+
+00:10:14.900 --> 00:10:22.745
+the ssl-port to be 5100 and the
+test-ssl-port to be 5101.
+
+00:10:22.745 --> 00:10:26.990
+We're going to disable any insecure
+requests that effectively
+
+00:10:26.990 --> 00:10:30.995
+closes port 5000, which
+we've been using so far,
+
+00:10:30.995 --> 00:10:34.415
+and we'll be telling the application
+to use the key-store-file
+
+00:10:34.415 --> 00:10:38.510
+in src/main/resources called currency.
+keystore with the password of redhat,
+
+00:10:38.510 --> 00:10:43.205
+so we also need to copy that file
+to the correct location, of course.
+
+00:10:43.205 --> 00:10:49.460
+What we'll also do is we'll turn
+off any client authentication.
+
+00:10:49.460 --> 00:10:52.384
+We do not need to do mutual TLS.
+
+00:10:52.384 --> 00:10:58.490
+But for testing, we're still
+going to allow insecure requests.
+
+00:10:58.490 --> 00:11:04.400
+So we'll just be adding these two properties
+to the end of src/main/resources
+
+00:11:04.400 --> 00:11:09.275
+application.properties
+file. Right! these changes,
+
+00:11:09.275 --> 00:11:12.889
+changing of the ports, turning on TLS,
+
+00:11:12.889 --> 00:11:18.080
+these do require the Quarkus
+service to be restarted.
+
+00:11:18.080 --> 00:11:22.940
+So what I had to do is I had to press
+
+00:11:22.940 --> 00:11:29.930
+Ctrl+C and restart Quarkus once more
+to be able to use it on port 5100;
+
+00:11:29.930 --> 00:11:32.040
+as you can see here.
+
+00:11:32.860 --> 00:11:36.720
+Coming back to the terminal.
+
+00:11:39.370 --> 00:11:42.905
+I can check that plain
+
+00:11:42.905 --> 00:11:46.760
+HTTP doesn't yield any responses.
+
+00:11:46.760 --> 00:11:50.975
+I can also check that
+port 5000 is now closed.
+
+00:11:50.975 --> 00:11:57.875
+But we do get response on port 5100,
+if we try to use the HTTPS protocol,
+
+00:11:57.875 --> 00:12:04.640
+seeing that the subject issuer
+belong to a self-signed certificate.
+
+00:12:04.640 --> 00:12:09.440
+Right! Let's make sure
+that the tests still work.
+
+00:12:09.440 --> 00:12:11.975
+So running a mvn tests goal,
+
+00:12:11.975 --> 00:12:15.320
+we can see the tests actually do work.
+
+00:12:15.320 --> 00:12:23.660
+So, the server is listening
+on ports 5001 and 5101.
+
+00:12:23.660 --> 00:12:25.025
+So that's fine.
+
+00:12:25.025 --> 00:12:28.850
+Now what we're also going
+to do is we're going to
+
+00:12:28.850 --> 00:12:33.050
+containerize this currency
+application of ours.
+
+00:12:33.050 --> 00:12:37.445
+So we're going to add the
+extension container-image-jib.
+
+00:12:37.445 --> 00:12:44.045
+Now, if we just simply try building
+the application immediately,
+
+00:12:44.045 --> 00:12:49.105
+it's going to fail without
+installing a specific package first.
+
+00:12:49.105 --> 00:12:53.914
+So it tries to package the
+application in a container.
+
+00:12:53.914 --> 00:12:58.355
+But then it needs to store
+the image somewhere.
+
+00:12:58.355 --> 00:13:03.710
+And it fails because it expects
+to be able to execute docker.
+
+00:13:03.710 --> 00:13:07.250
+As you can see in this area,
+here on the left-hand side,
+
+00:13:07.250 --> 00:13:11.495
+because we didn't tell jib
+to push the image anywhere,
+
+00:13:11.495 --> 00:13:13.670
+so it has to store it somewhere.
+
+00:13:13.670 --> 00:13:18.875
+So it tries to use Docker to store
+the image in the local image store.
+
+00:13:18.875 --> 00:13:24.140
+So what we need to do for this to work
+is install podman-docker package.
+
+00:13:24.140 --> 00:13:26.839
+The podman-docker package basically
+
+00:13:26.839 --> 00:13:31.010
+simulates, because podman-docker
+have exactly the same syntax;
+
+00:13:31.010 --> 00:13:35.195
+It just basically adds
+one command called Docker.
+
+00:13:35.195 --> 00:13:39.515
+And that will allow jib to,
+
+00:13:39.515 --> 00:13:43.370
+to finally build the image
+and store it locally.
+
+00:13:43.370 --> 00:13:46.085
+There you can see here
+the build was successful.
+
+00:13:46.085 --> 00:13:49.550
+If we asked podman about
+the images on the system,
+
+00:13:49.550 --> 00:13:55.010
+there is the currency image
+with the tag of 1.0.0.0-SNAPSHOT.
+
+00:13:55.010 --> 00:14:00.170
+So we can then run the resulting
+container based off of that image.
+
+00:14:00.170 --> 00:14:05.390
+It needs to be able to connect to
+the OpenID Connect server though.
+
+00:14:05.390 --> 00:14:10.790
+So we need to tell it where that
+server is listening. And its not
+
+00:14:10.790 --> 00:14:13.310
+localhost because the
+application is containerized and
+
+00:14:13.310 --> 00:14:16.640
+localhost is the local network
+interface inside the container.
+
+00:14:16.640 --> 00:14:19.085
+So we need to tell it where to connect.
+
+00:14:19.085 --> 00:14:21.469
+If your host name is resolving,
+
+00:14:21.469 --> 00:14:25.460
+if workstation does resolve to
+some sort of an IP, that's perfect.
+
+00:14:25.460 --> 00:14:30.755
+You can just use the workstation
+hostname in the OIDC_HOST parameter.
+
+00:14:30.755 --> 00:14:34.940
+Otherwise, simply look up
+the IP address on one of
+
+00:14:34.940 --> 00:14:40.955
+your network interfaces and use
+it in the OIDC_HOST variable.
+
+00:14:40.955 --> 00:14:44.285
+The OIDC_PORT should be set to 8081.
+
+00:14:44.285 --> 00:14:48.575
+And once we run the container, here we go,
+
+00:14:48.575 --> 00:14:55.040
+it is started up. Testing that
+the application still works.
+
+00:14:55.040 --> 00:14:58.070
+We get a response from port 5100.
+
+00:14:58.070 --> 00:15:02.450
+So that's great. Now, we
+can proceed to modifying
+
+00:15:02.450 --> 00:15:05.420
+the exchange service to
+actually start using
+
+00:15:05.420 --> 00:15:07.490
+the currency application
+rather than simply
+
+00:15:07.490 --> 00:15:10.180
+presenting us with the
+built-in currencies.
+
+00:15:10.180 --> 00:15:14.015
+So we're going to change the directory
+to the exchange application.
+
+00:15:14.015 --> 00:15:17.315
+We have to create the data model.
+
+00:15:17.315 --> 00:15:22.325
+The currency is simply a sign and a name.
+
+00:15:22.325 --> 00:15:24.245
+So that's easy enough.
+
+00:15:24.245 --> 00:15:28.020
+It's going to be used by our new code.
+
+00:15:28.510 --> 00:15:34.310
+We also create the currency service
+interface, the client interface.
+
+00:15:34.310 --> 00:15:38.390
+So the interface that the exchange
+application is going to
+
+00:15:38.390 --> 00:15:43.385
+use whenever invoking the 
+currency application,
+
+00:15:43.385 --> 00:15:46.955
+as we said, we have to
+RegisterRestClient.
+
+00:15:46.955 --> 00:15:53.360
+We just have to leave in the getCurrencyNames
+and get currency endpoints.
+
+00:15:53.360 --> 00:15:59.165
+We don't need the delete
+endpoint. That's it, really.
+
+00:15:59.165 --> 00:16:03.875
+We do have to configure the client
+in application.properties though.
+
+00:16:03.875 --> 00:16:09.620
+So what we'll do is we'll simply use
+the com.redhat.exchange.service.
+
+00:16:09.620 --> 00:16:12.170
+CurrencyServices/mp-rest
+
+00:16:12.170 --> 00:16:18.785
+setting and setting the URL to wherever
+the currency application is running;
+
+00:16:18.785 --> 00:16:24.605
+defaulting to HTTPS
+localhost on port 5100.
+
+00:16:24.605 --> 00:16:30.200
+We're also going to copy the
+truststore containing the certificate
+
+00:16:30.200 --> 00:16:32.810
+belonging to the currency service into
+
+00:16:32.810 --> 00:16:35.960
+src/main/resources of
+the exchange application.
+
+00:16:35.960 --> 00:16:39.260
+Remember, the exchange application
+is going to be contacting
+
+00:16:39.260 --> 00:16:42.679
+the currency service and it needs to
+be able to trust its certificate
+
+00:16:42.679 --> 00:16:46.265
+and that is why we've added this file.
+
+00:16:46.265 --> 00:16:49.595
+Then of course, that means we need to add
+
+00:16:49.595 --> 00:16:54.905
+the mp-rest/trustStore and 
+mp-rest/trustStorePassword properties.
+
+00:16:54.905 --> 00:16:59.780
+And finally, we will
+
+00:16:59.780 --> 00:17:05.480
+also implement a feature toggle.
+
+00:17:05.480 --> 00:17:10.099
+Right now our external currency
+service feature is under development.
+
+00:17:10.099 --> 00:17:12.755
+So we want it to be turned off
+
+00:17:12.755 --> 00:17:16.565
+by default until we're
+finished with implementing it.
+
+00:17:16.565 --> 00:17:19.070
+So we're going to add a feature.
+
+00:17:19.070 --> 00:17:21.860
+external_currencies property
+to application.properties,
+
+00:17:21.860 --> 00:17:23.390
+setting it to false.
+
+00:17:23.390 --> 00:17:28.490
+And we're going to modify
+the CurrencyResource.
+
+00:17:28.490 --> 00:17:35.345
+java file of the exchange application
+to add a ConfigProperty.
+
+00:17:35.345 --> 00:17:38.705
+And the REST client import.
+
+00:17:38.705 --> 00:17:41.750
+And we're also importing the CurrencyService
+
+00:17:41.750 --> 00:17:46.445
+because it's
+from the service package.
+
+00:17:46.445 --> 00:17:48.890
+Of course, that's where the interface is,
+
+00:17:48.890 --> 00:17:51.410
+so that's why we need to import it.
+
+00:17:51.410 --> 00:17:55.070
+Right! so we're using the
+ConfigProperty annotation
+
+00:17:55.070 --> 00:17:58.190
+to initialize the 
+externalCurrencies boolean.
+
+00:17:58.190 --> 00:18:01.970
+By default it's set to
+false and we'll be injecting
+
+00:18:01.970 --> 00:18:04.040
+the REST client implementation of
+
+00:18:04.040 --> 00:18:08.210
+this CurrencyService interface
+into the currencies field.
+
+00:18:08.210 --> 00:18:13.175
+Then we're going to modify the
+getCurrencyNames endpoint.
+
+00:18:13.175 --> 00:18:17.390
+We're going to remove the built-in code,
+
+00:18:17.390 --> 00:18:20.615
+which just returns three
+currencies and we're going to
+
+00:18:20.615 --> 00:18:25.999
+replace it with a feature
+toggle conditional.
+
+00:18:25.999 --> 00:18:28.415
+So, if externalCurrencies are enabled,
+
+00:18:28.415 --> 00:18:32.165
+we're going to invoke the
+currencies webclient,
+
+00:18:32.165 --> 00:18:36.860
+web service client to return the
+external services currencies.
+
+00:18:36.860 --> 00:18:40.700
+Otherwise, we're just going to invoke
+the getDefaultCurrencyNames method,
+
+00:18:40.700 --> 00:18:42.545
+which we've added right here.
+
+00:18:42.545 --> 00:18:45.800
+And this is where the
+old code was moved to.
+
+00:18:45.800 --> 00:18:48.770
+Similarly for the 
+getCurrencySign method,
+
+00:18:48.770 --> 00:18:53.270
+we're going to add the
+feature toggle using
+
+00:18:53.270 --> 00:18:57.860
+the REST client if the
+externalCurrencies toggle is on.
+
+00:18:57.860 --> 00:19:03.365
+Otherwise just getting the default
+currency sign for a particular name.
+
+00:19:03.365 --> 00:19:06.590
+And that's basically the code that
+
+00:19:06.590 --> 00:19:09.890
+we inserted into the
+getCurrencySign to replace
+
+00:19:09.890 --> 00:19:12.095
+the old code which is now in
+
+00:19:12.095 --> 00:19:16.490
+getDefaultCurrencySign method
+and just contains the
+
+00:19:16.490 --> 00:19:21.605
+three currencies that initially
+were known to the exchange application.
+
+00:19:21.605 --> 00:19:24.395
+So in another terminal window,
+
+00:19:24.395 --> 00:19:30.605
+going to the exchange directory and
+starting the Quarkus application,
+
+00:19:30.605 --> 00:19:34.940
+the currency exchange
+application in dev mode,
+
+00:19:34.940 --> 00:19:39.125
+we can come back to the
+initial terminal and test it.
+
+00:19:39.125 --> 00:19:44.270
+So for as long as the currencies
+feature toggle is off,
+
+00:19:44.270 --> 00:19:47.120
+we just simply add the
+built-in currencies.
+
+00:19:47.120 --> 00:19:50.630
+That's perfect. Now let's
+turn the feature toggle on,
+
+00:19:50.630 --> 00:19:56.705
+replacing the value in the feature.
+external_currencies from false to true.
+
+00:19:56.705 --> 00:20:01.055
+Trying to test the
+getCurrencies method again.
+
+00:20:01.055 --> 00:20:06.560
+Here we see that we do successfully
+connect to the currency exchange,
+
+00:20:06.560 --> 00:20:11.360
+to the currency list application
+and get the full external list.
+
+00:20:11.360 --> 00:20:13.745
+Now of course, we need to handle
+
+00:20:13.745 --> 00:20:17.420
+the eventuality that the external
+current application is down.
+
+00:20:17.420 --> 00:20:23.330
+So we're going to add the
+Quarkus smallrye-fault extension here.
+
+00:20:23.330 --> 00:20:29.180
+The fault tolerance extension allows
+us to modify the CurrencyResourec.java,
+
+00:20:29.180 --> 00:20:35.960
+selecting a fallback method
+to be getDefaultCurrencyNames.
+
+00:20:35.960 --> 00:20:39.500
+So if the client fails in
+
+00:20:39.500 --> 00:20:41.150
+the getCurrencyNames then
+
+00:20:41.150 --> 00:20:44.690
+the getDefaultCurrencyNames
+method will be invoked instead.
+
+00:20:44.690 --> 00:20:47.240
+We're also adding a
+timeout with just using
+
+00:20:47.240 --> 00:20:50.270
+the default settings for
+the timeout method to
+
+00:20:50.270 --> 00:20:56.749
+protect us from slow responses in
+the currency list application.
+
+00:20:56.749 --> 00:21:03.755
+So shutting down the container that
+is running the currency application.
+
+00:21:03.755 --> 00:21:06.950
+We can use the short name
+of the image, by the way.
+
+00:21:06.950 --> 00:21:10.460
+Shutting down the container
+and coming back to test,
+
+00:21:10.460 --> 00:21:13.055
+we see that the currencies endpoint
+
+00:21:13.055 --> 00:21:17.150
+successfully returns just
+built-in currencies.
+
+00:21:17.150 --> 00:21:20.734
+And then restarting the container,
+
+00:21:20.734 --> 00:21:25.805
+we can see that now the currencies
+are actually returned again.
+
+00:21:25.805 --> 00:21:30.575
+So the last thing we need to
+do is add some metrics to the,
+
+00:21:30.575 --> 00:21:33.200
+to the currency exchange application.
+
+00:21:33.200 --> 00:21:34.490
+For that purpose, we are going to add
+
+00:21:34.490 --> 00:21:38.914
+the micrometer-registry-
+prometheus extension.
+
+00:21:38.914 --> 00:21:42.815
+And we're going to implement a metric that
+
+00:21:42.815 --> 00:21:47.615
+counts how many times the currency
+sign has been retrieved by someone.
+
+00:21:47.615 --> 00:21:51.320
+So in the CurrencyResource.java file,
+
+00:21:51.320 --> 00:21:57.665
+we're going to add an injection
+point for the MeterRegistry.
+
+00:21:57.665 --> 00:22:03.230
+And then we're going
+to add the invocation.
+
+00:22:03.230 --> 00:22:05.210
+So in the getCurrencySign method,
+
+00:22:05.210 --> 00:22:08.420
+we're going to add the
+invocation to registry.counter,
+
+00:22:08.420 --> 00:22:10.850
+simply calling it,
+
+00:22:10.850 --> 00:22:12.995
+currencysign.count.
+
+00:22:12.995 --> 00:22:16.370
+And every time someone
+invokes this method,
+
+00:22:16.370 --> 00:22:19.160
+we're going to increment
+the counter. That's it.
+
+00:22:19.160 --> 00:22:22.670
+So of course, if if we try to obtain
+
+00:22:22.670 --> 00:22:27.590
+the metrics information immediately
+after adding the counter,
+
+00:22:27.590 --> 00:22:30.985
+we're not going to get anything
+because nobody has invoked
+
+00:22:30.985 --> 00:22:34.460
+the getCurrencySign method so far.
+
+00:22:34.460 --> 00:22:42.185
+So what we need to do actually is we
+need to go and open the web front-end.
+
+00:22:42.185 --> 00:22:44.570
+And again, this is a
+point where of course,
+
+00:22:44.570 --> 00:22:47.780
+if you hadn't started the services
+at the beginning of the exercise,
+
+00:22:47.780 --> 00:22:52.070
+you're going to need to start at
+least the front-end service and
+
+00:22:52.070 --> 00:22:55.550
+the history service in 
+order to be able to
+
+00:22:55.550 --> 00:22:59.210
+perform some sample
+calculations like this,
+
+00:22:59.210 --> 00:23:05.570
+simply submitting a couple of times
+a request to perform conversion.
+
+00:23:05.570 --> 00:23:09.830
+And once you've done a couple of requests,
+
+00:23:09.830 --> 00:23:14.300
+simply go back to the
+terminal and try to obtain
+
+00:23:14.300 --> 00:23:18.965
+the metrics where you're going to
+see that the currency sign count,
+
+00:23:18.965 --> 00:23:21.005
+total number of invocations was,
+
+00:23:21.005 --> 00:23:24.815
+however many times you've
+invoke the conversion. Right!
+
+00:23:24.815 --> 00:23:29.075
+that allows us to grade
+the comprehensive-review.
+
+00:23:29.075 --> 00:23:33.680
+I myself have never started the new
+service because we didn't even need it.
+
+00:23:33.680 --> 00:23:35.915
+So that's why I'm getting a fail here.
+
+00:23:35.915 --> 00:23:38.900
+And I'm getting a fail
+here, as well, because
+
+00:23:38.900 --> 00:23:43.340
+the exchange application
+has in the front-end,
+
+00:23:43.340 --> 00:23:47.450
+has a news facing endpoint.
+
+00:23:47.450 --> 00:23:49.310
+Other than that, if you've used
+
+00:23:49.310 --> 00:23:52.895
+the started-services group at
+the beginning of the exercise,
+
+00:23:52.895 --> 00:23:56.195
+then you should be
+getting all successful in
+
+00:23:56.195 --> 00:23:59.750
+passing scores and overall
+exercise grade of pass,
+
+00:23:59.750 --> 00:24:06.620
+which allows us to clean up using 'lab
+comprehensive-review finish' script,
+
+00:24:06.620 --> 00:24:10.340
+and shut down all the
+remaining running applications
+
+00:24:10.340 --> 00:24:13.190
+such as keycloak by pressing Ctrl+C,
+
+00:24:13.190 --> 00:24:16.880
+Any other containers that may
+still had been running and so on.
+
+00:24:16.880 --> 00:24:20.855
+And congratulations, this brings
+us to the end of the course.
+
+00:24:20.855 --> 00:24:22.580
+And I hope you've enjoyed it.
+
+00:24:22.580 --> 00:24:25.520
+I hope you've enjoyed
+learning about writing Quarkus
+
+00:24:25.520 --> 00:24:29.105
+based microservices and
+adding microservice features.
+
+00:24:29.105 --> 00:24:32.690
+I hope you will be joining us
+again soon in some other course.
+
+00:24:32.690 --> 00:24:36.270
+Until then, good luck and all the best.
 
