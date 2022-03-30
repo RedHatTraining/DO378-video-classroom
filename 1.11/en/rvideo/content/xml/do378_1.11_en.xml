@@ -223,7 +223,7 @@
 			</video>
 			<video name="Testing Microservices with Mock Frameworks" uuid="2f4db836-9626-43bb-ab34-276ec8482322" data-duration="707" >
 				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_07_03_Testing_Microservices_with_Mock_Frameworks"><![CDATA[]]></subtitle>
-				<videothumb name=""><![CDATA[]]></videothumb>
+				<videothumb name="DO378_1-11_VC_07_03_Testing_Microservices_with_Mock_Frameworks"><![CDATA[]]></videothumb>
 			</video>
 			<video name="Guided Exercise - Testing Microservices with Mock Frameworks" uuid="923e4331-3574-46cc-9ff7-27c6bae6296b" data-duration="292" >
 				<subtitle label="English" srclang="en" vttpath="DO378_1-11_VC_07_04_Guided_Exercise_Testing_Microservices_with_Mock_Frameworks"><![CDATA[]]></subtitle>
